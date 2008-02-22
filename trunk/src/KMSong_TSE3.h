@@ -11,7 +11,8 @@
 #ifdef __WIN32__
 #include "tse3/plt/Win32.h"
 #elif defined(unix)
-#include "tse3/plt/OSS.h"
+//#include "tse3/plt/OSS.h"
+#include "tse3/plt/Alsa.h"
 #endif
 #include "tse3/Playable.h"
 #include "tse3/Song.h"
@@ -78,7 +79,8 @@ private:
 #ifdef __WIN32__
     static TSE3::Plt::Win32MidiScheduler   scheduler_;
 #elif defined(unix)
-    static TSE3::Plt::OSSMidiScheduler      scheduler_;
+    //static TSE3::Plt::OSSMidiScheduler      scheduler_;
+    static TSE3::Plt::AlsaMidiScheduler        scheduler_;
 #endif
     TSE3::Transport                 transport_;
 

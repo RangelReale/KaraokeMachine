@@ -1,3 +1,4 @@
+#include <iostream>
 #include <sstream>
 #include <vector>
 #include "KMachine.h"
@@ -146,6 +147,7 @@ void KMachine::Loop()
 {
     if (playing_)
     {
+        //std::cout << "KMachine::Loop playing" << std::endl;
         if (!playing_->Poll())
         {
             DoStop();
