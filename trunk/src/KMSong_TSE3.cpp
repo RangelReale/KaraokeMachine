@@ -36,7 +36,11 @@ private:
 // CLASS
 //      KMSong_TSE3
 /////////////////////////////////
+#ifdef __WIN32__
 TSE3::Plt::Win32MidiScheduler KMSong_TSE3::scheduler_;
+#elif defined(unix)
+TSE3::Plt::OSSMidiScheduler KMSong_TSE3::scheduler_;
+#endif
 
 KMSong_TSE3::KMSong_TSE3(KMInputStream &stream) :
     KMSong(stream), metronome_(), /*scheduler_(), */transport_(&metronome_, &scheduler_),
@@ -50,7 +54,7 @@ KMSong_TSE3::KMSong_TSE3(const std::string &filename) :
     KMSong(filename), metronome_(), /*scheduler_(), */transport_(&metronome_, &scheduler_),
     lyrics_(), melodytrack_(-1), melodytrackvolume_(0)
 {
-    std::ifstream in(filename.c_str(), ifstream::in|ifstream::binary);
+    std::ifstream in(filename.c_str(), std::ifstream::in|std::ifstream::binary);
     if (!Load(in))
         throw KMException("Could not load song");
 }

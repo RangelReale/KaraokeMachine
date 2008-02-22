@@ -1,5 +1,5 @@
-diff -urpN orig/tse3-0.3.1/configure tse3-0.3.1/configure
---- orig/tse3-0.3.1/configure	Tue Aug 23 13:27:34 2005
+diff -urpN tse3-0.3.1-orig/configure tse3-0.3.1/configure
+--- tse3-0.3.1-orig/configure	Tue Aug 23 13:27:34 2005
 +++ tse3-0.3.1/configure	Sun Feb 17 18:27:28 2008
 @@ -22588,6 +22588,7 @@ fi
  if test "$MINGW32" = "yes"; then
@@ -9,12 +9,8 @@ diff -urpN orig/tse3-0.3.1/configure tse3-0.3.1/configure
  
  if test "$have_win32" = "yes"; then
    echo "$as_me:$LINENO: result: yes" >&5
-Binary files orig/tse3-0.3.1/doc/pete.jpeg and tse3-0.3.1/doc/pete.jpeg differ
-Binary files orig/tse3-0.3.1/doc/trax.gif and tse3-0.3.1/doc/trax.gif differ
-Binary files orig/tse3-0.3.1/doc/tse3.gif and tse3-0.3.1/doc/tse3.gif differ
-Binary files orig/tse3-0.3.1/doc/tse3logo.png and tse3-0.3.1/doc/tse3logo.png differ
-diff -urpN orig/tse3-0.3.1/src/examples/midifile/midifile.cpp tse3-0.3.1/src/examples/midifile/midifile.cpp
---- orig/tse3-0.3.1/src/examples/midifile/midifile.cpp	Mon Jul 25 11:22:30 2005
+diff -urpN tse3-0.3.1-orig/src/examples/midifile/midifile.cpp tse3-0.3.1/src/examples/midifile/midifile.cpp
+--- tse3-0.3.1-orig/src/examples/midifile/midifile.cpp	Mon Jul 25 11:22:30 2005
 +++ tse3-0.3.1/src/examples/midifile/midifile.cpp	Mon Feb 18 10:31:10 2008
 @@ -39,22 +39,79 @@
  #include "tse3/Metronome.h"
@@ -144,9 +140,8 @@ diff -urpN orig/tse3-0.3.1/src/examples/midifile/midifile.cpp tse3-0.3.1/src/exa
  
      /**************************************************************************
       * All done
-Binary files orig/tse3-0.3.1/src/examples/scale/export.midi and tse3-0.3.1/src/examples/scale/export.midi differ
-diff -urpN orig/tse3-0.3.1/src/tse3/Midi.h tse3-0.3.1/src/tse3/Midi.h
---- orig/tse3-0.3.1/src/tse3/Midi.h	Tue Aug 23 12:47:34 2005
+diff -urpN tse3-0.3.1-orig/src/tse3/Midi.h tse3-0.3.1/src/tse3/Midi.h
+--- tse3-0.3.1-orig/src/tse3/Midi.h	Tue Aug 23 12:47:34 2005
 +++ tse3-0.3.1/src/tse3/Midi.h	Mon Feb 18 10:17:54 2008
 @@ -17,6 +17,9 @@
  #ifndef TSE3_MIDI_H
@@ -234,8 +229,8 @@ diff -urpN orig/tse3-0.3.1/src/tse3/Midi.h tse3-0.3.1/src/tse3/Midi.h
  
          /**
           * These are some "reserved" port numbers. Valid port numbers
-diff -urpN orig/tse3-0.3.1/src/tse3/MidiFile.cpp tse3-0.3.1/src/tse3/MidiFile.cpp
---- orig/tse3-0.3.1/src/tse3/MidiFile.cpp	Mon Jul 25 11:23:00 2005
+diff -urpN tse3-0.3.1-orig/src/tse3/MidiFile.cpp tse3-0.3.1/src/tse3/MidiFile.cpp
+--- tse3-0.3.1-orig/src/tse3/MidiFile.cpp	Mon Jul 25 11:23:00 2005
 +++ tse3-0.3.1/src/tse3/MidiFile.cpp	Tue Feb 19 00:00:28 2008
 @@ -23,6 +23,7 @@
  #include "tse3/TempoTrack.h"
@@ -326,8 +321,8 @@ diff -urpN orig/tse3-0.3.1/src/tse3/MidiFile.cpp tse3-0.3.1/src/tse3/MidiFile.cp
              break;
          }
          case 0x03: // Sequence/Track name
-diff -urpN orig/tse3-0.3.1/src/tse3/MidiFile.h tse3-0.3.1/src/tse3/MidiFile.h
---- orig/tse3-0.3.1/src/tse3/MidiFile.h	Mon Jul 25 11:23:00 2005
+diff -urpN tse3-0.3.1-orig/src/tse3/MidiFile.h tse3-0.3.1/src/tse3/MidiFile.h
+--- tse3-0.3.1-orig/src/tse3/MidiFile.h	Mon Jul 25 11:23:00 2005
 +++ tse3-0.3.1/src/tse3/MidiFile.h	Mon Feb 18 23:59:00 2008
 @@ -81,6 +81,22 @@ namespace TSE3
              MidiFileImport(const std::string &filename,
@@ -365,8 +360,8 @@ diff -urpN orig/tse3-0.3.1/src/tse3/MidiFile.h tse3-0.3.1/src/tse3/MidiFile.h
  
              /**
               * Loads the MIDI file header.
-diff -urpN orig/tse3-0.3.1/src/tse3/Song.cpp tse3-0.3.1/src/tse3/Song.cpp
---- orig/tse3-0.3.1/src/tse3/Song.cpp	Mon Jul 25 11:23:00 2005
+diff -urpN tse3-0.3.1-orig/src/tse3/Song.cpp tse3-0.3.1/src/tse3/Song.cpp
+--- tse3-0.3.1-orig/src/tse3/Song.cpp	Mon Jul 25 11:23:00 2005
 +++ tse3-0.3.1/src/tse3/Song.cpp	Mon Feb 18 01:55:22 2008
 @@ -22,6 +22,7 @@
  #include "tse3/KeySigTrack.h"
@@ -485,8 +480,8 @@ diff -urpN orig/tse3-0.3.1/src/tse3/Song.cpp tse3-0.3.1/src/tse3/Song.cpp
      parser.add("Phrase",       &pimpl->phraseList);
      parser.add("Track",        &trackLoader);
      parser.parse(in, info);
-diff -urpN orig/tse3-0.3.1/src/tse3/Song.h tse3-0.3.1/src/tse3/Song.h
---- orig/tse3-0.3.1/src/tse3/Song.h	Mon Jul 25 11:23:00 2005
+diff -urpN tse3-0.3.1-orig/src/tse3/Song.h tse3-0.3.1/src/tse3/Song.h
+--- tse3-0.3.1-orig/src/tse3/Song.h	Mon Jul 25 11:23:00 2005
 +++ tse3-0.3.1/src/tse3/Song.h	Mon Feb 18 01:25:58 2008
 @@ -34,6 +34,7 @@ namespace TSE3
      class KeySigTrack;
@@ -511,8 +506,8 @@ diff -urpN orig/tse3-0.3.1/src/tse3/Song.h tse3-0.3.1/src/tse3/Song.h
  
              /**
               * Read the Song title.
-diff -urpN orig/tse3-0.3.1/src/tse3/TextTrack.cpp tse3-0.3.1/src/tse3/TextTrack.cpp
---- orig/tse3-0.3.1/src/tse3/TextTrack.cpp	Thu Jan  1 00:00:00 1970
+diff -urpN tse3-0.3.1-orig/src/tse3/TextTrack.cpp tse3-0.3.1/src/tse3/TextTrack.cpp
+--- tse3-0.3.1-orig/src/tse3/TextTrack.cpp	Thu Jan  1 00:00:00 1970
 +++ tse3-0.3.1/src/tse3/TextTrack.cpp	Mon Feb 18 02:45:12 2008
 @@ -0,0 +1,263 @@
 +/*
@@ -778,8 +773,8 @@ diff -urpN orig/tse3-0.3.1/src/tse3/TextTrack.cpp tse3-0.3.1/src/tse3/TextTrack.
 +    parser.parse(in, info);
 +}
 +#endif
-diff -urpN orig/tse3-0.3.1/src/tse3/TextTrack.h tse3-0.3.1/src/tse3/TextTrack.h
---- orig/tse3-0.3.1/src/tse3/TextTrack.h	Thu Jan  1 00:00:00 1970
+diff -urpN tse3-0.3.1-orig/src/tse3/TextTrack.h tse3-0.3.1/src/tse3/TextTrack.h
+--- tse3-0.3.1-orig/src/tse3/TextTrack.h	Thu Jan  1 00:00:00 1970
 +++ tse3-0.3.1/src/tse3/TextTrack.h	Mon Feb 18 01:21:46 2008
 @@ -0,0 +1,137 @@
 +/*
@@ -919,8 +914,8 @@ diff -urpN orig/tse3-0.3.1/src/tse3/TextTrack.h tse3-0.3.1/src/tse3/TextTrack.h
 +}
 +
 +#endif
-diff -urpN orig/tse3-0.3.1/src/tse3/Transport.cpp tse3-0.3.1/src/tse3/Transport.cpp
---- orig/tse3-0.3.1/src/tse3/Transport.cpp	Mon Jul 25 11:23:00 2005
+diff -urpN tse3-0.3.1-orig/src/tse3/Transport.cpp tse3-0.3.1/src/tse3/Transport.cpp
+--- tse3-0.3.1-orig/src/tse3/Transport.cpp	Mon Jul 25 11:23:00 2005
 +++ tse3-0.3.1/src/tse3/Transport.cpp	Mon Feb 18 01:46:16 2008
 @@ -572,6 +572,11 @@ void Transport::pollPlayback()
                              metronome->setBeatsPerBar(e.data.data2 >> 4);
@@ -934,8 +929,8 @@ diff -urpN orig/tse3-0.3.1/src/tse3/Transport.cpp tse3-0.3.1/src/tse3/Transport.
                      }
                  }
  
-diff -urpN orig/tse3-0.3.1/src/tse3/listen/TextTrack.h tse3-0.3.1/src/tse3/listen/TextTrack.h
---- orig/tse3-0.3.1/src/tse3/listen/TextTrack.h	Thu Jan  1 00:00:00 1970
+diff -urpN tse3-0.3.1-orig/src/tse3/listen/TextTrack.h tse3-0.3.1/src/tse3/listen/TextTrack.h
+--- tse3-0.3.1-orig/src/tse3/listen/TextTrack.h	Thu Jan  1 00:00:00 1970
 +++ tse3-0.3.1/src/tse3/listen/TextTrack.h	Mon Feb 18 00:47:56 2008
 @@ -0,0 +1,30 @@
 +/*
@@ -968,8 +963,8 @@ diff -urpN orig/tse3-0.3.1/src/tse3/listen/TextTrack.h tse3-0.3.1/src/tse3/liste
 +}
 +
 +#endif
-diff -urpN orig/tse3-0.3.1/src/tse3/plt/Factory_Win32.cpp tse3-0.3.1/src/tse3/plt/Factory_Win32.cpp
---- orig/tse3-0.3.1/src/tse3/plt/Factory_Win32.cpp	Mon Jul 25 11:22:56 2005
+diff -urpN tse3-0.3.1-orig/src/tse3/plt/Factory_Win32.cpp tse3-0.3.1/src/tse3/plt/Factory_Win32.cpp
+--- tse3-0.3.1-orig/src/tse3/plt/Factory_Win32.cpp	Mon Jul 25 11:22:56 2005
 +++ tse3-0.3.1/src/tse3/plt/Factory_Win32.cpp	Sun Feb 17 19:25:40 2008
 @@ -26,8 +26,48 @@
  
@@ -1026,8 +1021,8 @@ diff -urpN orig/tse3-0.3.1/src/tse3/plt/Factory_Win32.cpp tse3-0.3.1/src/tse3/pl
  
 -
 +*/
-diff -urpN orig/tse3-0.3.1/src/tse3/plt/OSS.cpp tse3-0.3.1/src/tse3/plt/OSS.cpp
---- orig/tse3-0.3.1/src/tse3/plt/OSS.cpp	Mon Jul 25 11:22:56 2005
+diff -urpN tse3-0.3.1-orig/src/tse3/plt/OSS.cpp tse3-0.3.1/src/tse3/plt/OSS.cpp
+--- tse3-0.3.1-orig/src/tse3/plt/OSS.cpp	Mon Jul 25 11:22:56 2005
 +++ tse3-0.3.1/src/tse3/plt/OSS.cpp	Sun Feb 17 17:06:26 2008
 @@ -29,7 +29,9 @@
  // These #includes are linux specific and I need to do some autoconf
@@ -1039,8 +1034,8 @@ diff -urpN orig/tse3-0.3.1/src/tse3/plt/OSS.cpp tse3-0.3.1/src/tse3/plt/OSS.cpp
  
  #ifdef HAVE_LINUX_AWE_VOICE_H
  #include <linux/awe_voice.h>
-diff -urpN orig/tse3-0.3.1/src/tse3/plt/Win32.cpp tse3-0.3.1/src/tse3/plt/Win32.cpp
---- orig/tse3-0.3.1/src/tse3/plt/Win32.cpp	Mon Jul 25 11:22:56 2005
+diff -urpN tse3-0.3.1-orig/src/tse3/plt/Win32.cpp tse3-0.3.1/src/tse3/plt/Win32.cpp
+--- tse3-0.3.1-orig/src/tse3/plt/Win32.cpp	Mon Jul 25 11:22:56 2005
 +++ tse3-0.3.1/src/tse3/plt/Win32.cpp	Sun Feb 17 23:12:52 2008
 @@ -24,6 +24,8 @@
  #include "tse3/Error.h"
@@ -1228,8 +1223,8 @@ diff -urpN orig/tse3-0.3.1/src/tse3/plt/Win32.cpp tse3-0.3.1/src/tse3/plt/Win32.
            return;
      CallbackData* data = new CallbackData;
      data->port = hMidi[e.data.port].out;
-diff -urpN orig/tse3-0.3.1/src/tse3/plt/Win32.h tse3-0.3.1/src/tse3/plt/Win32.h
---- orig/tse3-0.3.1/src/tse3/plt/Win32.h	Mon Jul 25 11:22:56 2005
+diff -urpN tse3-0.3.1-orig/src/tse3/plt/Win32.h tse3-0.3.1/src/tse3/plt/Win32.h
+--- tse3-0.3.1-orig/src/tse3/plt/Win32.h	Mon Jul 25 11:22:56 2005
 +++ tse3-0.3.1/src/tse3/plt/Win32.h	Sun Feb 17 23:12:18 2008
 @@ -20,6 +20,8 @@
  #include "tse3/MidiScheduler.h"
@@ -1263,8 +1258,8 @@ diff -urpN orig/tse3-0.3.1/src/tse3/plt/Win32.h tse3-0.3.1/src/tse3/plt/Win32.h
      }
  }
  
-diff -urpN orig/tse3-0.3.1/src/tse3play/tse3play.cpp tse3-0.3.1/src/tse3play/tse3play.cpp
---- orig/tse3-0.3.1/src/tse3play/tse3play.cpp	Tue Aug 23 12:58:36 2005
+diff -urpN tse3-0.3.1-orig/src/tse3play/tse3play.cpp tse3-0.3.1/src/tse3play/tse3play.cpp
+--- tse3-0.3.1-orig/src/tse3play/tse3play.cpp	Tue Aug 23 12:58:36 2005
 +++ tse3-0.3.1/src/tse3play/tse3play.cpp	Sun Feb 17 19:42:00 2008
 @@ -49,6 +49,9 @@
  #include "tse3/plt/Arts.h"

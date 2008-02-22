@@ -65,7 +65,7 @@ std::string kmutil_getfilename(const std::string &path)
 
 #ifdef __WIN32__
 	pos = static_cast<int>(path.find_last_of('\\'));           //find the last slash in the path
-#elif defined(__UNIX__)
+#elif defined(unix)
 	pos = static_cast<int>(path.find_last_of('/'));           //find the last slash in the path
 #else
     #error Unknown platform

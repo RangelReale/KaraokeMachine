@@ -12,20 +12,19 @@ using namespace KaraokeMachine;
 
 int main ( int argc, char** argv )
 {
-/*
     if (argc < 2)
     {
-        std::cout << "Useage: midifile <filename>\n";
+        std::cout << "Useage: KaraokeMachine <filename.kps>\n";
         exit(1);
     }
-*/
 
     KMBackend_SDL backend;
     //KMSong_TSE3 song(argv[1]);
 
     KMachine_Basic machine(backend);
 
-    machine.Songs().Load("e:\\transfer\\karaoke\\test.kps");
+    //machine.Songs().Load("e:\\transfer\\karaoke\\test.kps");
+    machine.Songs().Load(argv[1]);
 
 /*
     unsigned int pid=machine.Songs().Add();

@@ -8,7 +8,11 @@
 #include "tse3/Metronome.h"
 #include "tse3/util/MidiScheduler.h"
 #include "tse3/Transport.h"
+#ifdef __WIN32__
 #include "tse3/plt/Win32.h"
+#elif defined(unix)
+#include "tse3/plt/OSS.h"
+#endif
 #include "tse3/Playable.h"
 #include "tse3/Song.h"
 
@@ -71,7 +75,11 @@ private:
 
     TSE3::Song *song_;
     TSE3::Metronome                 metronome_;
+#ifdef __WIN32__
     static TSE3::Plt::Win32MidiScheduler   scheduler_;
+#elif defined(unix)
+    static TSE3::Plt::OSSMidiScheduler      scheduler_;
+#endif
     TSE3::Transport                 transport_;
 
     lyrics_t lyrics_;

@@ -29,7 +29,11 @@ KMBackend_SDL::KMBackend_SDL() :
     }
 
 
+#ifdef __WIN32__
     font_=TTF_OpenFont("c:\\windows\\fonts\\LUCON.TTF", 22);
+#elif defined(unix)
+    font_=TTF_OpenFont("/usr/share/fonts/truetype/freefont/FreeSans.ttf", 22);
+#endif
     if ( !font_ )
     {
         throw KMException( "Unable to load font" );
