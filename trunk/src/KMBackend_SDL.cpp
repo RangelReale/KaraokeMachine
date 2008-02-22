@@ -40,12 +40,12 @@ KMBackend_SDL::~KMBackend_SDL()
 {
     TTF_CloseFont(font_);
 }
-
+/*
 void KMBackend_SDL::ShowImage(KMImage *image)
 {
 
 }
-
+*/
 bool KMBackend_SDL::Loop(KMachine &machine)
 {
     SDL_Surface *text_surface;

@@ -11,7 +11,7 @@ public:
     KMBackend() {}
     virtual ~KMBackend() {}
 
-    virtual void ShowImage(KMImage *image) = 0;
+    //virtual void ShowImage(KMImage *image) = 0;
 
     virtual bool Loop(KMachine &machine) = 0;
 private:

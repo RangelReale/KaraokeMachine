@@ -15,7 +15,7 @@ public:
     KMBackend_SDL();
     virtual ~KMBackend_SDL();
 
-    virtual void ShowImage(KMImage *image);
+    //virtual void ShowImage(KMImage *image);
 
     virtual bool Loop(KMachine &machine);
 private:
