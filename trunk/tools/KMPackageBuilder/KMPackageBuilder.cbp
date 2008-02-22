@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="KMPackageBuilder" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin\Debug\KMPackageBuilder" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj\Debug\" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-g" />
+					<Add option="-D__WXDEBUG__" />
+					<Add directory="$(#wx.include_debug)" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add directory="$(#wx)\lib\gcc_lib\mswud" />
+				</ResourceCompiler>
+				<Linker>
+					<Add library="libwxmsw28ud.a" />
+					<Add library="libwxpngd.a" />
+					<Add library="libwxjpegd.a" />
+					<Add library="libwxtiffd.a" />
+					<Add library="libwxzlibd.a" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="bin\Release\KMPackageBuilder" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj\Release\" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add directory="$(#wx.include_release)" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add directory="$(#wx)\lib\gcc_lib\mswu" />
+				</ResourceCompiler>
+				<Linker>
+					<Add option="-s" />
+					<Add library="libwxmsw28u.a" />
+					<Add library="libwxpng.a" />
+					<Add library="libwxjpeg.a" />
+					<Add library="libwxtiff.a" />
+					<Add library="libwxzlib.a" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-pipe" />
+			<Add option="-mthreads" />
+			<Add option="-D__GNUWIN32__" />
+			<Add option="-D__WXMSW__" />
+			<Add option="-DwxUSE_UNICODE" />
+			<Add directory="$(#wx.include)" />
+			<Add directory="..\..\src" />
+			<Add directory="$(#tse3.include)" />
+		</Compiler>
+		<ResourceCompiler>
+			<Add directory="$(#wx)\include" />
+		</ResourceCompiler>
+		<Linker>
+			<Add library="libkernel32.a" />
+			<Add library="libuser32.a" />
+			<Add library="libgdi32.a" />
+			<Add library="libwinspool.a" />
+			<Add library="libcomdlg32.a" />
+			<Add library="libadvapi32.a" />
+			<Add library="libshell32.a" />
+			<Add library="libole32.a" />
+			<Add library="liboleaut32.a" />
+			<Add library="libuuid.a" />
+			<Add library="libcomctl32.a" />
+			<Add library="libwsock32.a" />
+			<Add library="libodbc32.a" />
+			<Add library="tse3" />
+			<Add library="winmm" />
+			<Add directory="$(#wx.lib)" />
+			<Add directory="$(#tse3.lib)" />
+		</Linker>
+		<Unit filename="..\..\src\KMDefs.h" />
+		<Unit filename="..\..\src\KMImage.cpp" />
+		<Unit filename="..\..\src\KMImage.h" />
+		<Unit filename="..\..\src\KMSong.cpp" />
+		<Unit filename="..\..\src\KMSong.h" />
+		<Unit filename="..\..\src\KMSongFactory.cpp" />
+		<Unit filename="..\..\src\KMSongFactory.h" />
+		<Unit filename="..\..\src\KMSong_TSE3.cpp" />
+		<Unit filename="..\..\src\KMSong_TSE3.h" />
+		<Unit filename="..\..\src\KMUtil.cpp" />
+		<Unit filename="..\..\src\KMUtil.h" />
+		<Unit filename="res\resource.rc">
+			<Option compilerVar="WINDRES" />
+		</Unit>
+		<Unit filename="src\DialogSongEdit.cpp" />
+		<Unit filename="src\DialogSongEdit.h" />
+		<Unit filename="src\DialogSongPackageEdit.cpp" />
+		<Unit filename="src\DialogSongPackageEdit.h" />
+		<Unit filename="src\KMPackageBuilderApp.cpp" />
+		<Unit filename="src\KMPackageBuilderApp.h" />
+		<Unit filename="src\KMPackageBuilderMain.cpp" />
+		<Unit filename="src\KMPackageBuilderMain.h" />
+		<Unit filename="src\PBDoc.cpp" />
+		<Unit filename="src\PBDoc.h" />
+		<Unit filename="src\PBView.cpp" />
+		<Unit filename="src\PBView.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
