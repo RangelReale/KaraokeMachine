@@ -98,6 +98,10 @@
 		<Unit filename="res\resource.rc">
 			<Option compilerVar="WINDRES" />
 		</Unit>
+		<Unit filename="src\DialogImageEdit.cpp" />
+		<Unit filename="src\DialogImageEdit.h" />
+		<Unit filename="src\DialogImagePackageEdit.cpp" />
+		<Unit filename="src\DialogImagePackageEdit.h" />
 		<Unit filename="src\DialogSongEdit.cpp" />
 		<Unit filename="src\DialogSongEdit.h" />
 		<Unit filename="src\DialogSongPackageEdit.cpp" />

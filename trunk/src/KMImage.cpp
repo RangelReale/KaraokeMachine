@@ -44,26 +44,58 @@ KMImagePackage::~KMImagePackage()
         delete file_;
 }
 
-int KMImagePackage::Add(const std::string &filename)
+unsigned short KMImagePackage::Add(const std::string &imagename,
+    const std::string &filename, unsigned short id)
 {
-    images_.push_back( KMImagePackageItem(this, filename) );
-    return images_.size()-1;
+    if (id==0) id=++maxid_;
+    if (id>maxid_) maxid_=id;
+    images_.insert( std::pair<unsigned short, KMImagePackageItem>(id, KMImagePackageItem(this, id, imagename, filename)) );
+    return id;
 }
 
-int KMImagePackage::Add()
+unsigned short KMImagePackage::Add(unsigned short id)
 {
-    images_.push_back( KMImagePackageItem(this) );
-    return images_.size()-1;
+    if (id==0) id=++maxid_;
+    if (id>maxid_) maxid_=id;
+    images_.insert( std::pair<unsigned short, KMImagePackageItem>(id, KMImagePackageItem(this, id)) );
+    return id;
 }
 
-void KMImagePackage::Remove(int index)
+bool KMImagePackage::Exists(unsigned short id)
 {
-    images_.erase(images_.begin()+index);
+    return images_.find(id)!=images_.end();
 }
 
-KMImagePackageItem &KMImagePackage::Get(int index)
+
+void KMImagePackage::Remove(unsigned short id)
 {
-    return images_[index];
+    images_.erase(id);
+}
+
+KMImagePackageItem &KMImagePackage::Get(unsigned short id)
+{
+    images_t::iterator i=images_.find(id);
+    if (i==images_.end())
+        throw KMException("Image not found");
+    return i->second;
+}
+
+void KMImagePackage::ChangeId(unsigned short oldid, unsigned short newid)
+{
+    images_t::iterator i=images_.find(oldid);
+    if (i==images_.end()) return;
+
+    images_.insert(images_t::value_type(newid, i->second));
+    images_.find(newid)->second.id_=newid;
+    images_.erase(oldid);
+}
+
+void KMImagePackage::Ids(KMArrayInt &ids)
+{
+    for (images_t::iterator i=images_.begin(); i!=images_.end(); i++)
+    {
+        ids.push_back(i->first);
+    }
 }
 
 void KMImagePackage::Load(KMInputStream &stream)
@@ -106,7 +138,7 @@ void KMImagePackage::Load(KMInputStream &stream)
         if (strncmp(image.magic, KMIMAGEPACKAGE_MAGIC_IMAGE, KMIMAGEPACKAGE_MAGIC_IMAGE_SIZE)!=0)
             throw KMException("Invalid file");
 
-        KMImagePackageItem *newimage=&Get(Add());
+        KMImagePackageItem *newimage=&Get(Add(image.id));
 
         memset(tmp, 0, sizeof(tmp));
         strncpy(tmp, image.filename, KMIMAGEPACKAGE_MAXPATH);
@@ -163,23 +195,24 @@ void KMImagePackage::Save(KMOutputStream &stream)
 
         memset(&image, 0, sizeof(image));
         strncpy(image.magic, KMIMAGEPACKAGE_MAGIC_IMAGE, KMIMAGEPACKAGE_MAGIC_IMAGE_SIZE);
-        strncpy(image.filename, kmutil_getfilename(i->filename_).c_str(), KMIMAGEPACKAGE_MAXPATH);
-        strncpy(image.title, i->title_.c_str(), KMIMAGEPACKAGE_MAXTEXT);
-        image.iswide=i->iswide_;
+        image.id=i->second.GetId();
+        strncpy(image.filename, kmutil_getfilename(i->second.filename_).c_str(), KMIMAGEPACKAGE_MAXPATH);
+        strncpy(image.title, i->second.title_.c_str(), KMIMAGEPACKAGE_MAXTEXT);
+        image.iswide=i->second.iswide_;
 
-        i->GetFileData(filedata);
+        i->second.GetFileData(filedata);
         filedata.seekg(0, std::ios::end);
         image.filesize=filedata.tellg();
         filedata.seekg(0);
 
         // update image information
-        i->filesize_=image.filesize;
-        i->filename_=kmutil_getfilename(i->filename_);
+        i->second.filesize_=image.filesize;
+        i->second.filename_=kmutil_getfilename(i->second.filename_);
 
         stream.write((char*)&image, sizeof(image));
 
         // write file data
-        i->filepos_=stream.tellp();
+        i->second.filepos_=stream.tellp();
         kmutil_copystream(filedata, stream);
     }
 }

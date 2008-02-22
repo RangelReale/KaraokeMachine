@@ -57,25 +57,21 @@ PBImageDocument::~PBImageDocument(void)
 
 bool PBImageDocument::OnNewDocument()
 {
+    SetTitle(wxT("New Image"));
     return true;
 }
 
 bool PBImageDocument::OnSaveDocument(const wxString& filename)
 {
-    return false;
+    imagepackage_.Save(std::string(filename.mb_str(wxConvUTF8)));
+    Modify(false);
+    return true;
 }
 
 bool PBImageDocument::OnOpenDocument(const wxString& filename)
 {
-    return false;
-}
-
-bool PBImageDocument::IsModified(void) const
-{
-    return false;
-}
-
-void PBImageDocument::Modify(bool mod)
-{
-
+    imagepackage_.Load(std::string(filename.mb_str(wxConvUTF8)));
+    UpdateAllViews();
+    Modify(false);
+    return true;
 }

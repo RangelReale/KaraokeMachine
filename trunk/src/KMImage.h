@@ -21,13 +21,14 @@ class KMImagePackage;
  */
 class KMImagePackageItem {
 public:
-    KMImagePackageItem(KMImagePackage *package,
-        std::string filename = "") : package_(package),
-        title_(""), filename_(filename), iswide_(false),
+    KMImagePackageItem(KMImagePackage *package, unsigned short id, std::string title = "",
+        std::string filename = "") : package_(package), id_(id),
+        title_(title), filename_(filename), iswide_(false),
         filepos_(0), filesize_(0) {}
 
     KMImagePackage *Package() const { return package_; }
 
+    unsigned short GetId() const { return id_; }
     const std::string &GetTitle() const { return title_; }
     const std::string &GetFilename() const { return filename_; }
     bool GetIsWide() const { return iswide_; }
@@ -39,6 +40,7 @@ public:
     void GetFileData(std::ostream &stream) const;
 private:
     KMImagePackage *package_;
+    unsigned short id_;
     std::string title_, filename_;
     bool iswide_;
     unsigned int filepos_, filesize_;
@@ -54,14 +56,18 @@ private:
 class KMImagePackage {
 public:
     KMImagePackage() :
+        maxid_(0),
         title_(""), author_(""), description_(""),
         images_(), file_(NULL) {}
     ~KMImagePackage();
 
-    int Add(const std::string &filename);
-    KMImagePackageItem &Get(int index);
-    void Remove(int index);
-    int GetCount() { return images_.size(); }
+    unsigned short Add(const std::string &imagename,
+        const std::string &filename, unsigned short id = 0);
+    bool Exists(unsigned short id);
+    KMImagePackageItem &Get(unsigned short id);
+    void Remove(unsigned short id);
+    void ChangeId(unsigned short oldid, unsigned short newid);
+    void Ids(KMArrayInt &ids);
 
     const std::string &GetTitle() { return title_; }
     const std::string &GetAuthor() { return author_; }
@@ -76,13 +82,14 @@ public:
 
     KMInputStream *GetFile() { return file_; }
 private:
-    typedef std::deque<KMImagePackageItem> images_t;
+    typedef std::map<unsigned short, KMImagePackageItem> images_t;
 
-    int Add();
+    unsigned short Add(unsigned short id);
 
     void Load(KMInputStream &stream);
     void Save(KMOutputStream &stream);
 
+    unsigned short maxid_;
     std::string title_, author_, description_;
     images_t images_;
     KMStream *file_;

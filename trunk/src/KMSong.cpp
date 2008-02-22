@@ -89,7 +89,7 @@ KMSongPackageItem &KMSongPackage::Get(unsigned short id)
     return i->second;
 }
 
-void KMSongPackage::ChangeSongId(unsigned short oldid, unsigned short newid)
+void KMSongPackage::ChangeId(unsigned short oldid, unsigned short newid)
 {
     songs_t::iterator i=songs_.find(oldid);
     if (i==songs_.end()) return;

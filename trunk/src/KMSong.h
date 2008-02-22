@@ -153,7 +153,7 @@ public:
     bool Exists(unsigned short id);
     KMSongPackageItem &Get(unsigned short id);
     void Remove(unsigned short id);
-    void ChangeSongId(unsigned short oldid, unsigned short newid);
+    void ChangeId(unsigned short oldid, unsigned short newid);
     void Ids(KMArrayInt &ids);
 
     unsigned int GetId() { return id_; }

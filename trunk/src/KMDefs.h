@@ -66,6 +66,7 @@ typedef struct kmimagepackage_header_t
 typedef struct kmimagepackage_image_t
 {
     char magic[4];
+    unsigned short id;
     char filename[KMSONGPACKAGE_MAXPATH];
     char title[KMSONGPACKAGE_MAXTEXT];
     unsigned char iswide;

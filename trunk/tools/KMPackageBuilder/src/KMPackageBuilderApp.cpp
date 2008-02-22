@@ -33,6 +33,8 @@ bool KMPackageBuilderApp::OnInit()
 {
     SetAppName(wxT("KaraokeMachine Package Builder"));
 
+    wxImage::AddHandler(new wxJPEGHandler);
+
     //// Create a document manager
     docManager_ = new wxDocManager;
 

@@ -5,6 +5,7 @@
 #include <wx/cmdproc.h>
 
 #include "KMSong.h"
+#include "KMImage.h"
 
 using namespace KaraokeMachine;
 
@@ -39,8 +40,10 @@ public:
     virtual bool OnNewDocument();
     virtual bool OnSaveDocument(const wxString& filename);
     virtual bool OnOpenDocument(const wxString& filename);
-    virtual bool IsModified(void) const;
-    virtual void Modify(bool mod);
+private:
+    KMImagePackage imagepackage_;
+
+    friend class PBImageView;
 };
 
 #endif //_H_PBDOC_H_
