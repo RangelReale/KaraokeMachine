@@ -41,6 +41,8 @@ TSE3::Plt::Win32MidiScheduler KMSong_TSE3::scheduler_;
 #elif defined(unix)
 //TSE3::Plt::OSSMidiScheduler KMSong_TSE3::scheduler_;
 TSE3::Plt::AlsaMidiScheduler KMSong_TSE3::scheduler_;
+#else
+    #error "Unknown platform"
 #endif
 
 KMSong_TSE3::KMSong_TSE3(KMInputStream &stream) :
@@ -74,7 +76,7 @@ bool KMSong_TSE3::Load(KMInputStream &stream)
 {
     TSE3::MidiFileImport mfi(stream);
 
-    transport_.filter()->setPort(17);
+    transport_.filter()->setPort(1);
     //transport_.attachCallback(new KMSong_TSE3_Callback(this));
 
     song_ = mfi.load();

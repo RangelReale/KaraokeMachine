@@ -13,6 +13,8 @@
 #elif defined(unix)
 //#include "tse3/plt/OSS.h"
 #include "tse3/plt/Alsa.h"
+#else
+    #error "Unknown platform"
 #endif
 #include "tse3/Playable.h"
 #include "tse3/Song.h"
@@ -81,6 +83,8 @@ private:
 #elif defined(unix)
     //static TSE3::Plt::OSSMidiScheduler      scheduler_;
     static TSE3::Plt::AlsaMidiScheduler        scheduler_;
+#else
+    #error "Unknown platform"
 #endif
     TSE3::Transport                 transport_;
 

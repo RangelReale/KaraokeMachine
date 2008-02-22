@@ -33,6 +33,8 @@ KMBackend_SDL::KMBackend_SDL() :
     font_=TTF_OpenFont("c:\\windows\\fonts\\LUCON.TTF", 22);
 #elif defined(unix)
     font_=TTF_OpenFont("/usr/share/fonts/truetype/freefont/FreeSans.ttf", 22);
+#else
+    #error "Unknown platform"
 #endif
     if ( !font_ )
     {
