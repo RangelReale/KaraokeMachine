@@ -6,6 +6,7 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <set>
 
 namespace KaraokeMachine {
 
@@ -20,6 +21,18 @@ class KMException : public std::runtime_error
 {
 public:
     KMException(const std::string &what) : std::runtime_error(what) {}
+};
+
+class KMTags
+{
+public:
+    KMTags() : taglist_() {}
+
+    std::string GetTags();
+    void SetTags(const std::string &v);
+private:
+    typedef std::set<std::string> taglist_t;
+    taglist_t taglist_;
 };
 
 typedef std::iostream KMStream;

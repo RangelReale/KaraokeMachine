@@ -125,6 +125,7 @@ void KMPB_SongEditDialog::Init()
     startlyrics_=wxEmptyString;
     melodytrack_=0;
     transpose_=0;
+    tags_=wxEmptyString;
 }
 
 void KMPB_SongEditDialog::Load(KMSongPackageItem *song)
@@ -137,6 +138,7 @@ void KMPB_SongEditDialog::Load(KMSongPackageItem *song)
     startlyrics_=wxString(song->GetStartLyrics().c_str(), wxConvUTF8);
     melodytrack_=song->GetMelodyTrack()+1;
     transpose_=song->GetTranspose();
+    tags_=wxString(song->Tags().GetTags().c_str(), wxConvUTF8);
 
     song_=new std::stringstream;
     song->GetFileData(*song_);
@@ -151,6 +153,7 @@ void KMPB_SongEditDialog::Save(KMSongPackageItem *song)
     song->SetSubGenre(std::string(subgenre_.mb_str(wxConvUTF8)));
     song->SetMelodyTrack(melodytrack_-1);
     song->SetTranspose(transpose_);
+    song->Tags().SetTags(std::string(tags_.mb_str(wxConvUTF8)));
 }
 
 void KMPB_SongEditDialog::CreateControls()
@@ -165,10 +168,13 @@ void KMPB_SongEditDialog::CreateControls()
     boxsizer->Add(bodysizer, 1, wxEXPAND|wxALL, 3);
 
     // FIELDS
-    //wxBoxSizer *fieldssizer = new wxBoxSizer(wxVERTICAL);
+    wxBoxSizer *fieldssizer = new wxBoxSizer(wxVERTICAL);
+/*
     wxFlexGridSizer *fieldssizer = new wxFlexGridSizer(2);
     fieldssizer->AddGrowableCol(1, 1);
+    fieldssizer->AddGrowableRow(8, 1);
     fieldssizer->SetFlexibleDirection(wxHORIZONTAL);
+*/
     bodysizer->Add(fieldssizer, 1, wxEXPAND|wxALL, 3);
 
     // Title
@@ -219,6 +225,12 @@ void KMPB_SongEditDialog::CreateControls()
     fieldssizer->Add(new wxSpinCtrl(this, ID_TRANSPOSE, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, -20, 20, 0),
         0, wxGROW|wxALL, 3);
 
+    // Tags
+    fieldssizer->Add(new wxStaticText(this, wxID_STATIC, wxT("&Tags (comma-separated):"), wxDefaultPosition, wxDefaultSize, 0),
+        0, wxALIGN_LEFT|wxALL, 3);
+    fieldssizer->Add(new wxTextCtrl(this, ID_TAGS, wxEmptyString, wxDefaultPosition, wxSize(-1, 40), wxTE_MULTILINE),
+        1, wxGROW|wxALL, 3);
+
 
     // Lyric
     wxStaticText *lyricctrl=new wxStaticText(this, ID_LYRIC, wxT(""), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE|wxST_NO_AUTORESIZE);
@@ -258,6 +270,7 @@ void KMPB_SongEditDialog::CreateControls()
     FindWindow(ID_STARTLYRICS)->SetValidator(wxTextValidator(wxFILTER_NONE, &startlyrics_));
     FindWindow(ID_MELODYTRACK)->SetValidator(wxGenericValidator(&melodytrack_));
     FindWindow(ID_TRANSPOSE)->SetValidator(wxGenericValidator(&transpose_));
+    FindWindow(ID_TAGS)->SetValidator(wxTextValidator(wxFILTER_NONE, &tags_));
 
     SetSizer(topsizer);
     topsizer->SetSizeHints(this);

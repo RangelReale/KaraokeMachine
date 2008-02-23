@@ -31,13 +31,15 @@ public:
 protected:
     enum {
         ID_FIRST = wxID_HIGHEST,
+        ID_PREVIEW,
         ID_TITLE,
-        ID_ISWIDE
+        ID_ISWIDE,
+        ID_TAGS
     };
 private:
     std::stringstream *image_;
 
-    wxString title_;
+    wxString title_, tags_;
     bool iswide_;
 };
 

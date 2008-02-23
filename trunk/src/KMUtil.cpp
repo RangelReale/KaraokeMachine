@@ -89,5 +89,26 @@ void kmutil_copystream(std::istream &source, std::ostream &dest)
     } while(true);
 }
 
+std::string KMTags::GetTags()
+{
+    std::string ret;
+    for (taglist_t::const_iterator i=taglist_.begin(); i!=taglist_.end(); i++)
+    {
+        if (!ret.empty())
+            ret+=",";
+        ret+=*i;
+    }
+    return ret;
+}
+
+void KMTags::SetTags(const std::string &v)
+{
+    taglist_.clear();
+    std::vector<std::string> tokens=kmutil_tokenize(v, ",");
+    for (std::vector<std::string>::const_iterator i=tokens.begin(); i!=tokens.end(); i++)
+        taglist_.insert(*i);
+}
+
+
 
 };

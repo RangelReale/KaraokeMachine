@@ -15,6 +15,8 @@
 #pragma hdrstop
 #endif //__BORLANDC__
 
+#include <wx/config.h>
+
 #include "KMPackageBuilderApp.h"
 #include "KMPackageBuilderMain.h"
 
@@ -33,17 +35,20 @@ bool KMPackageBuilderApp::OnInit()
 {
     SetAppName(wxT("KaraokeMachine Package Builder"));
 
+    // create default config file
+    wxConfigBase::Get(true);
+
     wxImage::AddHandler(new wxJPEGHandler);
 
     //// Create a document manager
     docManager_ = new wxDocManager;
 
     //// Template: Song
-    (void) new wxDocTemplate((wxDocManager *) docManager_, wxT("Songs"), wxT("*.kps"), wxT(""), wxT("kps"),wxT("Songs Doc"), wxT("Songs View"),
+    (void) new wxDocTemplate((wxDocManager *) docManager_, wxT("Song Packages"), wxT("*.kps"), wxT(""), wxT("kps"),wxT("Songs Doc"), wxT("Songs View"),
           CLASSINFO(PBSongDocument), CLASSINFO(PBSongView));
 
     //// Template: Image
-    (void) new wxDocTemplate(docManager_, wxT("Images"), wxT("*.kpi"), wxT(""), wxT("kpi"), wxT("Images Doc"), wxT("Images View"),
+    (void) new wxDocTemplate(docManager_, wxT("Image Packages"), wxT("*.kpi"), wxT(""), wxT("kpi"), wxT("Images Doc"), wxT("Images View"),
           CLASSINFO(PBImageDocument), CLASSINFO(PBImageView));
 
     KMPackageBuilderFrame* frame = new KMPackageBuilderFrame((wxDocManager *) docManager_, (wxFrame *) NULL,

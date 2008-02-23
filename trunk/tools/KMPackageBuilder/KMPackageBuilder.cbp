@@ -21,6 +21,7 @@
 					<Add directory="$(#wx)\lib\gcc_lib\mswud" />
 				</ResourceCompiler>
 				<Linker>
+					<Add library="wxmsw28ud_gizmos" />
 					<Add library="libwxmsw28ud.a" />
 					<Add library="libwxpngd.a" />
 					<Add library="libwxjpegd.a" />
@@ -43,6 +44,7 @@
 				</ResourceCompiler>
 				<Linker>
 					<Add option="-s" />
+					<Add library="wxmsw28u_gizmos" />
 					<Add library="libwxmsw28u.a" />
 					<Add library="libwxpng.a" />
 					<Add library="libwxjpeg.a" />
@@ -61,6 +63,7 @@
 			<Add directory="$(#wx.include)" />
 			<Add directory="..\..\src" />
 			<Add directory="$(#tse3.include)" />
+			<Add directory="$(#wx.include_contrib)" />
 		</Compiler>
 		<ResourceCompiler>
 			<Add directory="$(#wx)\include" />
@@ -118,6 +121,7 @@
 			<code_completion />
 			<envvars />
 			<debugger />
+			<lib_finder />
 		</Extensions>
 	</Project>
 </CodeBlocks_project_file>

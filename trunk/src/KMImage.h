@@ -24,7 +24,7 @@ public:
     KMImagePackageItem(KMImagePackage *package, unsigned short id, std::string title = "",
         std::string filename = "") : package_(package), id_(id),
         title_(title), filename_(filename), iswide_(false),
-        filepos_(0), filesize_(0) {}
+        filepos_(0), filesize_(0), tags_() {}
 
     KMImagePackage *Package() const { return package_; }
 
@@ -37,6 +37,8 @@ public:
     void SetFilename(const std::string &v) { filename_=v; }
     void SetIsWide(bool v) { iswide_=v; }
 
+    KMTags &Tags() { return tags_; }
+
     void GetFileData(std::ostream &stream) const;
 private:
     KMImagePackage *package_;
@@ -44,6 +46,7 @@ private:
     std::string title_, filename_;
     bool iswide_;
     unsigned int filepos_, filesize_;
+    KMTags tags_;
 
     friend class KMImagePackage;
 };

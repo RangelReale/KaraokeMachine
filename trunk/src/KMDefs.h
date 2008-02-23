@@ -14,6 +14,7 @@ typedef long kmtime_t; // time in ms
 #define KMSONGPACKAGE_MAXTEXT       100
 #define KMSONGPACKAGE_MAXPATH       255
 #define KMSONGPACKAGE_MAXGENRE      40
+#define KMSONGPACKAGE_MAXTAGS       255
 #define KMSONGPACKAGE_MAGIC_SONG   "KMSS"
 #define KMSONGPACKAGE_MAGIC_SONG_SIZE   4
 
@@ -23,6 +24,7 @@ typedef long kmtime_t; // time in ms
 #define KMIMAGEPACKAGE_VERSION       1
 #define KMIMAGEPACKAGE_MAXTEXT       100
 #define KMIMAGEPACKAGE_MAXPATH       255
+#define KMIMAGEPACKAGE_MAXTAGS       255
 #define KMIMAGEPACKAGE_MAGIC_IMAGE   "KMII"
 #define KMIMAGEPACKAGE_MAGIC_IMAGE_SIZE   4
 
@@ -50,6 +52,7 @@ typedef struct kmsongpackage_song_t
     char startlyrics[KMSONGPACKAGE_MAXTEXT];
     char melodytrack;
     char transpose;
+    char tags[KMSONGPACKAGE_MAXTAGS];
     unsigned int filesize;
 };
 
@@ -70,6 +73,7 @@ typedef struct kmimagepackage_image_t
     char filename[KMSONGPACKAGE_MAXPATH];
     char title[KMSONGPACKAGE_MAXTEXT];
     unsigned char iswide;
+    char tags[KMIMAGEPACKAGE_MAXTAGS];
     unsigned int filesize;
 };
 

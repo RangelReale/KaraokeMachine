@@ -178,6 +178,10 @@ void KMSongPackage::Load(KMInputStream &stream)
         strncpy(tmp, song.startlyrics, KMSONGPACKAGE_MAXTEXT);
         newsong->startlyrics_=tmp;
 
+        memset(tmp, 0, sizeof(tmp));
+        strncpy(tmp, song.tags, KMSONGPACKAGE_MAXTAGS);
+        newsong->Tags().SetTags(tmp);
+
         newsong->melodytrack_=song.melodytrack;
         newsong->transpose_=song.transpose;
         newsong->filepos_=stream.tellg();
@@ -236,6 +240,7 @@ void KMSongPackage::Save(KMOutputStream &stream)
         strncpy(song.startlyrics, i->second.startlyrics_.c_str(), KMSONGPACKAGE_MAXTEXT);
         song.melodytrack=i->second.melodytrack_;
         song.transpose=i->second.transpose_;
+        strncpy(song.tags, i->second.Tags().GetTags().c_str(), KMSONGPACKAGE_MAXTAGS);
 
         i->second.GetFileData(filedata);
         filedata.seekg(0, std::ios::end);

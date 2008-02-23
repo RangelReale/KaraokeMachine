@@ -150,6 +150,10 @@ void KMImagePackage::Load(KMInputStream &stream)
 
         newimage->iswide_=image.iswide;
 
+        memset(tmp, 0, sizeof(tmp));
+        strncpy(tmp, image.tags, KMIMAGEPACKAGE_MAXTAGS);
+        newimage->Tags().SetTags(tmp);
+
         newimage->filepos_=stream.tellg();
         newimage->filesize_=image.filesize;
 
@@ -199,6 +203,7 @@ void KMImagePackage::Save(KMOutputStream &stream)
         strncpy(image.filename, kmutil_getfilename(i->second.filename_).c_str(), KMIMAGEPACKAGE_MAXPATH);
         strncpy(image.title, i->second.title_.c_str(), KMIMAGEPACKAGE_MAXTEXT);
         image.iswide=i->second.iswide_;
+        strncpy(image.tags, i->second.Tags().GetTags().c_str(), KMIMAGEPACKAGE_MAXTEXT);
 
         i->second.GetFileData(filedata);
         filedata.seekg(0, std::ios::end);

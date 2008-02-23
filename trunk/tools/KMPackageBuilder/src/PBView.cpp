@@ -40,7 +40,7 @@ END_EVENT_TABLE()
 bool PBSongView::OnCreate(wxDocument *doc, long flags)
 {
     frame = wxGetApp().CreateChildFrame(doc, this, true);
-    frame->SetTitle(wxT("Song"));
+    frame->SetTitle(wxT("Song Package"));
     frame->Connect(ID_ADD, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(PBSongView::OnAdd), NULL, this);
     frame->Connect(ID_EDIT, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(PBSongView::OnEdit), NULL, this);
     frame->Connect(ID_REMOVE, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(PBSongView::OnRemove), NULL, this);
@@ -265,7 +265,7 @@ END_EVENT_TABLE()
 bool PBImageView::OnCreate(wxDocument *doc, long flags)
 {
     frame = wxGetApp().CreateChildFrame(doc, this, true);
-    frame->SetTitle(wxT("Image"));
+    frame->SetTitle(wxT("Image Package"));
     frame->Connect(ID_ADD, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(PBImageView::OnAdd), NULL, this);
     frame->Connect(ID_EDIT, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(PBImageView::OnEdit), NULL, this);
     frame->Connect(ID_REMOVE, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(PBImageView::OnRemove), NULL, this);
@@ -439,6 +439,7 @@ void PBImageView::AddFile(const wxString &filename)
 
     PBImageDocument *doc=(PBImageDocument*)GetDocument();
     nid=doc->imagepackage_.Add(std::string(fn.GetName().mb_str(wxConvUTF8)), std::string(filename.mb_str(wxConvUTF8)));
+    doc->imagepackage_.Get(nid).SetIsWide((float)image->GetWidth()/(float)image->GetHeight()>1.5);
 
     TreeAdd(nid, fn.GetName());
 

@@ -101,6 +101,7 @@ protected:
         ID_STARTLYRICS,
         ID_MELODYTRACK,
         ID_TRANSPOSE,
+        ID_TAGS,
 
         ID_LYRIC,
 
@@ -111,7 +112,7 @@ private:
     std::stringstream *song_;
     KMPB_SongEditDialog_Player *player_;
 
-    wxString title_, artist_, artist2_, genre_, subgenre_, startlyrics_;
+    wxString title_, artist_, artist2_, genre_, subgenre_, startlyrics_, tags_;
     int melodytrack_, transpose_;
 };
 

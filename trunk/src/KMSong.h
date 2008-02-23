@@ -100,7 +100,7 @@ public:
         std::string filename = "") : package_(package), id_(id),
         title_(title), artist_(""), artist2_(""), genre_(""), subgenre_(""),
         startlyrics_(""), melodytrack_(-1), transpose_(0), filename_(filename),
-        filepos_(0), filesize_(0) {}
+        filepos_(0), filesize_(0), tags_() {}
 
     KMSongPackage *Package() const { return package_; }
     unsigned short GetId() const { return id_; }
@@ -124,6 +124,8 @@ public:
     void SetMelodyTrack(char v) { melodytrack_=v; }
     void SetTranspose(char v) { transpose_=v; }
 
+    KMTags &Tags() { return tags_; }
+
     void GetFileData(std::ostream &stream) const;
 private:
     KMSongPackage *package_;
@@ -132,6 +134,7 @@ private:
     char melodytrack_, transpose_;
     std::string filename_;
     unsigned int filepos_, filesize_;
+    KMTags tags_;
 
     friend class KMSongPackage;
 };
