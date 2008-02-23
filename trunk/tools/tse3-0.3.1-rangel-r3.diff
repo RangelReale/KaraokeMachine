@@ -1,0 +1,1912 @@
+diff -urpNw tse3-0.3.1-old/configure tse3-0.3.1/configure
+--- tse3-0.3.1-old/configure	Tue Aug 23 10:27:34 2005
++++ tse3-0.3.1/configure	Fri Feb 22 13:01:28 2008
+@@ -22585,11 +22585,14 @@ have_win32="no"
+ if test "$CYGWIN" = "yes"; then
+   have_win32="yes"
+ fi
+-if test "$MINGW32" = "yes"; then
++case $host in
++  *-*-mingw*)
+   have_win32="yes"
+-fi
++    ;;
++esac
+ 
+ if test "$have_win32" = "yes"; then
++  LDFLAGS="$LDFLAGS -lwinmm"
+   echo "$as_me:$LINENO: result: yes" >&5
+ echo "${ECHO_T}yes" >&6
+ else
+diff -urpNw tse3-0.3.1-old/configure.in tse3-0.3.1/configure.in
+--- tse3-0.3.1-old/configure.in	Tue Aug 23 10:27:24 2005
++++ tse3-0.3.1/configure.in	Fri Feb 22 13:00:18 2008
+@@ -376,11 +376,14 @@ have_win32="no"
+ if test "$CYGWIN" = "yes"; then
+   have_win32="yes"
+ fi
+-if test "$MINGW32" = "yes"; then
++case $host in
++  *-*-mingw*)
+   have_win32="yes"
+-fi
++    ;;
++esac
+ 
+ if test "$have_win32" = "yes"; then
++  LDFLAGS="$LDFLAGS -lwinmm"
+   AC_MSG_RESULT(yes)
+ else
+   AC_MSG_RESULT(no)
+Binary files tse3-0.3.1-old/doc/pete.jpeg and tse3-0.3.1/doc/pete.jpeg differ
+Binary files tse3-0.3.1-old/doc/trax.gif and tse3-0.3.1/doc/trax.gif differ
+Binary files tse3-0.3.1-old/doc/tse3.gif and tse3-0.3.1/doc/tse3.gif differ
+Binary files tse3-0.3.1-old/doc/tse3logo.png and tse3-0.3.1/doc/tse3logo.png differ
+diff -urpNw tse3-0.3.1-old/src/examples/midifile/midifile.cpp tse3-0.3.1/src/examples/midifile/midifile.cpp
+--- tse3-0.3.1-old/src/examples/midifile/midifile.cpp	Mon Jul 25 08:22:30 2005
++++ tse3-0.3.1/src/examples/midifile/midifile.cpp	Fri Feb 22 12:24:44 2008
+@@ -39,22 +39,82 @@
+ #include "tse3/Metronome.h"
+ #include "tse3/util/MidiScheduler.h"
+ #include "tse3/Transport.h"
++#ifdef WIN32
++#include "tse3/plt/Win32.h"
++#include <windows.h>
++#endif
++#include "tse3/Playable.h"
+ 
+ // Used in step 3
+ #include "tse3/Song.h"
+ 
++#include <string>
++using namespace std;
++
++class mycallback : public TSE3::TransportCallback
++{
++public:
++    std::string Show(TSE3::MidiCommand c) {
++        switch (c.status)
++        {
++        case TSE3::MidiCommand_NoteOff: return "NoteOff"; break;
++        case TSE3::MidiCommand_NoteOn: return "NoteOn"; break;
++        case TSE3::MidiCommand_KeyPressure: return "KeyPressure"; break;
++        case TSE3::MidiCommand_ControlChange: return "ControlChange"; break;
++        case TSE3::MidiCommand_ProgramChange: return "ProgramChange"; break;
++        case TSE3::MidiCommand_ChannelPressure: return "ChannelPressure"; break;
++        case TSE3::MidiCommand_PitchBend: return "PitchBend"; break;
++        case TSE3::MidiCommand_System: return "System"; break;
++
++        // Meta MIDI messages
++        case TSE3::MidiCommand_Invalid: return "Invalid"; break;
++        case TSE3::MidiCommand_TSE_Meta:
++        {
++            switch (c.data1)
++            {
++            case TSE3::MidiCommand_TSE_Meta_Tempo: return "TSE Meta: Tempo"; break;
++            case TSE3::MidiCommand_TSE_Meta_TimeSig: return "TSE Meta: TimeSig"; break;
++            case TSE3::MidiCommand_TSE_Meta_KeySig: return "TSE Meta: KeySig"; break;
++            case TSE3::MidiCommand_TSE_Meta_MoveTo: return "TSE Meta: MoveTo"; break;
++            case TSE3::MidiCommand_TSE_Meta_Text : {
++                return string("TSE Meta: Text = ")+c.str;
++                break;
++            }
++            default:
++                return "TSE Meta"; break;
++            }
++        }
++        case TSE3::MidiCommand_NoteEdit_Meta: return "Noteedit meta"; break;
++        }
++        return "Unknown";
++    }
++
++    virtual void 	Transport_MidiIn (TSE3::MidiCommand c) {
++        std::cout << "MidiIn: " << Show(c) << endl;
++    }
++    virtual void 	Transport_MidiOut (TSE3::MidiCommand c) {
++        if (c.status==TSE3::MidiCommand_TSE_Meta && c.data1==TSE3::MidiCommand_TSE_Meta_Text)
++        {
++            std::cout << c.str << endl;
++        }
++        //std::cout << "MidiOut: " << Show(c) << endl;
++    }
++};
++
++
+ int main(int argc, char *argv[])
+ {
+     if (argc < 2)
+     {
+         std::cout << "Useage: midifile <filename>\n";
++        exit(1);
+     }
+ 
+     /**************************************************************************
+      * 1. Load the MIDI file
+      *************************************************************************/
+ 
+-    TSE3::MidiFileImport mfi(argv[1]);
++    TSE3::MidiFileImport mfi(argv[1], 2);
+ 
+     /**************************************************************************
+      * 2. Create a Transport object to do some playback with
+@@ -62,32 +122,46 @@ int main(int argc, char *argv[])
+ 
+     // (You really want to create a MidiScheduler for your platform)
+     TSE3::Metronome                 metronome;
++#ifdef WIN32
++    TSE3::Plt::Win32MidiScheduler   scheduler;
++#else
+     TSE3::Util::StreamMidiScheduler scheduler;
++#endif
+     TSE3::Transport                 transport(&metronome, &scheduler);
+ 
++    //transport.filter()->setPort(scheduler.portNumber(1));
++    transport.filter()->setPort(1);
++
++    //TSE3::Notifier<TSE3::PlayableListener> plisten;
++    //TSE3::Transport::listener_type pl2;
++    //transport.attachTo(&plisten);
++
++    transport.attachCallback(new mycallback);
++
+     /**************************************************************************
+      * 3. Create a Song object from the file, and play the Song
+      *************************************************************************/
+ 
+     TSE3::Song *song = mfi.load();
+-
+     transport.play(song, 0);
+     while (transport.status() != TSE3::Transport::Resting)
+     {
+         transport.poll();
+         // perhaps sleep here to prevent slaughtering the CPU
++        //Sleep(100);
+     }
+ 
+     /**************************************************************************
+      * 4. The quicker way to just play a MIDI file
+      *************************************************************************/
+-
++/*
+     transport.play(&mfi, 0);
+     while (transport.status() != TSE3::Transport::Resting)
+     {
+         transport.poll();
+         // perhaps sleep here to prevent slaughtering the CPU
+     }
++*/
+ 
+     /**************************************************************************
+      * All done
+diff -urpNw tse3-0.3.1-old/src/tse3/Makefile.am tse3-0.3.1/src/tse3/Makefile.am
+--- tse3-0.3.1-old/src/tse3/Makefile.am	Mon Jul 25 08:23:00 2005
++++ tse3-0.3.1/src/tse3/Makefile.am	Fri Feb 22 12:24:44 2008
+@@ -1,9 +1,9 @@
+-tse3h_HEADERS = DisplayParams.h Error.h EventTrack.h FileBlockParser.h Filter.h TSE2MDL.h FlagTrack.h KeySigTrack.h Metronome.h Midi.h MidiCommandFilter.h MidiData.h MidiEcho.h MidiFile.h MidiFilter.h MidiMapper.h MidiParams.h Mixer.h Mutex.h Notifier.h Panic.h Part.h Phrase.h PhraseEdit.h PhraseList.h Playable.h Progress.h RepeatTrack.h MidiScheduler.h Serializable.h Song.h TempoTrack.h TimeSigTrack.h Track.h Transport.h TSE3.h TSE3MDL.h
++tse3h_HEADERS = DisplayParams.h Error.h EventTrack.h FileBlockParser.h Filter.h TSE2MDL.h FlagTrack.h KeySigTrack.h Metronome.h Midi.h MidiCommandFilter.h MidiData.h MidiEcho.h MidiFile.h MidiFilter.h MidiMapper.h MidiParams.h Mixer.h Mutex.h Notifier.h Panic.h Part.h Phrase.h PhraseEdit.h PhraseList.h Playable.h Progress.h RepeatTrack.h MidiScheduler.h Serializable.h Song.h TempoTrack.h TextTrack.h TimeSigTrack.h Track.h Transport.h TSE3.h TSE3MDL.h
+ tse3hdir = $(pkgincludedir)
+ 
+ lib_LTLIBRARIES = libtse3.la
+ 
+-libtse3_la_SOURCES = DisplayParams.cpp Error.cpp FileBlockParser.cpp Filter.cpp TSE2MDL.cpp FlagTrack.cpp KeySigTrack.cpp Metronome.cpp Midi.cpp MidiCommandFilter.cpp MidiData.cpp MidiEcho.cpp MidiFile.cpp MidiFilter.cpp MidiMapper.cpp MidiParams.cpp Mixer.cpp Mutex.cpp Notifier.cpp Panic.cpp Part.cpp Phrase.cpp PhraseEdit.cpp PhraseList.cpp Playable.cpp RepeatTrack.cpp MidiScheduler.cpp Serializable.cpp Song.cpp TempoTrack.cpp TimeSigTrack.cpp Track.cpp Transport.cpp TSE3.cpp TSE3MDL.cpp
++libtse3_la_SOURCES = DisplayParams.cpp Error.cpp FileBlockParser.cpp Filter.cpp TSE2MDL.cpp FlagTrack.cpp KeySigTrack.cpp Metronome.cpp Midi.cpp MidiCommandFilter.cpp MidiData.cpp MidiEcho.cpp MidiFile.cpp MidiFilter.cpp MidiMapper.cpp MidiParams.cpp Mixer.cpp Mutex.cpp Notifier.cpp Panic.cpp Part.cpp Phrase.cpp PhraseEdit.cpp PhraseList.cpp Playable.cpp RepeatTrack.cpp MidiScheduler.cpp Serializable.cpp Song.cpp TempoTrack.cpp TextTrack.cpp TimeSigTrack.cpp Track.cpp Transport.cpp TSE3.cpp TSE3MDL.cpp
+ man_MANS = tse3.3
+ 
+ EXTRA_DIST = tse3.3
+diff -urpNw tse3-0.3.1-old/src/tse3/Makefile.in tse3-0.3.1/src/tse3/Makefile.in
+--- tse3-0.3.1-old/src/tse3/Makefile.in	Tue Aug 23 10:27:38 2005
++++ tse3-0.3.1/src/tse3/Makefile.in	Fri Feb 22 13:01:22 2008
+@@ -70,8 +70,8 @@ am_libtse3_la_OBJECTS = DisplayParams.lo
+ 	MidiFile.lo MidiFilter.lo MidiMapper.lo MidiParams.lo Mixer.lo \
+ 	Mutex.lo Notifier.lo Panic.lo Part.lo Phrase.lo PhraseEdit.lo \
+ 	PhraseList.lo Playable.lo RepeatTrack.lo MidiScheduler.lo \
+-	Serializable.lo Song.lo TempoTrack.lo TimeSigTrack.lo Track.lo \
+-	Transport.lo TSE3.lo TSE3MDL.lo
++	Serializable.lo Song.lo TempoTrack.lo TextTrack.lo \
++	TimeSigTrack.lo Track.lo Transport.lo TSE3.lo TSE3MDL.lo
+ libtse3_la_OBJECTS = $(am_libtse3_la_OBJECTS)
+ PROGRAMS = $(noinst_PROGRAMS)
+ am_test_OBJECTS = test.$(OBJEXT)
+@@ -234,10 +234,10 @@ sbindir = @sbindir@
+ sharedstatedir = @sharedstatedir@
+ sysconfdir = @sysconfdir@
+ target_alias = @target_alias@
+-tse3h_HEADERS = DisplayParams.h Error.h EventTrack.h FileBlockParser.h Filter.h TSE2MDL.h FlagTrack.h KeySigTrack.h Metronome.h Midi.h MidiCommandFilter.h MidiData.h MidiEcho.h MidiFile.h MidiFilter.h MidiMapper.h MidiParams.h Mixer.h Mutex.h Notifier.h Panic.h Part.h Phrase.h PhraseEdit.h PhraseList.h Playable.h Progress.h RepeatTrack.h MidiScheduler.h Serializable.h Song.h TempoTrack.h TimeSigTrack.h Track.h Transport.h TSE3.h TSE3MDL.h
++tse3h_HEADERS = DisplayParams.h Error.h EventTrack.h FileBlockParser.h Filter.h TSE2MDL.h FlagTrack.h KeySigTrack.h Metronome.h Midi.h MidiCommandFilter.h MidiData.h MidiEcho.h MidiFile.h MidiFilter.h MidiMapper.h MidiParams.h Mixer.h Mutex.h Notifier.h Panic.h Part.h Phrase.h PhraseEdit.h PhraseList.h Playable.h Progress.h RepeatTrack.h MidiScheduler.h Serializable.h Song.h TempoTrack.h TextTrack.h TimeSigTrack.h Track.h Transport.h TSE3.h TSE3MDL.h
+ tse3hdir = $(pkgincludedir)
+ lib_LTLIBRARIES = libtse3.la
+-libtse3_la_SOURCES = DisplayParams.cpp Error.cpp FileBlockParser.cpp Filter.cpp TSE2MDL.cpp FlagTrack.cpp KeySigTrack.cpp Metronome.cpp Midi.cpp MidiCommandFilter.cpp MidiData.cpp MidiEcho.cpp MidiFile.cpp MidiFilter.cpp MidiMapper.cpp MidiParams.cpp Mixer.cpp Mutex.cpp Notifier.cpp Panic.cpp Part.cpp Phrase.cpp PhraseEdit.cpp PhraseList.cpp Playable.cpp RepeatTrack.cpp MidiScheduler.cpp Serializable.cpp Song.cpp TempoTrack.cpp TimeSigTrack.cpp Track.cpp Transport.cpp TSE3.cpp TSE3MDL.cpp
++libtse3_la_SOURCES = DisplayParams.cpp Error.cpp FileBlockParser.cpp Filter.cpp TSE2MDL.cpp FlagTrack.cpp KeySigTrack.cpp Metronome.cpp Midi.cpp MidiCommandFilter.cpp MidiData.cpp MidiEcho.cpp MidiFile.cpp MidiFilter.cpp MidiMapper.cpp MidiParams.cpp Mixer.cpp Mutex.cpp Notifier.cpp Panic.cpp Part.cpp Phrase.cpp PhraseEdit.cpp PhraseList.cpp Playable.cpp RepeatTrack.cpp MidiScheduler.cpp Serializable.cpp Song.cpp TempoTrack.cpp TextTrack.cpp TimeSigTrack.cpp Track.cpp Transport.cpp TSE3.cpp TSE3MDL.cpp
+ man_MANS = tse3.3
+ EXTRA_DIST = tse3.3
+ 
+@@ -373,6 +373,7 @@ distclean-compile:
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TSE3.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TSE3MDL.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TempoTrack.Plo@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TextTrack.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TimeSigTrack.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Track.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Transport.Plo@am__quote@
+diff -urpNw tse3-0.3.1-old/src/tse3/Midi.h tse3-0.3.1/src/tse3/Midi.h
+--- tse3-0.3.1-old/src/tse3/Midi.h	Tue Aug 23 09:47:34 2005
++++ tse3-0.3.1/src/tse3/Midi.h	Fri Feb 22 12:24:46 2008
+@@ -17,6 +17,9 @@
+ #ifndef TSE3_MIDI_H
+ #define TSE3_MIDI_H
+ 
++#include <string>
++#include <memory>
++
+ namespace TSE3
+ {
+     /**
+@@ -386,13 +389,16 @@ namespace TSE3
+      *                                       holds the time to move to. This
+      *                                       is generated by the
+      *                                       @ref SongIterator.
++     * @li @p MidiCommand_TSE_Meta_Text    - Data 2 holds the text
++     *                                       See @ref Text.
+      */
+     enum TSEMetaMidiCommands
+     {
+         MidiCommand_TSE_Meta_Tempo      = 0x00,
+         MidiCommand_TSE_Meta_TimeSig    = 0x01,
+         MidiCommand_TSE_Meta_KeySig     = 0x02,
+-        MidiCommand_TSE_Meta_MoveTo     = 0x03
++        MidiCommand_TSE_Meta_MoveTo     = 0x03,
++        MidiCommand_TSE_Meta_Text      = 0x0f
+     };
+ 
+     /**
+@@ -535,7 +541,22 @@ namespace TSE3
+         MidiCommand(int status, int channel, int port,
+                     int data1, int data2)
+             : port(port), status(status), channel(channel),
+-              data1(data1), data2(data2), selected(0) {}
++              data1(data1), data2(data2), selected(0), str("") {}
++
++        /**
++         * Construct a MidiCommmand with two data bytes and str
++         *
++         * @param status  Status value (4 bits).
++         * @param channel Channel value (0-15).
++         * @param port    Port value.
++         * @param data1   First data byte value (0-127).
++         * @param data2   Second data byte value (0-127).
++         * @param str     String value.
++         */
++        MidiCommand(int status, int channel, int port,
++                    int data1, int data2, const std::string &str)
++            : port(port), status(status), channel(channel),
++              data1(data1), data2(data2), selected(0), str(str) {}
+ 
+         /**
+          * Construct a MidiCommmand with one data byte
+@@ -548,14 +569,19 @@ namespace TSE3
+         MidiCommand(int status, int channel, int port,
+                     int data1)
+             : port(port), status(status), channel(channel),
+-              data1(data1), data2(0), selected(0) {}
++              data1(data1), data2(0), selected(0), str("") {}
+ 
+         /**
+          * Construct a MidiCommand with status MidiCommand_Invalid.
+          */
+         MidiCommand()
+             : port(0), status(MidiCommand_Invalid), channel(0),
+-              data1(0), data2(0), selected(0) {}
++              data1(0), data2(0), selected(0), str("") {}
++
++        /**
++         * Deletes str if needed.
++         */
++        //~MidiCommand() { if(str) delete str; }
+ 
+         /**
+          * Returns the number of data bytes this type of MidiCommand has.
+@@ -622,6 +648,11 @@ namespace TSE3
+          * @see Phrase
+          */
+         unsigned selected : 1;
++
++        /**
++         * The str value.
++         */
++        std::string str;
+ 
+         /**
+          * These are some "reserved" port numbers. Valid port numbers
+diff -urpNw tse3-0.3.1-old/src/tse3/MidiFile.cpp tse3-0.3.1/src/tse3/MidiFile.cpp
+--- tse3-0.3.1-old/src/tse3/MidiFile.cpp	Mon Jul 25 08:23:00 2005
++++ tse3-0.3.1/src/tse3/MidiFile.cpp	Fri Feb 22 12:24:46 2008
+@@ -23,6 +23,7 @@
+ #include "tse3/TempoTrack.h"
+ #include "tse3/TimeSigTrack.h"
+ #include "tse3/KeySigTrack.h"
++#include "tse3/TextTrack.h"
+ #include "tse3/PhraseList.h"
+ #include "tse3/PhraseEdit.h"
+ #include "tse3/Error.h"
+@@ -380,6 +381,21 @@ void MidiFileImportIterator::importMeta(
+                                          (sf << 4) | mi);
+             break;
+         }
++        case 0x01: // Text event
++        {
++            std::string text;
++            int n = 0;
++            while (n < length)
++            {
++                text += char(*(mtrkpos[c]++));
++                ++n;
++            }
++            mtrkcommand[c] = MidiCommand(MidiCommand_TSE_Meta, 0, 0,
++                                         MidiCommand_TSE_Meta_Text, 0,
++                                         text);
++            break;
++        }
++
+     }
+     mtrkpos[c] += length;
+ }
+@@ -444,6 +460,25 @@ MidiFileImport::MidiFileImport(const std
+ : filename(fn), verbose(v), out(o), file(0), fileLastClock(-1)
+ {
+     std::ifstream in(filename.c_str(), std::ios::binary | std::ios::in);
++    loadStream(in, v, o);
++}
++
++
++MidiFileImport::MidiFileImport(std::istream &in, int v, std::ostream &o)
++: filename(""), verbose(v), out(o), file(0), fileLastClock(-1)
++{
++    loadStream(in, v, o);
++}
++
++
++MidiFileImport::~MidiFileImport()
++{
++    delete [] file;
++}
++
++
++void MidiFileImport::loadStream(std::istream &in, int v, std::ostream &o)
++{
+     if (!in.good())
+     {
+         throw MidiFileImportError("Source MIDI file will not open.");
+@@ -481,12 +516,6 @@ MidiFileImport::MidiFileImport(const std
+ }
+ 
+ 
+-MidiFileImport::~MidiFileImport()
+-{
+-    delete [] file;
+-}
+-
+-
+ Song *MidiFileImport::load(Progress *progress)
+ {
+     Song *song = new Song(0);
+@@ -794,7 +823,18 @@ void MidiFileImport::loadMeta(size_t &po
+         }
+         case 0x01: // Text event
+         {
+-            if (verbose >= 2) out << "text event (skipping)\n";
++            if (verbose >= 2) out << "text event\n";
++
++            std::string text;
++            int n = 0;
++            while (n < length)
++            {
++                text += char(file[pos+n]);
++                ++n;
++            }
++            song->textTrack()->insert(Event<Text>(Text(text),
++                                        Clock::convert(time, filePPQN)));
++            //out << "text: " << text << "\n";
+             break;
+         }
+         case 0x03: // Sequence/Track name
+diff -urpNw tse3-0.3.1-old/src/tse3/MidiFile.h tse3-0.3.1/src/tse3/MidiFile.h
+--- tse3-0.3.1-old/src/tse3/MidiFile.h	Mon Jul 25 08:23:00 2005
++++ tse3-0.3.1/src/tse3/MidiFile.h	Fri Feb 22 12:24:46 2008
+@@ -81,6 +81,22 @@ namespace TSE3
+             MidiFileImport(const std::string &filename,
+                            int                verbose = 0,
+                            std::ostream      &out     = std::cout);
++
++            /**
++             * Creates a MidiFileImport object for the given MIDI input stream.
++             *
++             * @param  in 	Input stream of MIDI file to import.
++             * @param  verbose  Level of diagnostic output to produce
++             *                  0: none,
++             *                  1: basic reporting at chunk level
++             *                  2: Include meta information
++             *                  3: list all MIDI commands
++             * @param  out      ostream to produce output on.
++             * @throws MidiFileImportError
++             */
++            MidiFileImport(std::istream &in,
++                           int                verbose = 0,
++                           std::ostream      &out     = std::cout);
+             ~MidiFileImport();
+ 
+             /**
+@@ -118,6 +134,12 @@ namespace TSE3
+             friend class MidiFileImportIterator;
+ 
+         private:
++            /**
++             * Loads the MIDI file from stream
++             */
++            void loadStream(std::istream &in,
++		   int                verbose = 0,
++		   std::ostream      &out     = std::cout);
+ 
+             /**
+              * Loads the MIDI file header.
+diff -urpNw tse3-0.3.1-old/src/tse3/Song.cpp tse3-0.3.1/src/tse3/Song.cpp
+--- tse3-0.3.1-old/src/tse3/Song.cpp	Mon Jul 25 08:23:00 2005
++++ tse3-0.3.1/src/tse3/Song.cpp	Fri Feb 22 12:24:46 2008
+@@ -22,6 +22,7 @@
+ #include "tse3/KeySigTrack.h"
+ #include "tse3/PhraseList.h"
+ #include "tse3/FlagTrack.h"
++#include "tse3/TextTrack.h"
+ #include "tse3/FileBlockParser.h"
+ #include "tse3/Error.h"
+ #include "tse3/Mutex.h"
+@@ -174,6 +175,7 @@ namespace
+             PlayableIterator               *_tsti;    // TimeSigTrackIterator
+             PlayableIterator               *_ksti;    // KeySigTrackIterator
+             PlayableIterator               *_rti;     // RepeatIterator
++            PlayableIterator               *_txti;    // TextTrackIterator
+             int                             _source;  // where _next came from
+ 
+             /**
+@@ -186,7 +188,8 @@ namespace
+                 TimeSigTrack = -2,
+                 KeySigTrack  = -3,
+                 RepeatEvent  = -4,
+-                None         = -5
++                TextTrack    = -5,
++                None         = -6
+             };
+ 
+         private:
+@@ -204,6 +207,7 @@ SongIterator::SongIterator(Song *s, Cloc
+     _tsti = _song->timeSigTrack()->iterator(c);
+     _ksti = _song->keySigTrack()->iterator(c);
+     _rti  = new RepeatIterator(_song, c);
++    _txti  = _song->textTrack()->iterator(c);
+     updateIterators(c);
+     moveTo(c);
+     attachTo(_song);
+@@ -218,6 +222,7 @@ SongIterator::~SongIterator()
+     delete _tsti;
+     delete _ksti;
+     delete _rti;
++    delete _txti;
+ }
+ 
+ 
+@@ -244,6 +249,7 @@ void SongIterator::moveTo(Clock c)
+     if (_tsti) _tsti->moveTo(c);
+     if (_ksti) _ksti->moveTo(c);
+     if (_rti)  _rti->moveTo(c);
++    if (_txti)  _txti->moveTo(c);
+     std::vector<PlayableIterator*>::iterator i = _ti.begin();
+     while (i != _ti.end())
+     {
+@@ -287,6 +293,13 @@ void SongIterator::getNextEvent()
+             ++(*_rti);
+         }
+     }
++    else if (_source == TextTrack)
++    {
++        if (_txti)
++        {
++            ++(*_txti);
++        }
++    }
+     else if (_source != None)
+     {
+         ++(*(_ti[_source]));
+@@ -336,6 +349,16 @@ void SongIterator::getNextEvent()
+         }
+         _more = true;
+     }
++    if (_txti && _txti->more())
++    {
++        MidiEvent tmp = *(*_txti);
++        if (_more == false || tmp.time < _next.time)
++        {
++            _next   = tmp;
++            _source = TextTrack;
++        }
++        _more = true;
++    }
+ 
+     std::vector<PlayableIterator*>::iterator i = _ti.begin();
+     int trackNo = 0;
+@@ -387,6 +410,7 @@ class TSE3::SongImpl
+         TimeSigTrack         timeSigTrack;
+         KeySigTrack          keySigTrack;
+         FlagTrack            flagTrack;
++        TextTrack           textTrack;
+ 
+         std::vector<Track *> tracks;
+         int                  soloTrack; // -1 for no solo
+@@ -464,6 +488,10 @@ FlagTrack *Song::flagTrack()
+     return &pimpl->flagTrack;
+ }
+ 
++TextTrack *Song::textTrack()
++{
++    return &pimpl->textTrack;
++}
+ 
+ const std::string &Song::title() const
+ {
+@@ -818,6 +846,8 @@ void Song::save(std::ostream &o, int i) 
+     pimpl->keySigTrack.save(o, i+1);
+     o << indent(i+1) << "FlagTrack\n";
+     pimpl->flagTrack.save(o, i+1);
++    o << indent(i+1) << "TextTrack\n";
++    pimpl->textTrack.save(o, i+1);
+     o << indent(i+1) << "SoloTrack:" << soloTrack()              << "\n";
+     o << indent(i+1) << "Repeat:";
+     if (pimpl->repeat) o << "On\n"; else o << "Off\n";
+@@ -883,6 +913,7 @@ void Song::load(std::istream &in, Serial
+     parser.add("TimeSigTrack", &pimpl->timeSigTrack);
+     parser.add("KeySigTrack",  &pimpl->keySigTrack);
+     parser.add("FlagTrack",    &pimpl->flagTrack);
++    parser.add("TextTrack",   &pimpl->textTrack);
+     parser.add("Phrase",       &pimpl->phraseList);
+     parser.add("Track",        &trackLoader);
+     parser.parse(in, info);
+diff -urpNw tse3-0.3.1-old/src/tse3/Song.h tse3-0.3.1/src/tse3/Song.h
+--- tse3-0.3.1-old/src/tse3/Song.h	Mon Jul 25 08:23:00 2005
++++ tse3-0.3.1/src/tse3/Song.h	Fri Feb 22 12:24:46 2008
+@@ -34,6 +34,7 @@ namespace TSE3
+     class KeySigTrack;
+     class PhraseList;
+     class FlagTrack;
++    class TextTrack;
+ 
+     /**
+      * The Song is the container of an entire piece of music. It contains
+@@ -125,6 +126,14 @@ namespace TSE3
+              * @return Song's @ref FlagTrack
+              */
+             FlagTrack *flagTrack();
++
++            /**
++             * Returns the Song's @ref TextTrack.
++             *
++             * @return Song's @ref TextTrack
++             */
++            TextTrack *textTrack();
++
+ 
+             /**
+              * Read the Song title.
+diff -urpNw tse3-0.3.1-old/src/tse3/TextTrack.cpp tse3-0.3.1/src/tse3/TextTrack.cpp
+--- tse3-0.3.1-old/src/tse3/TextTrack.cpp	Wed Dec 31 21:00:00 1969
++++ tse3-0.3.1/src/tse3/TextTrack.cpp	Fri Feb 22 12:24:46 2008
+@@ -0,0 +1,263 @@
++/*
++ * @(#)TextTrack.cpp 3.00 17 Feb 2008
++ *
++ * Copyright (c) 2008 Rangel Reale (rreale@bol.com.br)
++ *
++ * This file is part of TSE3 - the Trax Sequencer Engine version 3.00.
++ *
++ * This library is modifiable/redistributable under the terms of the GNU
++ * General Public License.
++ *
++ * You should have received a copy of the GNU General Public License along
++ * with this program; see the file COPYING. If not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
++ *
++ */
++
++#include "tse3/TextTrack.h"
++#include "tse3/FileBlockParser.h"
++
++#include <sstream>
++
++using namespace TSE3;
++
++/******************************************************************************
++ * TextTrackIterator class
++ *****************************************************************************/
++
++namespace TSE3
++{
++    /**
++     * The @ref PlayableIterator for the @ref TextTrack class.
++     *
++     * @short   TextTrack PlayableIterator.
++     * @author  Rangel Reale
++     * @version 3.00
++     * @see     PlayableIterator
++     * @see     TextTrack
++     */
++    class TextTrackIterator : public PlayableIterator,
++                               public Listener<TextTrackListener>
++    {
++        public:
++
++            TextTrackIterator(TextTrack *t, Clock c);
++            virtual ~TextTrackIterator();
++            virtual void moveTo(Clock c);
++
++            virtual void EventTrack_EventAltered(EventTrack<Text> *);
++            virtual void EventTrack_EventInserted(EventTrack<Text> *);
++            virtual void EventTrack_EventErased(EventTrack<Text> *);
++            virtual void Notifier_Deleted(EventTrack<Text> *);
++
++        protected:
++
++            virtual void getNextEvent();
++
++            size_t      _pos;
++            TextTrack *_ttrack;
++
++        private:
++
++            TextTrackIterator &operator=(const TextTrackIterator &);
++            TextTrackIterator(const TextTrackIterator &);
++    };
++}
++
++
++TextTrackIterator::TextTrackIterator(TextTrack *t, Clock c)
++: _pos(0), _ttrack(t)
++{
++    moveTo(c);
++    attachTo(_ttrack);
++}
++
++
++TextTrackIterator::~TextTrackIterator()
++{
++}
++
++
++void TextTrackIterator::moveTo(Clock c)
++{
++    if (_ttrack) _pos = _ttrack->index(c);
++    if (!_ttrack || _pos == _ttrack->size() || !_ttrack->status())
++    {
++        _more = false;
++        _next = MidiEvent();
++    }
++    else
++    {
++        _more = true;
++        _next = MidiEvent(MidiCommand(MidiCommand_TSE_Meta, 0, 0,
++                                      MidiCommand_TSE_Meta_Text, 0,
++                                      (*_ttrack)[_pos].data.text),
++                         (*_ttrack)[_pos].time);
++    }
++}
++
++
++void TextTrackIterator::getNextEvent()
++{
++    ++_pos;
++    if (_pos == _ttrack->size())
++    {
++        _more = false;
++        _next = MidiEvent();
++    }
++    else
++    {
++        _more = true;
++        _next = MidiEvent(MidiCommand(MidiCommand_TSE_Meta, 0, 0,
++                                      MidiCommand_TSE_Meta_Text, 0,
++                                      (*_ttrack)[_pos].data.text),
++                         (*_ttrack)[_pos].time);
++    }
++}
++
++
++void TextTrackIterator::EventTrack_EventAltered(EventTrack<Text> *)
++{
++    moveTo(_next.time);
++}
++
++
++void TextTrackIterator::EventTrack_EventInserted(EventTrack<Text> *)
++{
++    moveTo(_next.time);
++}
++
++
++void TextTrackIterator::EventTrack_EventErased(EventTrack<Text> *)
++{
++    moveTo(_next.time);
++}
++
++
++void TextTrackIterator::Notifier_Deleted(EventTrack<Text> *)
++{
++    _ttrack = 0;
++    _more   = false;
++    _next   = MidiEvent();
++}
++
++
++/******************************************************************************
++ * TextTrack class
++ *****************************************************************************/
++
++TextTrack::TextTrack()
++: _status(true)
++{
++    insert(Event<Text>(Text(), 0));
++}
++
++
++TextTrack::~TextTrack()
++{
++}
++
++
++PlayableIterator *TextTrack::iterator(Clock index)
++{
++    return new TextTrackIterator(this, index);
++}
++
++
++Clock TextTrack::lastClock() const
++{
++    return (!data.empty()) ? data[size()-1].time : Clock(0);
++}
++
++/******************************************************************************
++ * TextTrack Serializable interface
++ *****************************************************************************/
++
++void TextTrack::save(std::ostream &o, int i) const
++{
++
++}
++
++void TextTrack::load(std::istream &in, SerializableLoadInfo &info)
++{
++
++}
++
++#if 0
++void TextTrack::save(std::ostream &o, int i) const
++{
++    o << indent(i)   << "{\n";
++    o << indent(i+1) << "Status:";
++    if (_status)
++        o << "On\n";
++    else
++        o << "Off\n";
++    o << indent(i+1) << "Events\n";
++    o << indent(i+1) << "{\n";
++    for (size_t n = 0; n < size(); ++n)
++    {
++        o << indent(i+2) << data[n].time << ":" << data[n].data.text << "\n";
++    }
++    o << indent(i+1) << "}\n";
++    o << indent(i) << "}\n";
++}
++
++
++namespace
++{
++    /**
++     * A catch-all FileItemParser to handle data items in the TextTrack
++     * Events sub-block.
++     */
++    class FileItemParser_Events : public FileItemParser
++    {
++        public:
++            FileItemParser_Events(TextTrack *tt, int PPQN)
++            : tt(tt), PPQN(PPQN) {}
++            virtual void parse(const std::string &line)
++            {
++                int time, tempo;
++                std::istringstream si(line);
++                si >> time;
++                si.ignore(1); // skip colon
++                si >> tempo;
++                time = Clock::convert(time, PPQN);
++                tt->insert(Event<Text>(Tempo(tempo), time));
++            }
++        private:
++            TextTrack *tt;
++            int         PPQN;
++    };
++
++    /**
++     * A simple Serializable class that creates a simple FileBlockParser
++     * to load the Events sub-block of the TextTrack block.
++     */
++    class Events : public Serializable
++    {
++        public:
++            Events(TextTrack *tt)
++            : tt(tt) {}
++            virtual void load(std::istream &in, SerializableLoadInfo &info)
++            {
++                FileItemParser_Events events(tt, info.PPQN);
++                FileBlockParser parser;
++                parser.add(&events);
++                parser.parse(in, info);
++            }
++        private:
++            TextTrack *tt;
++    };
++}
++
++
++void TextTrack::load(std::istream &in, SerializableLoadInfo &info)
++{
++    FileItemParser_OnOff<TextTrack> status(this, &TextTrack::setStatus);
++    Events events(this);
++    FileBlockParser parser;
++    parser.add("Status", &status);
++    parser.add("Events", &events);
++    parser.parse(in, info);
++}
++#endif
+diff -urpNw tse3-0.3.1-old/src/tse3/TextTrack.h tse3-0.3.1/src/tse3/TextTrack.h
+--- tse3-0.3.1-old/src/tse3/TextTrack.h	Wed Dec 31 21:00:00 1969
++++ tse3-0.3.1/src/tse3/TextTrack.h	Fri Feb 22 12:24:46 2008
+@@ -0,0 +1,137 @@
++/*
++ * @(#)TextTrack.h 3.00 17 Feb 2008
++ *
++ * Copyright (c) 2008 Rangel Reale (rreale@bol.com.br)
++ *
++ * This file is part of TSE3 - the Trax Sequencer Engine version 3.00.
++ *
++ * This library is modifiable/redistributable under the terms of the GNU
++ * General Public License.
++ *
++ * You should have received a copy of the GNU General Public License along
++ * with this program; see the file COPYING. If not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
++ *
++ */
++
++#ifndef TSE3_TEXTTRACK_H
++#define TSE3_TEXTTRACK_H
++
++#include "tse3/listen/TextTrack.h"
++
++#include "tse3/Notifier.h"
++#include "tse3/Playable.h"
++#include "tse3/Serializable.h"
++#include "tse3/EventTrack.h"
++
++#include <string>
++
++namespace TSE3
++{
++    /**
++     * Text objects are song lyrics
++     *
++     * This class defines the type that is used to create text events,
++     * which are of type @ref Event<@ref Text>.
++     *
++     * Text is a value type.
++     *
++     * @short   A text (lyrics) event
++     * @author  Rangel Reale
++     * @version 3.00
++     * @see     TextTrack
++     * @see     Event
++     */
++    class Text
++    {
++        public:
++
++            /**
++             * Create a Text.
++             *
++             * @param t Text value
++             */
++            Text(std::string t = "") : text(t) {}
++
++            std::string text;
++
++            int operator==(const Text &f) const { return text == f.text; }
++    };
++
++    /**
++     * The TextTrack provides a simple time ordered list of lyrics
++     * in the @ref Song.
++     *
++     * There is one TextTrack per @ref Song.
++     *
++     * @short   A list of Text events
++     * @author  Rangel Reale
++     * @version 3.00
++     * @see     Event
++     * @see     Text
++     */
++    class TextTrack : public EventTrack<Text>,
++                       public Serializable
++    {
++        public:
++
++            /**
++             * Creates an empty TextTrack.
++             */
++            TextTrack();
++            virtual ~TextTrack();
++
++            /**
++             * Returns the status of the TextTrack.
++             *
++             * A value of true means text events are generated, a value of
++             * false means no text events are generated
++             *
++             * @return TextTrack status
++             * @see    setStatus
++             */
++            bool status() const { return _status; }
++
++            /**
++             * Set the TextTrack status value.
++             *
++             * @param s New status
++             * @see   status
++             */
++            void setStatus(bool s) { _status = s; }
++
++            /**
++             * @reimplemented
++             */
++            virtual PlayableIterator *iterator(Clock index);
++
++            /**
++             * @reimplemented
++             */
++            virtual Clock lastClock() const;
++
++            /**
++             * @reimplemented
++             */
++            virtual void save(std::ostream &o, int i) const;
++
++            /**
++             * @reimplemented
++             */
++            virtual void load(std::istream &i, SerializableLoadInfo &info);
++
++        private:
++
++            TextTrack &operator=(const TextTrack &);
++            TextTrack(const TextTrack &);
++
++            /**
++             * Used by load to read events.
++             */
++            void loadEvents(std::istream &i, int filePPQN);
++
++            bool _status;
++    };
++}
++
++#endif
+diff -urpNw tse3-0.3.1-old/src/tse3/Transport.cpp tse3-0.3.1/src/tse3/Transport.cpp
+--- tse3-0.3.1-old/src/tse3/Transport.cpp	Mon Jul 25 08:23:00 2005
++++ tse3-0.3.1/src/tse3/Transport.cpp	Fri Feb 22 12:24:46 2008
+@@ -572,6 +572,11 @@ void Transport::pollPlayback()
+                             metronome->setBeatsPerBar(e.data.data2 >> 4);
+                             break;
+                         }
++                        case MidiCommand_TSE_Meta_Text:
++                        {
++                            callback_MidiOut(e.data);
++                            break;
++                        }
+                     }
+                 }
+ 
+diff -urpNw tse3-0.3.1-old/src/tse3/cmd/Phrase.h tse3-0.3.1/src/tse3/cmd/Phrase.h
+--- tse3-0.3.1-old/src/tse3/cmd/Phrase.h	Mon Jul 25 08:22:38 2005
++++ tse3-0.3.1/src/tse3/cmd/Phrase.h	Fri Feb 22 12:24:44 2008
+@@ -19,6 +19,7 @@
+ 
+ #include "tse3/cmd/Command.h"
+ #include "tse3/Phrase.h"
++#include "tse3/PhraseEdit.h"
+ #include "tse3/DisplayParams.h"
+ 
+ #include <vector>
+diff -urpNw tse3-0.3.1-old/src/tse3/listen/TextTrack.h tse3-0.3.1/src/tse3/listen/TextTrack.h
+--- tse3-0.3.1-old/src/tse3/listen/TextTrack.h	Wed Dec 31 21:00:00 1969
++++ tse3-0.3.1/src/tse3/listen/TextTrack.h	Fri Feb 22 12:24:44 2008
+@@ -0,0 +1,30 @@
++/*
++ * @(#)listen/TextTrack.h 3.00 17 Feb 2008
++ *
++ * Copyright (c) 2008 Rangel Reale (rreale@bol.com.br)
++ *
++ * This file is part of TSE3 - the Trax Sequencer Engine version 3.00.
++ *
++ * This library is modifiable/redistributable under the terms of the GNU
++ * General Public License.
++ *
++ * You should have received a copy of the GNU General Public License along
++ * with this program; see the file COPYING. If not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
++ *
++ */
++
++#ifndef TSE3_LISTEN_TEXTTRACK_H
++#define TSE3_LISTEN_TEXTTRACK_H
++
++#include "tse3/listen/EventTrack.h"
++
++namespace TSE3
++{
++    class Text;
++    class TextTrack;
++
++    typedef EventTrackListener<Text> TextTrackListener;
++}
++
++#endif
+diff -urpNw tse3-0.3.1-old/src/tse3/plt/Factory_Win32.cpp tse3-0.3.1/src/tse3/plt/Factory_Win32.cpp
+--- tse3-0.3.1-old/src/tse3/plt/Factory_Win32.cpp	Mon Jul 25 08:22:56 2005
++++ tse3-0.3.1/src/tse3/plt/Factory_Win32.cpp	Fri Feb 22 12:24:46 2008
+@@ -26,8 +26,48 @@
+ 
+ #include "tse3/Error.h"
+ 
++using namespace std;
++using namespace TSE3;
+ using namespace TSE3::Plt;
+ 
++/******************************************************************************
++ * Win32 MidiSchedulerFactory class
++ *****************************************************************************/
++
++MidiSchedulerFactory::MidiSchedulerFactory(bool b)
++: _canReturnNull(b)
++{
++}
++
++
++MidiSchedulerFactory::~MidiSchedulerFactory()
++{
++}
++
++
++MidiScheduler *MidiSchedulerFactory::createScheduler()
++{
++    try
++    {
++        Win32MidiScheduler *ms = new Win32MidiScheduler();
++        cout << "Created new Win32MidiScheduler seccussfully\n";
++        return ms;
++    }
++    catch (MidiSchedulerError)
++    {
++        cout << "Failed to create a Win32MidiScheduler\n";
++        if (_canReturnNull)
++        {
++            return new TSE3::Util::NullMidiScheduler();
++        }
++        else
++        {
++            throw;
++        }
++    }
++}
++
++/*
+ 
+ TSE3::MidiSchedulerFactory::MidiSchedulerFactory(bool c)
+ : _canReturnNull(c)
+@@ -54,4 +94,4 @@ TSE3::MidiScheduler *TSE3::MidiScheduler
+     }
+ }
+ 
+-
++*/
+diff -urpNw tse3-0.3.1-old/src/tse3/plt/OSS.cpp tse3-0.3.1/src/tse3/plt/OSS.cpp
+--- tse3-0.3.1-old/src/tse3/plt/OSS.cpp	Mon Jul 25 08:22:56 2005
++++ tse3-0.3.1/src/tse3/plt/OSS.cpp	Fri Feb 22 12:24:46 2008
+@@ -29,8 +29,14 @@
+ // These #includes are linux specific and I need to do some autoconf
+ // magic to work out how to conditionally include them
+ 
++#ifdef TSE3_WITH_OSS
+ #include <sys/ioctl.h>
++#endif
++
++// awe_voice.h is no longer included in modern kernels, use local copy
++#include "awe_voice.h"
+ 
++/*
+ #ifdef HAVE_LINUX_AWE_VOICE_H
+ #include <linux/awe_voice.h>
+ #elif HAVE_AWE_VOICE_H
+@@ -40,6 +46,7 @@
+ #elif HAVE__USR_SRC_SYS_GNU_I386_ISA_SOUND_AWE_VOICE_H
+ #include "/usr/src/sys/gnu/i386/isa/sound/awe_voice.h"
+ #endif
++*/
+ 
+ #ifndef TSE3_WITH_OSS
+     // Euch!
+diff -urpNw tse3-0.3.1-old/src/tse3/plt/Win32.cpp tse3-0.3.1/src/tse3/plt/Win32.cpp
+--- tse3-0.3.1-old/src/tse3/plt/Win32.cpp	Mon Jul 25 08:22:56 2005
++++ tse3-0.3.1/src/tse3/plt/Win32.cpp	Fri Feb 22 12:24:46 2008
+@@ -24,6 +24,8 @@
+ #include "tse3/Error.h"
+ #include "tse3/util/MulDiv.h"
+ 
++#include "tse3/util/MidiScheduler.h"
++
+ #include <windows.h>
+ 
+ using namespace TSE3;
+@@ -41,7 +43,7 @@ static char *STR_MOD_UNKNOWN  = "Unknown
+ /******************************************************************************
+  * Win32 MidiSchedulerFactory class
+  *****************************************************************************/
+-
++/*
+ MidiSchedulerFactory::MidiSchedulerFactory(bool b)
+ : _canReturnNull(b)
+ {
+@@ -61,12 +63,12 @@ MidiScheduler *MidiSchedulerFactory::cre
+         cout << "Created new Win32MidiScheduler seccussfully\n";
+         return ms;
+     }
+-    catch (Win32MidiSchedulerException)
++    catch (MidiSchedulerError)
+     {
+         cout << "Failed to create a Win32MidiScheduler\n";
+         if (_canReturnNull)
+         {
+-            return new NullMidiScheduler();
++            return new TSE3::Util::NullMidiScheduler();
+         }
+         else
+         {
+@@ -74,7 +76,7 @@ MidiScheduler *MidiSchedulerFactory::cre
+         }
+     }
+ }
+-
++*/
+ 
+ 
+ /******************************************************************************
+@@ -82,7 +84,7 @@ MidiScheduler *MidiSchedulerFactory::cre
+  *****************************************************************************/
+ 
+ Win32MidiScheduler::Win32MidiScheduler()
+-: hMidi(NULL), nMidi(0)
++: hMidi(NULL), nMidi(0), wstartClock(0)
+ {
+     unsigned int nMidiIn = midiInGetNumDevs();
+     nMidi                = midiOutGetNumDevs() + nMidiIn;
+@@ -132,7 +134,7 @@ Win32MidiScheduler::~Win32MidiScheduler(
+ }
+ 
+ 
+-const char* Win32MidiScheduler::impl_implementationName()
++const char* Win32MidiScheduler::impl_implementationName() const
+ {
+     return "Win32MidiScheduler version 0.00 [dev].";
+ }
+@@ -140,7 +142,7 @@ const char* Win32MidiScheduler::impl_imp
+ 
+ const char* Win32MidiScheduler::impl_portName(int port) const
+ {
+-  if (port > ports()) 
++  if (port > numPorts())
+     return NULL;
+   else if (port < midiInGetNumDevs()) {
+     MIDIINCAPS m;
+@@ -155,7 +157,7 @@ const char* Win32MidiScheduler::impl_por
+ 
+ const char* Win32MidiScheduler::impl_portType(int port) const
+ {
+-  if (port > ports()) return NULL;
++  if (port > numPorts()) return NULL;
+   if (port < midiInGetNumDevs()) {
+     return "MIDI Input Device";
+   } else {
+@@ -194,7 +196,7 @@ void Win32MidiScheduler::impl_tx(MidiCom
+ //    midiShortMsg((int)mc);
+ }
+ 
+-void Win32MidiScheduler::impl_runMidiData(HMIDIOUT o, MidiCommand mc) {
++void Win32MidiScheduler::runMidiData(HMIDIOUT o, MidiCommand mc) {
+   union {
+     DWORD dwData;
+     BYTE  bData[4];
+@@ -210,12 +212,12 @@ void Win32MidiScheduler::impl_runMidiDat
+ 
+ void Win32MidiScheduler::impl_start(Clock s)
+ {
+-    if (!_running) {
++    if (!running()) {
+        TIMECAPS timecaps;
+        timeGetDevCaps(&timecaps, sizeof(timecaps));
+        timeBeginPeriod(10);
+ 
+-       startTime = timeGetTime();
++       wstartClock = timeGetTime();
+        clockStarted(s);
+     }
+ }
+@@ -223,12 +225,14 @@ void Win32MidiScheduler::impl_start(Cloc
+ 
+ void Win32MidiScheduler::impl_stop(Clock t)
+ {
+-    if (!_running) return;
++    if (!running()) return;
++/*
+     if (t != -1) {
+       restingClock = t;
+     } else {
+       restingClock = clock();
+     }
++*/
+     timeEndPeriod(10);
+     clockStopped(t);
+ }
+@@ -242,14 +246,15 @@ void Win32MidiScheduler::impl_moveTo(Clo
+ 
+ Clock Win32MidiScheduler::impl_clock()
+ {
+-    int time = timeGetTime() - startTime;
++    int time = timeGetTime() - wstartClock;
+     return msToClock(time);
+ }
+ 
+ 
+ int Win32MidiScheduler::impl_msecs()
+ {
+-    return timeGetTime() - startTime;
++    return timeGetTime() - wstartClock;
++    //return timeGetTime();
+ }
+ 
+ 
+@@ -285,8 +290,7 @@ struct CallbackData
+   Win32MidiScheduler* sch;
+ };
+ 
+-
+-void Win32MidiScheduler::impl_callback(UINT uID,    UINT uMsg, 
++void Win32MidiScheduler::callback(UINT uID,    UINT uMsg,
+                                   DWORD _data, DWORD dw1, DWORD dw2)
+ {
+   CallbackData *data = (CallbackData*) _data;
+@@ -294,13 +298,12 @@ void Win32MidiScheduler::impl_callback(U
+   delete data;
+ }
+ 
+-
+ void Win32MidiScheduler::impl_tx(MidiEvent e)
+ {
+   unsigned int msecs = clockToMs(e.time);  
+   if (msecs > timeGetTime()) {
+     if (  e.data.port < midiInGetNumDevs() 
+-       || e.data.port > ports()) 
++       || e.data.port > numPorts())
+           return;
+     CallbackData* data = new CallbackData;
+     data->port = hMidi[e.data.port].out;
+diff -urpNw tse3-0.3.1-old/src/tse3/plt/Win32.h tse3-0.3.1/src/tse3/plt/Win32.h
+--- tse3-0.3.1-old/src/tse3/plt/Win32.h	Mon Jul 25 08:22:56 2005
++++ tse3-0.3.1/src/tse3/plt/Win32.h	Fri Feb 22 12:24:46 2008
+@@ -20,6 +20,8 @@
+ #include "tse3/MidiScheduler.h"
+ #include <Windows.h>
+ 
++using namespace std;
++
+ namespace TSE3
+ {
+     namespace Plt
+@@ -122,10 +124,12 @@ namespace TSE3
+               };
+               HMIDI   *hMidi;
+               UINT     nMidi;
++              Clock wstartClock;
+ 
+               void runMidiData(HMIDIOUT, MidiCommand);
+-              static void callback(UINT, UINT, DWORD, DWORD, DWORD); 
++	      static CALLBACK void callback(UINT, UINT, DWORD, DWORD, DWORD);
+         };
++
+     }
+ }
+ 
+diff -urpNw tse3-0.3.1-old/src/tse3/plt/awe_voice.h tse3-0.3.1/src/tse3/plt/awe_voice.h
+--- tse3-0.3.1-old/src/tse3/plt/awe_voice.h	Wed Dec 31 21:00:00 1969
++++ tse3-0.3.1/src/tse3/plt/awe_voice.h	Fri Feb 22 12:24:46 2008
+@@ -0,0 +1,525 @@
++/*
++ * sound/awe_voice.h
++ *
++ * Voice information definitions for the low level driver for the 
++ * AWE32/SB32/AWE64 wave table synth.
++ *   version 0.4.4; Jan. 4, 2000
++ *
++ * Copyright (C) 1996-2000 Takashi Iwai
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
++ */
++
++#ifndef AWE_VOICE_H
++#define AWE_VOICE_H
++
++#ifndef SAMPLE_TYPE_AWE32
++#define SAMPLE_TYPE_AWE32	0x20
++#endif
++
++#ifndef _PATCHKEY
++#define _PATCHKEY(id) ((id<<8)|0xfd)
++#endif
++
++/*----------------------------------------------------------------
++ * patch information record
++ *----------------------------------------------------------------*/
++
++/* patch interface header: 16 bytes */
++typedef struct awe_patch_info {
++	short key;			/* use AWE_PATCH here */
++#define AWE_PATCH	_PATCHKEY(0x07)
++
++	short device_no;		/* synthesizer number */
++	unsigned short sf_id;		/* file id (should be zero) */
++	short optarg;			/* optional argument */
++	int len;			/* data length (without this header) */
++
++	short type;			/* patch operation type */
++#define AWE_LOAD_INFO		0	/* awe_voice_rec */
++#define AWE_LOAD_DATA		1	/* awe_sample_info */
++#define AWE_OPEN_PATCH		2	/* awe_open_parm */
++#define AWE_CLOSE_PATCH		3	/* none */
++#define AWE_UNLOAD_PATCH	4	/* none */
++#define AWE_REPLACE_DATA	5	/* awe_sample_info (optarg=#channels)*/
++#define AWE_MAP_PRESET		6	/* awe_voice_map */
++/*#define AWE_PROBE_INFO	7*/	/* awe_voice_map (pat only) */
++#define AWE_PROBE_DATA		8	/* optarg=sample */
++#define AWE_REMOVE_INFO		9	/* optarg=(bank<<8)|instr */
++#define AWE_LOAD_CHORUS_FX	0x10	/* awe_chorus_fx_rec (optarg=mode) */
++#define AWE_LOAD_REVERB_FX	0x11	/* awe_reverb_fx_rec (optarg=mode) */
++
++	short reserved;			/* word alignment data */
++
++	/* the actual patch data begins after this */
++#if defined(AWE_COMPAT_030) && AWE_COMPAT_030
++	char data[0];
++#endif
++} awe_patch_info;
++
++/*#define AWE_PATCH_INFO_SIZE	16*/
++#define AWE_PATCH_INFO_SIZE	sizeof(awe_patch_info)
++
++
++/*----------------------------------------------------------------
++ * open patch
++ *----------------------------------------------------------------*/
++
++#define AWE_PATCH_NAME_LEN	32
++
++typedef struct _awe_open_parm {
++	unsigned short type;		/* sample type */
++#define AWE_PAT_TYPE_MISC	0
++#define AWE_PAT_TYPE_GM		1
++#define AWE_PAT_TYPE_GS		2
++#define AWE_PAT_TYPE_MT32	3
++#define AWE_PAT_TYPE_XG		4
++#define AWE_PAT_TYPE_SFX	5
++#define AWE_PAT_TYPE_GUS	6
++#define AWE_PAT_TYPE_MAP	7
++
++#define AWE_PAT_LOCKED		0x100	/* lock the samples */
++#define AWE_PAT_SHARED		0x200	/* sample is shared */
++
++	short reserved;
++	char name[AWE_PATCH_NAME_LEN];
++} awe_open_parm;
++
++/*#define AWE_OPEN_PARM_SIZE	28*/
++#define AWE_OPEN_PARM_SIZE	sizeof(awe_open_parm)
++
++
++/*----------------------------------------------------------------
++ * raw voice information record
++ *----------------------------------------------------------------*/
++
++/* wave table envelope & effect parameters to control EMU8000 */
++typedef struct _awe_voice_parm {
++	unsigned short moddelay;	/* modulation delay (0x8000) */
++	unsigned short modatkhld;	/* modulation attack & hold time (0x7f7f) */
++	unsigned short moddcysus;	/* modulation decay & sustain (0x7f7f) */
++	unsigned short modrelease;	/* modulation release time (0x807f) */
++	short modkeyhold, modkeydecay;	/* envelope change per key (not used) */
++	unsigned short voldelay;	/* volume delay (0x8000) */
++	unsigned short volatkhld;	/* volume attack & hold time (0x7f7f) */
++	unsigned short voldcysus;	/* volume decay & sustain (0x7f7f) */
++	unsigned short volrelease;	/* volume release time (0x807f) */
++	short volkeyhold, volkeydecay;	/* envelope change per key (not used) */
++	unsigned short lfo1delay;	/* LFO1 delay (0x8000) */
++	unsigned short lfo2delay;	/* LFO2 delay (0x8000) */
++	unsigned short pefe;		/* modulation pitch & cutoff (0x0000) */
++	unsigned short fmmod;		/* LFO1 pitch & cutoff (0x0000) */
++	unsigned short tremfrq;		/* LFO1 volume & freq (0x0000) */
++	unsigned short fm2frq2;		/* LFO2 pitch & freq (0x0000) */
++	unsigned char cutoff;		/* initial cutoff (0xff) */
++	unsigned char filterQ;		/* initial filter Q [0-15] (0x0) */
++	unsigned char chorus;		/* chorus send (0x00) */
++	unsigned char reverb;		/* reverb send (0x00) */
++	unsigned short reserved[4];	/* not used */
++} awe_voice_parm;
++
++typedef struct _awe_voice_parm_block {
++	unsigned short moddelay;	/* modulation delay (0x8000) */
++	unsigned char modatk, modhld;
++	unsigned char moddcy, modsus;
++	unsigned char modrel, moddummy;
++	short modkeyhold, modkeydecay;	/* envelope change per key (not used) */
++	unsigned short voldelay;	/* volume delay (0x8000) */
++	unsigned char volatk, volhld;
++	unsigned char voldcy, volsus;
++	unsigned char volrel, voldummy;
++	short volkeyhold, volkeydecay;	/* envelope change per key (not used) */
++	unsigned short lfo1delay;	/* LFO1 delay (0x8000) */
++	unsigned short lfo2delay;	/* LFO2 delay (0x8000) */
++	unsigned char env1fc, env1pit;
++	unsigned char lfo1fc, lfo1pit;
++	unsigned char lfo1freq, lfo1vol;
++	unsigned char lfo2freq, lfo2pit;
++	unsigned char cutoff;		/* initial cutoff (0xff) */
++	unsigned char filterQ;		/* initial filter Q [0-15] (0x0) */
++	unsigned char chorus;		/* chorus send (0x00) */
++	unsigned char reverb;		/* reverb send (0x00) */
++	unsigned short reserved[4];	/* not used */
++} awe_voice_parm_block;
++
++#define AWE_VOICE_PARM_SIZE	48
++
++
++/* wave table parameters: 92 bytes */
++typedef struct _awe_voice_info {
++	unsigned short sf_id;		/* file id (should be zero) */
++	unsigned short sample;		/* sample id */
++	int start, end;			/* sample offset correction */
++	int loopstart, loopend;		/* loop offset correction */
++	short rate_offset;		/* sample rate pitch offset */
++	unsigned short mode;		/* sample mode */
++#define AWE_MODE_ROMSOUND		0x8000
++#define AWE_MODE_STEREO			1
++#define AWE_MODE_LOOPING		2
++#define AWE_MODE_NORELEASE		4	/* obsolete */
++#define AWE_MODE_INIT_PARM		8
++
++	short root;			/* midi root key */
++	short tune;			/* pitch tuning (in cents) */
++	signed char low, high;		/* key note range */
++	signed char vellow, velhigh;	/* velocity range */
++	signed char fixkey, fixvel;	/* fixed key, velocity */
++	signed char pan, fixpan;	/* panning, fixed panning */
++	short exclusiveClass;		/* exclusive class (0 = none) */
++	unsigned char amplitude;	/* sample volume (127 max) */
++	unsigned char attenuation;	/* attenuation (0.375dB) */
++	short scaleTuning;		/* pitch scale tuning(%), normally 100 */
++	awe_voice_parm parm;		/* voice envelope parameters */
++	short index;			/* internal index (set by driver) */
++} awe_voice_info;
++
++/*#define AWE_VOICE_INFO_SIZE	92*/
++#define AWE_VOICE_INFO_SIZE	sizeof(awe_voice_info)
++
++/*----------------------------------------------------------------*/
++
++/* The info entry of awe_voice_rec is changed from 0 to 1
++ * for some compilers refusing zero size array.
++ * Due to this change, sizeof(awe_voice_rec) becomes different
++ * from older versions.
++ * Use AWE_VOICE_REC_SIZE instead.
++ */
++
++/* instrument info header: 4 bytes */
++typedef struct _awe_voice_rec_hdr {
++	unsigned char bank;		/* midi bank number */
++	unsigned char instr;		/* midi preset number */
++	char nvoices;			/* number of voices */
++	char write_mode;		/* write mode; normally 0 */
++#define AWE_WR_APPEND		0	/* append anyway */
++#define AWE_WR_EXCLUSIVE	1	/* skip if already exists */
++#define AWE_WR_REPLACE		2	/* replace if already exists */
++} awe_voice_rec_hdr;
++
++/*#define AWE_VOICE_REC_SIZE	4*/
++#define AWE_VOICE_REC_SIZE	sizeof(awe_voice_rec_hdr)
++
++/* the standard patch structure for one sample */
++typedef struct _awe_voice_rec_patch {
++	awe_patch_info		patch;
++	awe_voice_rec_hdr	hdr;
++	awe_voice_info		info;
++} awe_voice_rec_patch;
++
++
++/* obsolete data type */
++#if defined(AWE_COMPAT_030) && AWE_COMPAT_030
++#define AWE_INFOARRAY_SIZE	0
++#else
++#define AWE_INFOARRAY_SIZE	1
++#endif
++
++typedef struct _awe_voice_rec {
++	unsigned char bank;		/* midi bank number */
++	unsigned char instr;		/* midi preset number */
++	short nvoices;			/* number of voices */
++	/* voice information follows here */
++	awe_voice_info info[AWE_INFOARRAY_SIZE];
++} awe_voice_rec;
++
++
++/*----------------------------------------------------------------
++ * sample wave information
++ *----------------------------------------------------------------*/
++
++/* wave table sample header: 32 bytes */
++typedef struct awe_sample_info {
++	unsigned short sf_id;		/* file id (should be zero) */
++	unsigned short sample;		/* sample id */
++	int start, end;			/* start & end offset */
++	int loopstart, loopend;		/* loop start & end offset */
++	int size;			/* size (0 = ROM) */
++	short checksum_flag;		/* use check sum = 1 */
++	unsigned short mode_flags;	/* mode flags */
++#define AWE_SAMPLE_8BITS	1	/* wave data is 8bits */
++#define AWE_SAMPLE_UNSIGNED	2	/* wave data is unsigned */
++#define AWE_SAMPLE_NO_BLANK	4	/* no blank loop is attached */
++#define AWE_SAMPLE_SINGLESHOT	8	/* single-shot w/o loop */
++#define AWE_SAMPLE_BIDIR_LOOP	16	/* bidirectional looping */
++#define AWE_SAMPLE_STEREO_LEFT	32	/* stereo left sound */
++#define AWE_SAMPLE_STEREO_RIGHT	64	/* stereo right sound */
++#define AWE_SAMPLE_REVERSE_LOOP 128	/* reverse looping */
++	unsigned int checksum;		/* check sum */
++#if defined(AWE_COMPAT_030) && AWE_COMPAT_030
++	unsigned short data[0];		/* sample data follows here */
++#endif
++} awe_sample_info;
++
++/*#define AWE_SAMPLE_INFO_SIZE	32*/
++#define AWE_SAMPLE_INFO_SIZE	sizeof(awe_sample_info)
++
++
++/*----------------------------------------------------------------
++ * voice preset mapping
++ *----------------------------------------------------------------*/
++
++typedef struct awe_voice_map {
++	int map_bank, map_instr, map_key;	/* key = -1 means all keys */
++	int src_bank, src_instr, src_key;
++} awe_voice_map;
++
++#define AWE_VOICE_MAP_SIZE	sizeof(awe_voice_map)
++
++
++/*----------------------------------------------------------------
++ * awe hardware controls
++ *----------------------------------------------------------------*/
++
++#define _AWE_DEBUG_MODE			0x00
++#define _AWE_REVERB_MODE		0x01
++#define _AWE_CHORUS_MODE		0x02
++#define _AWE_REMOVE_LAST_SAMPLES	0x03
++#define _AWE_INITIALIZE_CHIP		0x04
++#define _AWE_SEND_EFFECT		0x05
++#define _AWE_TERMINATE_CHANNEL		0x06
++#define _AWE_TERMINATE_ALL		0x07
++#define _AWE_INITIAL_VOLUME		0x08
++#define _AWE_INITIAL_ATTEN	_AWE_INITIAL_VOLUME
++#define _AWE_RESET_CHANNEL		0x09
++#define _AWE_CHANNEL_MODE		0x0a
++#define _AWE_DRUM_CHANNELS		0x0b
++#define _AWE_MISC_MODE			0x0c
++#define _AWE_RELEASE_ALL		0x0d
++#define _AWE_NOTEOFF_ALL		0x0e
++#define _AWE_CHN_PRESSURE		0x0f
++/*#define _AWE_GET_CURRENT_MODE		0x10*/
++#define _AWE_EQUALIZER			0x11
++/*#define _AWE_GET_MISC_MODE		0x12*/
++/*#define _AWE_GET_FONTINFO		0x13*/
++
++#define _AWE_MODE_FLAG			0x80
++#define _AWE_COOKED_FLAG		0x40	/* not supported */
++#define _AWE_MODE_VALUE_MASK		0x3F
++
++/*----------------------------------------------------------------*/
++
++#define _AWE_SET_CMD(p,dev,voice,cmd,p1,p2) \
++{((char*)(p))[0] = SEQ_PRIVATE;\
++ ((char*)(p))[1] = dev;\
++ ((char*)(p))[2] = _AWE_MODE_FLAG|(cmd);\
++ ((char*)(p))[3] = voice;\
++ ((unsigned short*)(p))[2] = p1;\
++ ((unsigned short*)(p))[3] = p2;}
++
++/* buffered access */
++#define _AWE_CMD(dev, voice, cmd, p1, p2) \
++{_SEQ_NEEDBUF(8);\
++ _AWE_SET_CMD(_seqbuf + _seqbufptr, dev, voice, cmd, p1, p2);\
++ _SEQ_ADVBUF(8);}
++
++/* direct access */
++#define _AWE_CMD_NOW(seqfd,dev,voice,cmd,p1,p2) \
++{struct seq_event_rec tmp;\
++ _AWE_SET_CMD(&tmp, dev, voice, cmd, p1, p2);\
++ ioctl(seqfd, SNDCTL_SEQ_OUTOFBAND, &tmp);}
++
++/*----------------------------------------------------------------*/
++
++/* set debugging mode */
++#define AWE_DEBUG_MODE(dev,p1)	_AWE_CMD(dev, 0, _AWE_DEBUG_MODE, p1, 0)
++/* set reverb mode; from 0 to 7 */
++#define AWE_REVERB_MODE(dev,p1)	_AWE_CMD(dev, 0, _AWE_REVERB_MODE, p1, 0)
++/* set chorus mode; from 0 to 7 */
++#define AWE_CHORUS_MODE(dev,p1)	_AWE_CMD(dev, 0, _AWE_CHORUS_MODE, p1, 0)
++
++/* reset channel */
++#define AWE_RESET_CHANNEL(dev,ch) _AWE_CMD(dev, ch, _AWE_RESET_CHANNEL, 0, 0)
++#define AWE_RESET_CONTROL(dev,ch) _AWE_CMD(dev, ch, _AWE_RESET_CHANNEL, 1, 0)
++
++/* send an effect to all layers */
++#define AWE_SEND_EFFECT(dev,voice,type,value) _AWE_CMD(dev,voice,_AWE_SEND_EFFECT,type,value)
++#define AWE_ADD_EFFECT(dev,voice,type,value) _AWE_CMD(dev,voice,_AWE_SEND_EFFECT,((type)|0x80),value)
++#define AWE_UNSET_EFFECT(dev,voice,type) _AWE_CMD(dev,voice,_AWE_SEND_EFFECT,((type)|0x40),0)
++/* send an effect to a layer */
++#define AWE_SEND_LAYER_EFFECT(dev,voice,layer,type,value) _AWE_CMD(dev,voice,_AWE_SEND_EFFECT,((layer+1)<<8|(type)),value)
++#define AWE_ADD_LAYER_EFFECT(dev,voice,layer,type,value) _AWE_CMD(dev,voice,_AWE_SEND_EFFECT,((layer+1)<<8|(type)|0x80),value)
++#define AWE_UNSET_LAYER_EFFECT(dev,voice,layer,type) _AWE_CMD(dev,voice,_AWE_SEND_EFFECT,((layer+1)<<8|(type)|0x40),0)
++
++/* terminate sound on the channel/voice */
++#define AWE_TERMINATE_CHANNEL(dev,voice) _AWE_CMD(dev,voice,_AWE_TERMINATE_CHANNEL,0,0)
++/* terminate all sounds */
++#define AWE_TERMINATE_ALL(dev) _AWE_CMD(dev, 0, _AWE_TERMINATE_ALL, 0, 0)
++/* release all sounds (w/o sustain effect) */
++#define AWE_RELEASE_ALL(dev) _AWE_CMD(dev, 0, _AWE_RELEASE_ALL, 0, 0)
++/* note off all sounds (w sustain effect) */
++#define AWE_NOTEOFF_ALL(dev) _AWE_CMD(dev, 0, _AWE_NOTEOFF_ALL, 0, 0)
++
++/* set initial attenuation */
++#define AWE_INITIAL_VOLUME(dev,atten) _AWE_CMD(dev, 0, _AWE_INITIAL_VOLUME, atten, 0)
++#define AWE_INITIAL_ATTEN  AWE_INITIAL_VOLUME
++/* relative attenuation */
++#define AWE_SET_ATTEN(dev,atten)  _AWE_CMD(dev, 0, _AWE_INITIAL_VOLUME, atten, 1)
++
++/* set channel playing mode; mode=0/1/2 */
++#define AWE_SET_CHANNEL_MODE(dev,mode) _AWE_CMD(dev, 0, _AWE_CHANNEL_MODE, mode, 0)
++#define AWE_PLAY_INDIRECT	0	/* indirect voice mode (default) */
++#define AWE_PLAY_MULTI		1	/* multi note voice mode */
++#define AWE_PLAY_DIRECT		2	/* direct single voice mode */
++#define AWE_PLAY_MULTI2		3	/* sequencer2 mode; used internally */
++
++/* set drum channel mask; channels is 32bit long value */
++#define AWE_DRUM_CHANNELS(dev,channels) _AWE_CMD(dev, 0, _AWE_DRUM_CHANNELS, ((channels) & 0xffff), ((channels) >> 16))
++
++/* set bass and treble control; values are from 0 to 11 */
++#define AWE_EQUALIZER(dev,bass,treble) _AWE_CMD(dev, 0, _AWE_EQUALIZER, bass, treble)
++
++/* remove last loaded samples */
++#define AWE_REMOVE_LAST_SAMPLES(seqfd,dev) _AWE_CMD_NOW(seqfd, dev, 0, _AWE_REMOVE_LAST_SAMPLES, 0, 0)
++/* initialize emu8000 chip */
++#define AWE_INITIALIZE_CHIP(seqfd,dev) _AWE_CMD_NOW(seqfd, dev, 0, _AWE_INITIALIZE_CHIP, 0, 0)
++
++/* set miscellaneous modes; meta command */
++#define AWE_MISC_MODE(dev,mode,value) _AWE_CMD(dev, 0, _AWE_MISC_MODE, mode, value)
++/* exclusive sound off; 1=off */
++#define AWE_EXCLUSIVE_SOUND(dev,mode) AWE_MISC_MODE(dev,AWE_MD_EXCLUSIVE_SOUND,mode)
++/* default GUS bank number */
++#define AWE_SET_GUS_BANK(dev,bank) AWE_MISC_MODE(dev,AWE_MD_GUS_BANK,bank)
++/* change panning position in realtime; 0=don't 1=do */
++#define AWE_REALTIME_PAN(dev,mode) AWE_MISC_MODE(dev,AWE_MD_REALTIME_PAN,mode)
++
++/* extended pressure controls; not portable with other sound drivers */
++#define AWE_KEY_PRESSURE(dev,ch,note,vel) SEQ_START_NOTE(dev,ch,(note)+128,vel)
++#define AWE_CHN_PRESSURE(dev,ch,vel) _AWE_CMD(dev,ch,_AWE_CHN_PRESSURE,vel,0)
++
++/*----------------------------------------------------------------*/
++
++/* reverb mode parameters */
++#define	AWE_REVERB_ROOM1	0
++#define AWE_REVERB_ROOM2	1
++#define	AWE_REVERB_ROOM3	2
++#define	AWE_REVERB_HALL1	3
++#define	AWE_REVERB_HALL2	4
++#define	AWE_REVERB_PLATE	5
++#define	AWE_REVERB_DELAY	6
++#define	AWE_REVERB_PANNINGDELAY 7
++#define AWE_REVERB_PREDEFINED	8
++/* user can define reverb modes up to 32 */
++#define AWE_REVERB_NUMBERS	32
++
++typedef struct awe_reverb_fx_rec {
++	unsigned short parms[28];
++} awe_reverb_fx_rec;
++
++/*----------------------------------------------------------------*/
++
++/* chorus mode parameters */
++#define AWE_CHORUS_1		0
++#define	AWE_CHORUS_2		1
++#define	AWE_CHORUS_3		2
++#define	AWE_CHORUS_4		3
++#define	AWE_CHORUS_FEEDBACK	4
++#define	AWE_CHORUS_FLANGER	5
++#define	AWE_CHORUS_SHORTDELAY	6
++#define	AWE_CHORUS_SHORTDELAY2	7
++#define AWE_CHORUS_PREDEFINED	8
++/* user can define chorus modes up to 32 */
++#define AWE_CHORUS_NUMBERS	32
++
++typedef struct awe_chorus_fx_rec {
++	unsigned short feedback;	/* feedback level (0xE600-0xE6FF) */
++	unsigned short delay_offset;	/* delay (0-0x0DA3) [1/44100 sec] */
++	unsigned short lfo_depth;	/* LFO depth (0xBC00-0xBCFF) */
++	unsigned int delay;	/* right delay (0-0xFFFFFFFF) [1/256/44100 sec] */
++	unsigned int lfo_freq;		/* LFO freq LFO freq (0-0xFFFFFFFF) */
++} awe_chorus_fx_rec;
++
++/*----------------------------------------------------------------*/
++
++/* misc mode types */
++enum {
++/* 0*/	AWE_MD_EXCLUSIVE_OFF,	/* obsolete */
++/* 1*/	AWE_MD_EXCLUSIVE_ON,	/* obsolete */
++/* 2*/	AWE_MD_VERSION,		/* read only */
++/* 3*/	AWE_MD_EXCLUSIVE_SOUND,	/* 0/1: exclusive note on (default=1) */
++/* 4*/	AWE_MD_REALTIME_PAN,	/* 0/1: do realtime pan change (default=1) */
++/* 5*/	AWE_MD_GUS_BANK,	/* bank number for GUS patches (default=0) */
++/* 6*/	AWE_MD_KEEP_EFFECT,	/* 0/1: keep effect values, (default=0) */
++/* 7*/	AWE_MD_ZERO_ATTEN,	/* attenuation of max volume (default=32) */
++/* 8*/	AWE_MD_CHN_PRIOR,	/* 0/1: set MIDI channel priority mode (default=1) */
++/* 9*/	AWE_MD_MOD_SENSE,	/* integer: modwheel sensitivity (def=18) */
++/*10*/	AWE_MD_DEF_PRESET,	/* integer: default preset number (def=0) */
++/*11*/	AWE_MD_DEF_BANK,	/* integer: default bank number (def=0) */
++/*12*/	AWE_MD_DEF_DRUM,	/* integer: default drumset number (def=0) */
++/*13*/	AWE_MD_TOGGLE_DRUM_BANK, /* 0/1: toggle drum flag with bank# (def=0) */
++/*14*/	AWE_MD_NEW_VOLUME_CALC,	/* 0/1: volume calculation mode (def=1) */
++/*15*/	AWE_MD_CHORUS_MODE,	/* integer: chorus mode (def=2) */
++/*16*/	AWE_MD_REVERB_MODE,	/* integer: chorus mode (def=4) */
++/*17*/	AWE_MD_BASS_LEVEL,	/* integer: bass level (def=5) */
++/*18*/	AWE_MD_TREBLE_LEVEL,	/* integer: treble level (def=9) */
++/*19*/	AWE_MD_DEBUG_MODE,	/* integer: debug level (def=0) */
++/*20*/	AWE_MD_PAN_EXCHANGE,	/* 0/1: exchange panning direction (def=0) */
++	AWE_MD_END
++};
++
++/*----------------------------------------------------------------*/
++
++/* effect parameters */
++enum {
++
++/* modulation envelope parameters */
++/* 0*/	AWE_FX_ENV1_DELAY,	/* WORD: ENVVAL */
++/* 1*/	AWE_FX_ENV1_ATTACK,	/* BYTE: up ATKHLD */
++/* 2*/	AWE_FX_ENV1_HOLD,	/* BYTE: lw ATKHLD */
++/* 3*/	AWE_FX_ENV1_DECAY,	/* BYTE: lw DCYSUS */
++/* 4*/	AWE_FX_ENV1_RELEASE,	/* BYTE: lw DCYSUS */
++/* 5*/	AWE_FX_ENV1_SUSTAIN,	/* BYTE: up DCYSUS */
++/* 6*/	AWE_FX_ENV1_PITCH,	/* BYTE: up PEFE */
++/* 7*/	AWE_FX_ENV1_CUTOFF,	/* BYTE: lw PEFE */
++
++/* volume envelope parameters */
++/* 8*/	AWE_FX_ENV2_DELAY,	/* WORD: ENVVOL */
++/* 9*/	AWE_FX_ENV2_ATTACK,	/* BYTE: up ATKHLDV */
++/*10*/	AWE_FX_ENV2_HOLD,	/* BYTE: lw ATKHLDV */
++/*11*/	AWE_FX_ENV2_DECAY,	/* BYTE: lw DCYSUSV */
++/*12*/	AWE_FX_ENV2_RELEASE,	/* BYTE: lw DCYSUSV */
++/*13*/	AWE_FX_ENV2_SUSTAIN,	/* BYTE: up DCYSUSV */
++	
++/* LFO1 (tremolo & vibrato) parameters */
++/*14*/	AWE_FX_LFO1_DELAY,	/* WORD: LFO1VAL */
++/*15*/	AWE_FX_LFO1_FREQ,	/* BYTE: lo TREMFRQ */
++/*16*/	AWE_FX_LFO1_VOLUME,	/* BYTE: up TREMFRQ */
++/*17*/	AWE_FX_LFO1_PITCH,	/* BYTE: up FMMOD */
++/*18*/	AWE_FX_LFO1_CUTOFF,	/* BYTE: lo FMMOD */
++
++/* LFO2 (vibrato) parameters */
++/*19*/	AWE_FX_LFO2_DELAY,	/* WORD: LFO2VAL */
++/*20*/	AWE_FX_LFO2_FREQ,	/* BYTE: lo FM2FRQ2 */
++/*21*/	AWE_FX_LFO2_PITCH,	/* BYTE: up FM2FRQ2 */
++
++/* Other overall effect parameters */
++/*22*/	AWE_FX_INIT_PITCH,	/* SHORT: pitch offset */
++/*23*/	AWE_FX_CHORUS,		/* BYTE: chorus effects send (0-255) */
++/*24*/	AWE_FX_REVERB,		/* BYTE: reverb effects send (0-255) */
++/*25*/	AWE_FX_CUTOFF,		/* BYTE: up IFATN */
++/*26*/	AWE_FX_FILTERQ,		/* BYTE: up CCCA */
++
++/* Sample / loop offset changes */
++/*27*/	AWE_FX_SAMPLE_START,	/* SHORT: offset */
++/*28*/	AWE_FX_LOOP_START,	/* SHORT: offset */
++/*29*/	AWE_FX_LOOP_END,	/* SHORT: offset */
++/*30*/	AWE_FX_COARSE_SAMPLE_START,	/* SHORT: upper word offset */
++/*31*/	AWE_FX_COARSE_LOOP_START,	/* SHORT: upper word offset */
++/*32*/	AWE_FX_COARSE_LOOP_END,		/* SHORT: upper word offset */
++/*33*/	AWE_FX_ATTEN,		/* BYTE: lo IFATN */
++
++	AWE_FX_END
++};
++
++#endif /* AWE_VOICE_H */
+diff -urpNw tse3-0.3.1-old/src/tse3play/tse3play.cpp tse3-0.3.1/src/tse3play/tse3play.cpp
+--- tse3-0.3.1-old/src/tse3play/tse3play.cpp	Tue Aug 23 09:58:36 2005
++++ tse3-0.3.1/src/tse3play/tse3play.cpp	Fri Feb 22 12:24:46 2008
+@@ -49,6 +49,9 @@
+ #include "tse3/plt/Arts.h"
+ #endif
+ 
++#ifdef __WIN32__
++  #include <windows.h>
++#endif //__WIN32
+ #include <unistd.h> // for usleep
+ //#include <time.h> // for nanosleep
+ 
+@@ -560,7 +563,19 @@ int TSE3Play::go()
+                 // then set more_to_come = false;
+                 if (usleepPeriod)
+                 {
++#ifdef __WIN32__
++		   /* On Windows, round to the nearest millisecond, with a
++		    * minimum of 1 millisecond if usleep was called with a
++		    * a non-zero value. */
++		   if (usleepPeriod > 500)
++		    Sleep ((usleepPeriod+500)/1000);
++		   else if (usleepPeriod > 0)
++		     Sleep (1);
++		   else
++		     Sleep (0);                    
++#else                    
+                     usleep(usleepPeriod);
++#endif                    
+                     //timespec a = {0, usleepPeriod*10}, b;
+                     //nanosleep(&a, &b);
+                 }
+diff -urpNw tse3-0.3.1-old/tse3.spec tse3-0.3.1/tse3.spec
+--- tse3-0.3.1-old/tse3.spec	Mon Jul 25 08:23:12 2005
++++ tse3-0.3.1/tse3.spec	Fri Feb 22 12:24:46 2008
+@@ -55,7 +55,7 @@ rm -rf $RPM_BUILD_ROOT
+ #   - I build in non debug mode to keep the library size down.
+ 
+ %build
+-CXXFLAGS=-O2 ./configure -prefix=$RPM_BUILD_ROOT/usr/local --with-install-root=$RPM_BUILD_ROOT --without-alsa --without-doc-install
++CXXFLAGS=-Wno-non-virtual-dtor -O2 ./configure -prefix=$RPM_BUILD_ROOT/usr/local --with-install-root=$RPM_BUILD_ROOT --without-alsa --without-doc-install
+ make
+ 
+ ###############################################################################
