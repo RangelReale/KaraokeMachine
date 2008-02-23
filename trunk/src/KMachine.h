@@ -4,12 +4,14 @@
 #include <map>
 #include "linked_ptr.h"
 #include "KMSong.h"
+#include "KMImage.h"
 
 namespace KaraokeMachine {
 
 // forward deckarations
 class KMachine;
 class KMachinePlaylist;
+class KMachineImageList;
 
 /**
  * @class KMachineSongs
@@ -23,11 +25,36 @@ public:
     unsigned int Add(unsigned int id = 0);
     KMSongPackage &Get(unsigned int id);
     bool Exists(unsigned int id);
+    void Ids(KMArrayInt &ids);
 
     unsigned int Load(const std::string &filename);
     int LoadPath(const std::string &path);
 private:
     typedef std::map<unsigned int, linked_ptr<KMSongPackage> > packages_t;
+
+    KMachine *machine_;
+    unsigned int maxid_;
+    packages_t packages_;
+};
+
+/**
+ * @class KMachineImages
+ *
+ * @brief Machine image database, organized by package
+ */
+class KMachineImages {
+public:
+    KMachineImages(KMachine *machine) : machine_(machine), maxid_(0), packages_() {}
+
+    unsigned int Add();
+    KMImagePackage &Get(unsigned int id);
+    bool Exists(unsigned int id);
+    void Ids(KMArrayInt &ids);
+
+    unsigned int Load(const std::string &filename);
+    int LoadPath(const std::string &path);
+private:
+    typedef std::map<unsigned int, linked_ptr<KMImagePackage> > packages_t;
 
     KMachine *machine_;
     unsigned int maxid_;
@@ -82,18 +109,66 @@ private:
 };
 
 /**
+ * @class KMachineImageListImage
+ *
+ * @brief Image list image
+ */
+class KMachineImageListImage {
+public:
+    KMachineImageListImage(KMachineImageList *imagelist, unsigned int package, unsigned short image) :
+        imagelist_(imagelist), package_(package), image_(image) {}
+
+    unsigned int GetPackageId() { return package_; }
+    unsigned short GetImageId() { return image_; }
+
+    KMImagePackageItem *GetImage();
+private:
+    KMachineImageList *imagelist_;
+    unsigned int package_;
+    unsigned short image_;
+};
+
+
+/**
+ * @class KMachineImageList
+ *
+ * @brief Image list
+ */
+class KMachineImageList {
+public:
+    KMachineImageList(KMachine *machine) : machine_(machine), images_() {}
+
+    int Add(unsigned int package, unsigned short image);
+    void Remove(int index);
+
+    int GetCount() { return images_.size(); }
+
+    KMachineImageListImage &Get(int index) { return images_[index]; }
+    KMachineImageListImage &GetRandom();
+
+    KMachine *Machine() { return machine_; }
+private:
+    typedef std::deque<KMachineImageListImage> images_t;
+
+    KMachine *machine_;
+    images_t images_;
+};
+
+/**
  * @class KMachine
  *
  * @brief Karaoke machine controller
  */
 class KMachine {
 public:
-    enum commant_t { KC_ADD, KC_STOP, KC_PAUSE, KC_SKIP, KC_SONGKEYDOWN, KC_SONGKEYUP };
+    enum commant_t { KC_ADD, KC_STOP, KC_PAUSE, KC_SKIP, KC_SKIPIMAGE, KC_SONGKEYDOWN, KC_SONGKEYUP };
 
-    KMachine() : chars_(""), songs_(this), playlist_(this), playing_(NULL) {}
+    KMachine() : chars_(""), songs_(this), images_(this), playlist_(this), imagelist_(this), playing_(NULL) {}
     virtual ~KMachine();
 
-    virtual void Run() = 0;
+    virtual void Initialize();
+    virtual void Finalize();
+    void Run();
 
     virtual void AddChar(unsigned char c);
     virtual void RemoveChar();
@@ -102,10 +177,16 @@ public:
     const std::string &GetChars() const { return chars_; }
 
     KMachinePlaylist &Playlist() { return playlist_; }
+    KMachineImageList &ImageList() { return imagelist_; }
+
     KMachineSongs &Songs() { return songs_; }
+    KMachineImages &Images() { return images_; }
+
 
     KMSong *Playing() { return playing_; }
 protected:
+    virtual void DoRun() = 0;
+
     void Loop();
 
     void DoStop();
@@ -117,7 +198,9 @@ private:
 
     std::string chars_;
     KMachineSongs songs_;
+    KMachineImages images_;
     KMachinePlaylist playlist_;
+    KMachineImageList imagelist_;
     KMSong *playing_;
 };
 

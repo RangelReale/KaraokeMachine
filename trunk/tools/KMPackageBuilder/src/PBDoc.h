@@ -34,7 +34,7 @@ class PBImageDocument: public wxDocument
     DECLARE_DYNAMIC_CLASS(PBImageDocument)
 private:
 public:
-    PBImageDocument(void) {}
+    PBImageDocument(void) : wxDocument(), imagepackage_(0) {}
     ~PBImageDocument(void);
 
     virtual bool OnNewDocument();

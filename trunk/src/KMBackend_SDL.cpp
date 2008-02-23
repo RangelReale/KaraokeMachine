@@ -1,10 +1,11 @@
+#include <sstream>
 #include "KMBackend_SDL.h"
 
 
 namespace KaraokeMachine {
 
 KMBackend_SDL::KMBackend_SDL() :
-    KMBackend()
+    KMBackend(), screen_(NULL), bg_(NULL)
 {
     // initialize SDL video
     if ( SDL_Init( SDL_INIT_VIDEO ) < 0 )
@@ -45,7 +46,22 @@ KMBackend_SDL::KMBackend_SDL() :
 KMBackend_SDL::~KMBackend_SDL()
 {
     TTF_CloseFont(font_);
+
+    if (bg_)
+    {
+        SDL_FreeSurface(bg_);
+    }
 }
+
+void KMBackend_SDL::SkipImage()
+{
+    if (bg_)
+    {
+        SDL_FreeSurface(bg_);
+        bg_=NULL;
+    }
+}
+
 /*
 void KMBackend_SDL::ShowImage(KMImage *image)
 {
@@ -64,6 +80,8 @@ bool KMBackend_SDL::Loop(KMachine &machine)
     if(transport.status() != TSE3::Transport::Resting)
         transport.poll();
 */
+
+
 
     // message processing loop
     SDL_Event event;
@@ -117,6 +135,7 @@ bool KMBackend_SDL::Loop(KMachine &machine)
                 case SDLK_9: machine.AddChar('9'); break;
                 case SDLK_RETURN: machine.DoCommand(KMachine::KC_ADD); break;
                 case SDLK_SPACE: machine.DoCommand(KMachine::KC_SKIP); break;
+                case SDLK_TAB: machine.DoCommand(KMachine::KC_SKIPIMAGE); break;
                 default:
                     break;
                 }
@@ -125,10 +144,32 @@ bool KMBackend_SDL::Loop(KMachine &machine)
         } // end switch
     } // end of message processing
 
+    // LOAD IMAGE
+    if (!bg_ && machine.ImageList().GetCount()>0)
+    {
+        SDL_FreeSurface(bg_);
+        bg_=NULL;
+
+        std::stringstream imagedata;
+        std::string sdata;
+        machine.ImageList().GetRandom().GetImage()->GetFileData(imagedata);
+        sdata=imagedata.str();
+        SDL_RWops *sdlimage=SDL_RWFromConstMem(sdata.data(), sdata.length());
+        bg_=IMG_LoadJPG_RW(sdlimage);
+        SDL_FreeRW(sdlimage);
+    }
+
+
     // DRAWING STARTS HERE
 
     // clear screen
     SDL_FillRect(screen_, 0, SDL_MapRGB(screen_->format, 0, 0, 0));
+
+    if (bg_)
+    {
+        SDL_BlitSurface(bg_, NULL, screen_, NULL);
+    }
+
 
     text_surface = TTF_RenderText_Blended(font_, "Karaoke Machine 0.1", black);
     if (text_surface != NULL)

@@ -44,11 +44,11 @@ bool KMPackageBuilderApp::OnInit()
     docManager_ = new wxDocManager;
 
     //// Template: Song
-    (void) new wxDocTemplate((wxDocManager *) docManager_, wxT("Song Packages"), wxT("*.kps"), wxT(""), wxT("kps"),wxT("Songs Doc"), wxT("Songs View"),
+    (void) new wxDocTemplate((wxDocManager *) docManager_, wxT("Song Packages"), wxT("*.kms"), wxT(""), wxT("kms"),wxT("Songs Doc"), wxT("Songs View"),
           CLASSINFO(PBSongDocument), CLASSINFO(PBSongView));
 
     //// Template: Image
-    (void) new wxDocTemplate(docManager_, wxT("Image Packages"), wxT("*.kpi"), wxT(""), wxT("kpi"), wxT("Images Doc"), wxT("Images View"),
+    (void) new wxDocTemplate(docManager_, wxT("Image Packages"), wxT("*.kmi"), wxT(""), wxT("kmi"), wxT("Images Doc"), wxT("Images View"),
           CLASSINFO(PBImageDocument), CLASSINFO(PBImageView));
 
     KMPackageBuilderFrame* frame = new KMPackageBuilderFrame((wxDocManager *) docManager_, (wxFrame *) NULL,

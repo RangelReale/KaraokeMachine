@@ -58,7 +58,7 @@ private:
  */
 class KMImagePackage {
 public:
-    KMImagePackage() :
+    KMImagePackage(unsigned int id) : id_(id),
         maxid_(0),
         title_(""), author_(""), description_(""),
         images_(), file_(NULL) {}
@@ -72,10 +72,12 @@ public:
     void ChangeId(unsigned short oldid, unsigned short newid);
     void Ids(KMArrayInt &ids);
 
+    unsigned int GetId() { return id_; }
     const std::string &GetTitle() { return title_; }
     const std::string &GetAuthor() { return author_; }
     const std::string &GetDescription() { return description_; }
 
+    void SetId(unsigned int v) { id_=v; }
     void SetTitle(const std::string &v) { title_=v; }
     void SetAuthor(const std::string &v) { author_=v; }
     void SetDescription(const std::string &v) { description_=v; }
@@ -92,6 +94,7 @@ private:
     void Load(KMInputStream &stream);
     void Save(KMOutputStream &stream);
 
+    unsigned int id_;
     unsigned short maxid_;
     std::string title_, author_, description_;
     images_t images_;

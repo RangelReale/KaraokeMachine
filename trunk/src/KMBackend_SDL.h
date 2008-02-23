@@ -6,6 +6,7 @@
 
 #include <SDL.h>
 #include <SDL_ttf.h>
+#include <SDL_image.h>
 
 namespace KaraokeMachine {
 
@@ -18,8 +19,9 @@ public:
     //virtual void ShowImage(KMImage *image);
 
     virtual bool Loop(KMachine &machine);
+    virtual void SkipImage();
 private:
-    SDL_Surface* screen_;
+    SDL_Surface *screen_, *bg_;
     TTF_Font *font_;
 };
 

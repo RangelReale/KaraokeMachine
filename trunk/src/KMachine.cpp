@@ -3,6 +3,9 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
+#include "boost/filesystem.hpp"
+#include "boost/random.hpp"
+
 #include "KMachine.h"
 #include "KMUtil.h"
 #include "KMSongFactory.h"
@@ -35,6 +38,15 @@ unsigned int KMachineSongs::Add(unsigned int id)
     return id;
 }
 
+void KMachineSongs::Ids(KMArrayInt &ids)
+{
+    for (packages_t::const_iterator i=packages_.begin(); i!=packages_.end(); i++)
+    {
+        ids.push_back(i->first);
+    }
+}
+
+
 unsigned int KMachineSongs::Load(const std::string &filename)
 {
     linked_ptr<KMSongPackage> newp=linked_ptr<KMSongPackage>(new KMSongPackage(0));
@@ -49,39 +61,83 @@ unsigned int KMachineSongs::Load(const std::string &filename)
 
 int KMachineSongs::LoadPath(const std::string &path)
 {
-    std::string lpath;
-    int loadcount=0;
+    if (!boost::filesystem::exists(path)) return 0;
 
-    DIR *pdir;
-    struct dirent *pent;
+   int loadcount=0;
 
-/*
-    if (lpath.substr(lpath.length()-1, lpath.length())!=std::string(kmutil_pathsep))
-        lpath.append(std::string(kmutil_pathsep));
-    lpath.append("*.kps");
-*/
-
-    pdir=opendir(path.c_str()); //"." refers to the current dir
-    if (!pdir){
-        throw KMException("Could not open load path");
-    }
-    errno=0;
-    while ((pent=readdir(pdir)))
+    for (boost::filesystem::directory_iterator d(path);
+        d!=boost::filesystem::directory_iterator(); ++d)
     {
-        if (pent->d_name!="." && pent->d_name!=".")
+        if (!boost::filesystem::is_directory(d->status()) &&
+            boost::filesystem::extension(d->leaf())==".kms")
         {
-            lpath=path+std::string(pent->d_name);
-            if (kmutil_getfileext(lpath).compare("kps")==0)
-            {
-                Load(lpath);
-                loadcount++;
-            }
+            Load(d->string());
+            loadcount++;
         }
     }
-    if (errno){
-        throw KMException("Error loading from path");
+    return loadcount;
+}
+
+/////////////////////////////////
+// CLASS
+//      KMachineImages
+/////////////////////////////////
+KMImagePackage &KMachineImages::Get(unsigned int id)
+{
+    packages_t::iterator i=packages_.find(id);
+    if (i==packages_.end())
+        throw KMException("Image package not found");
+    return *i->second;
+}
+
+bool KMachineImages::Exists(unsigned int id)
+{
+    packages_t::iterator i=packages_.find(id);
+    return i!=packages_.end();
+}
+
+unsigned int KMachineImages::Add()
+{
+    unsigned int id=++maxid_;
+    packages_.insert( std::pair<unsigned int, linked_ptr<KMImagePackage> >(id, linked_ptr<KMImagePackage>(new KMImagePackage(id))) );
+    return id;
+}
+
+void KMachineImages::Ids(KMArrayInt &ids)
+{
+    for (packages_t::const_iterator i=packages_.begin(); i!=packages_.end(); i++)
+    {
+        ids.push_back(i->first);
     }
-    closedir(pdir);
+}
+
+unsigned int KMachineImages::Load(const std::string &filename)
+{
+    linked_ptr<KMImagePackage> newp=linked_ptr<KMImagePackage>(new KMImagePackage(0));
+    newp->Load(filename);
+
+    unsigned int id=++maxid_;
+    newp->SetId(id);
+    packages_[id]=newp;
+    return id;
+}
+
+int KMachineImages::LoadPath(const std::string &path)
+{
+    if (!boost::filesystem::exists(path)) return 0;
+
+    int loadcount=0;
+
+    for (boost::filesystem::directory_iterator d(path);
+        d!=boost::filesystem::directory_iterator(); ++d)
+    {
+        if (!boost::filesystem::is_directory(d->status()) &&
+            boost::filesystem::extension(d->leaf())==".kmi")
+        {
+            Load(d->string());
+            loadcount++;
+        }
+    }
     return loadcount;
 }
 
@@ -109,6 +165,44 @@ void KMachinePlaylist::Remove(int index)
     songs_.erase(songs_.begin()+index);
 }
 
+/////////////////////////////////
+// CLASS
+//      KMachineImageListImage
+/////////////////////////////////
+KMImagePackageItem *KMachineImageListImage::GetImage()
+{
+    return &imagelist_->Machine()->Images().Get(package_).Get(image_);
+}
+
+
+/////////////////////////////////
+// CLASS
+//      KMachineImageList
+/////////////////////////////////
+int KMachineImageList::Add(unsigned int package, unsigned short image)
+{
+    images_.push_back(KMachineImageListImage(this, package, image));
+    return images_.size()-1;
+}
+
+void KMachineImageList::Remove(int index)
+{
+    images_.erase(images_.begin()+index);
+}
+
+KMachineImageListImage &KMachineImageList::GetRandom()
+{
+    if (GetCount()==0)
+        throw KMException("No items");
+
+    boost::mt19937 rng;
+    rng.seed(static_cast<unsigned int>(std::time(0)));
+    boost::uniform_int<> rval(0,GetCount()-1);
+    boost::variate_generator<boost::mt19937&, boost::uniform_int<> >
+           die(rng, rval);
+
+    return Get(die());
+}
 
 /////////////////////////////////
 // CLASS
@@ -119,6 +213,34 @@ KMachine::~KMachine()
 {
     DoStop();
 }
+
+void KMachine::Initialize()
+{
+    KMArrayInt ids, idsitem;
+    Images().Ids(ids);
+
+    for (KMArrayInt::iterator i=ids.begin(); i!=ids.end(); i++)
+    {
+        Images().Get(*i).Ids(idsitem);
+        for (KMArrayInt::iterator ii=idsitem.begin(); ii!=idsitem.end(); ii++)
+        {
+            imagelist_.Add(*i, *ii);
+        }
+    }
+}
+
+void KMachine::Finalize()
+{
+
+}
+
+void KMachine::Run()
+{
+    Initialize();
+    DoRun();
+    Finalize();
+}
+
 
 void KMachine::AddChar(unsigned char c)
 {

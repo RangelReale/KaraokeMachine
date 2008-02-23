@@ -37,6 +37,7 @@
 			<Add directory="$(#sdl_ttf.include)" />
 			<Add directory="$(#tse3.include)" />
 			<Add directory="$(#sdl_image.include)" />
+			<Add directory="$(#boost.include)" />
 		</Compiler>
 		<Linker>
 			<Add library="mingw32" />
@@ -49,10 +50,12 @@
 			<Add library="tse3" />
 			<Add library="winmm" />
 			<Add library="dxguid" />
+			<Add library="boost_filesystem-$(#boost.suffix)" />
 			<Add directory="$(#sdl.lib)" />
 			<Add directory="$(#sdl_ttf.lib)" />
 			<Add directory="$(#tse3.lib)" />
 			<Add directory="$(#sdl_image.lib)" />
+			<Add directory="$(#boost.lib)" />
 		</Linker>
 		<Unit filename="cb.bmp" />
 		<Unit filename="src\KMBackend.cpp" />
@@ -60,6 +63,8 @@
 		<Unit filename="src\KMBackend_SDL.cpp" />
 		<Unit filename="src\KMBackend_SDL.h" />
 		<Unit filename="src\KMDefs.h" />
+		<Unit filename="src\KMImage.cpp" />
+		<Unit filename="src\KMImage.h" />
 		<Unit filename="src\KMSong.cpp" />
 		<Unit filename="src\KMSong.h" />
 		<Unit filename="src\KMSongFactory.cpp" />
@@ -78,6 +83,7 @@
 			<code_completion />
 			<envvars />
 			<debugger />
+			<lib_finder />
 		</Extensions>
 	</Project>
 </CodeBlocks_project_file>

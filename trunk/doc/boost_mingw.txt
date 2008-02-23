@@ -1,0 +1,22 @@
+=================
+VARIABLES
+=================
+-----------------
+WINDOWS
+-----------------
+- boost
+	include=$(#boost)
+	lib=$(#boost)/stage/lib
+
+
+=================
+COMPILATION
+=================
+-----------------
+WINDOWS
+-----------------
+- using msys
+- cd tools/jam/src
+# ./build.sh
+- go back to root dir
+# tools/jam/src/bin.ntx86/bjam toolset=gcc variant=release threading=multi link=static stage

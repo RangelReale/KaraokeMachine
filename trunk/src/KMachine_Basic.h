@@ -13,7 +13,10 @@ public:
     KMachine_Basic(KMBackend &backend);
     virtual ~KMachine_Basic() {}
 
-    virtual void Run();
+    virtual void DoCommand(commant_t command, int param = 0);
+
+protected:
+    virtual void DoRun();
 private:
     KMBackend *backend_;
 };

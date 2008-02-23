@@ -14,6 +14,7 @@ public:
     //virtual void ShowImage(KMImage *image) = 0;
 
     virtual bool Loop(KMachine &machine) = 0;
+    virtual void SkipImage() {};
 private:
 
 };
