@@ -1,3 +1,5 @@
+#include <stdlib.h>
+#include <dirent.h>
 #include <iostream>
 #include <sstream>
 #include <vector>
@@ -33,7 +35,7 @@ unsigned int KMachineSongs::Add(unsigned int id)
     return id;
 }
 
-void KMachineSongs::Load(const std::string &filename)
+unsigned int KMachineSongs::Load(const std::string &filename)
 {
     linked_ptr<KMSongPackage> newp=linked_ptr<KMSongPackage>(new KMSongPackage(0));
     newp->Load(filename);
@@ -42,6 +44,45 @@ void KMachineSongs::Load(const std::string &filename)
     while (Exists(did)) did++;
     newp->SetId(did);
     packages_[did]=newp;
+    return did;
+}
+
+int KMachineSongs::LoadPath(const std::string &path)
+{
+    std::string lpath;
+    int loadcount=0;
+
+    DIR *pdir;
+    struct dirent *pent;
+
+/*
+    if (lpath.substr(lpath.length()-1, lpath.length())!=std::string(kmutil_pathsep))
+        lpath.append(std::string(kmutil_pathsep));
+    lpath.append("*.kps");
+*/
+
+    pdir=opendir(path.c_str()); //"." refers to the current dir
+    if (!pdir){
+        throw KMException("Could not open load path");
+    }
+    errno=0;
+    while ((pent=readdir(pdir)))
+    {
+        if (pent->d_name!="." && pent->d_name!=".")
+        {
+            lpath=path+std::string(pent->d_name);
+            if (kmutil_getfileext(lpath).compare("kps")==0)
+            {
+                Load(lpath);
+                loadcount++;
+            }
+        }
+    }
+    if (errno){
+        throw KMException("Error loading from path");
+    }
+    closedir(pdir);
+    return loadcount;
 }
 
 /////////////////////////////////

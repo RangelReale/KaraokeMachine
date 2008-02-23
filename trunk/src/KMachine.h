@@ -24,7 +24,8 @@ public:
     KMSongPackage &Get(unsigned int id);
     bool Exists(unsigned int id);
 
-    void Load(const std::string &filename);
+    unsigned int Load(const std::string &filename);
+    int LoadPath(const std::string &path);
 private:
     typedef std::map<unsigned int, linked_ptr<KMSongPackage> > packages_t;
 

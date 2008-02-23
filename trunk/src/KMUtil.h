@@ -10,11 +10,20 @@
 
 namespace KaraokeMachine {
 
+#ifdef __WIN32__
+    extern const char *kmutil_pathsep;
+#elif defined(unix)
+    extern const char *kmutil_pathsep;
+#else
+    #error "Unknown platform"
+#endif
+
 typedef std::vector<int> KMArrayInt;
 
 std::string kmutil_format(const std::string &format, ...);
 std::vector<std::string> kmutil_tokenize(const std::string& str,const std::string& delimiters);
 std::string kmutil_getfilename(const std::string &path);
+std::string kmutil_getfileext(const std::string &path);
 void kmutil_copystream(std::istream &source, std::ostream &dest);
 
 class KMException : public std::runtime_error

@@ -24,7 +24,9 @@ int main ( int argc, char** argv )
     KMachine_Basic machine(backend);
 
     //machine.Songs().Load("e:\\transfer\\karaoke\\test.kps");
-    machine.Songs().Load(argv[1]);
+    //machine.Songs().Load(argv[1]);
+    //machine.Songs().LoadPath("e:\\transfer\\karaoke\\");
+    machine.Songs().LoadPath("c:\\transfer\\files\\");
 
 /*
     unsigned int pid=machine.Songs().Add();

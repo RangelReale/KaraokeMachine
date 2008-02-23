@@ -4,6 +4,14 @@
 
 namespace KaraokeMachine {
 
+#ifdef __WIN32__
+    const char *kmutil_pathsep="\\";
+#elif defined(unix)
+    const char *kmutil_pathsep="/";
+#else
+    #error "Unknown platform"
+#endif
+
 std::string kmutil_format(const std::string &format, ...)
 {
     va_list argptr;
@@ -63,18 +71,24 @@ std::string kmutil_getfilename(const std::string &path)
 {
 	int pos = 0;
 
-#ifdef __WIN32__
-	pos = static_cast<int>(path.find_last_of('\\'));           //find the last slash in the path
-#elif defined(unix)
-	pos = static_cast<int>(path.find_last_of('/'));           //find the last slash in the path
-#else
-    #error "Unknown platform"
-#endif
+	pos = static_cast<int>(path.find_last_of(kmutil_pathsep));           //find the last slash in the path
 	if ( pos != static_cast<int>(std::string::npos) )                //if found
 	{
 		return path.substr(pos + 1, path.length() - pos );  //return the substring representing the file name
 	}
 	return path;
+}
+
+std::string kmutil_getfileext(const std::string &path)
+{
+	int pos = 0;
+
+	pos = static_cast<int>(path.find_last_of("."));           //find the last dot in the path
+	if ( pos != static_cast<int>(std::string::npos) )                //if found
+	{
+		return path.substr(pos + 1, path.length() - pos );  //return the substring representing the file ext
+	}
+	return "";
 }
 
 void kmutil_copystream(std::istream &source, std::ostream &dest)
