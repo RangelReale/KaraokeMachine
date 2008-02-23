@@ -14,7 +14,7 @@ int main ( int argc, char** argv )
 {
     if (argc < 2)
     {
-        std::cout << "Useage: KaraokeMachine <filename.kms>\n";
+        std::cout << "Useage: KaraokeMachine <directory>\n";
         exit(1);
     }
 
@@ -26,8 +26,11 @@ int main ( int argc, char** argv )
     //machine.Songs().Load("e:\\transfer\\karaoke\\test.kps");
     //machine.Songs().Load(argv[1]);
     //machine.Songs().LoadPath("e:\\transfer\\karaoke\\");
-    machine.Songs().LoadPath("c:\\transfer\\files\\");
-    machine.Images().LoadPath("c:\\transfer\\files\\");
+    //machine.Songs().LoadPath("c:\\transfer\\files\\");
+    //machine.Images().LoadPath("c:\\transfer\\files\\");
+
+    machine.Songs().LoadPath(argv[1]);
+    machine.Images().LoadPath(argv[1]);
 
 /*
     unsigned int pid=machine.Songs().Add();

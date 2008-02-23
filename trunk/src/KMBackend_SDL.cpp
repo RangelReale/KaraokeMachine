@@ -171,7 +171,7 @@ bool KMBackend_SDL::Loop(KMachine &machine)
     }
 
 
-    text_surface = TTF_RenderText_Blended(font_, "Karaoke Machine 0.1", black);
+    text_surface = TTF_RenderText_Blended(font_, "Karaoke Machine 0.2", black);
     if (text_surface != NULL)
     {
         //dst.x=20;
