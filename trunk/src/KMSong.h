@@ -73,6 +73,10 @@ public:
     KMLyrics &Lyrics() { return lyrics_; }
     int GetLyricsCurrentLine() { return lyricscurrentline_; }
     int GetLyricsCurrentPosPct() { return lyricscurrentpospct_; }
+
+    virtual int GetTrackCount() { return 0; }
+    virtual bool GetTrackPlaying(int trackindex) { return false; }
+
     const std::string &GetDebug() { return debug_; }
 protected:
     void SetTitle(const std::string &v) { title_=v; }

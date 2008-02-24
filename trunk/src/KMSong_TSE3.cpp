@@ -11,7 +11,7 @@ namespace KaraokeMachine {
 // CLASS
 //      KMSong_TSE3_Callback
 /////////////////////////////////
-/*
+
 class KMSong_TSE3_Callback : public TSE3::TransportCallback
 {
 public:
@@ -20,17 +20,14 @@ public:
     virtual void 	Transport_MidiIn (TSE3::MidiCommand c) {
     }
     virtual void 	Transport_MidiOut (TSE3::MidiCommand c) {
-        if (c.status==TSE3::MidiCommand_TSE_Meta && c.data1==TSE3::MidiCommand_TSE_Meta_Text)
+        if (c.status==TSE3::MidiCommand_NoteOn || c.status==TSE3::MidiCommand_NoteOff)
         {
-            KMSong_TSE3::lyrics_t::iterator i=song_->lyrics
-
-            //lyrics=c.str;
+            song_->trackplay_[c.channel]=c.status==TSE3::MidiCommand_NoteOn;
         }
     }
 private:
     KMSong_TSE3 *song_;
 };
-*/
 
 /////////////////////////////////
 // CLASS
@@ -47,7 +44,7 @@ TSE3::Plt::AlsaMidiScheduler KMSong_TSE3::scheduler_;
 
 KMSong_TSE3::KMSong_TSE3(KMInputStream &stream) :
     KMSong(stream), metronome_(), /*scheduler_(), */transport_(&metronome_, &scheduler_),
-    lyrics_(), melodytrack_(-1), melodytrackvolume_(0)
+    lyrics_(), trackplay_(), melodytrack_(-1), melodytrackvolume_(0)
 {
     if (!Load(stream))
         throw KMException("Could not load song");
@@ -55,7 +52,7 @@ KMSong_TSE3::KMSong_TSE3(KMInputStream &stream) :
 
 KMSong_TSE3::KMSong_TSE3(const std::string &filename) :
     KMSong(filename), metronome_(), /*scheduler_(), */transport_(&metronome_, &scheduler_),
-    lyrics_(), melodytrack_(-1), melodytrackvolume_(0)
+    lyrics_(), trackplay_(), melodytrack_(-1), melodytrackvolume_(0)
 {
     std::ifstream in(filename.c_str(), std::ifstream::in|std::ifstream::binary);
     if (!Load(in))
@@ -77,9 +74,12 @@ bool KMSong_TSE3::Load(KMInputStream &stream)
     TSE3::MidiFileImport mfi(stream);
 
     transport_.filter()->setPort(128);
-    //transport_.attachCallback(new KMSong_TSE3_Callback(this));
+    transport_.attachCallback(new KMSong_TSE3_Callback(this));
 
     song_ = mfi.load();
+    trackplay_.clear();
+    for (unsigned int i=0; i<song_->size(); i++)
+        trackplay_.push_back(false);
     LoadLyrics();
 
     return true;
@@ -230,6 +230,16 @@ void KMSong_TSE3::SetMelodyTrack(int t)
 
     }
     melodytrack_=t;
+}
+
+int KMSong_TSE3::GetTrackCount()
+{
+    return song_->size();
+}
+
+bool KMSong_TSE3::GetTrackPlaying(int trackindex)
+{
+    return trackplay_[trackindex];
 }
 
 

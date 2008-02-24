@@ -69,10 +69,14 @@ public:
     virtual int GetTranspose() { return transport_.filter()->transpose(); }
     virtual void SetTranspose(int t) { transport_.filter()->setTranspose(t); }
     virtual void SetMelodyTrack(int t);
+
+    virtual int GetTrackCount();
+    virtual bool GetTrackPlaying(int trackindex);
 protected:
     bool Load(KMInputStream &stream);
 private:
     typedef std::map<TSE3::Clock, KMSong_TSE3_Lyric> lyrics_t;
+    typedef std::vector<bool> trackplay_t;
 
     void LoadLyrics();
 
@@ -89,6 +93,7 @@ private:
     TSE3::Transport                 transport_;
 
     lyrics_t lyrics_;
+    trackplay_t trackplay_;
     int melodytrack_, melodytrackvolume_;
 
     friend class KMSong_TSE3_Callback;

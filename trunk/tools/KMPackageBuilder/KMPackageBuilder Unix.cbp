@@ -53,6 +53,7 @@
 			<Add option="$(#wx.cflags)" />
 			<Add option="$(#os.cflags)" />
 			<Add option="$(#os_gui.cflags)" />
+			<Add option="-Wno-non-virtual-dtor" />
 			<Add directory="$(#wx.include)" />
 			<Add directory="../../src" />
 			<Add directory="$(#tse3.include)" />
