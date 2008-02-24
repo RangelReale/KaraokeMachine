@@ -54,7 +54,9 @@ bool KMPackageBuilderApp::OnInit()
     KMPackageBuilderFrame* frame = new KMPackageBuilderFrame((wxDocManager *) docManager_, (wxFrame *) NULL,
         wxT("KaraokeMachine Package Builder"), wxPoint(0, 0), wxSize(500, 400),
                       wxDEFAULT_FRAME_STYLE | wxNO_FULL_REPAINT_ON_RESIZE);
+#ifdef __WXMSW__
     frame->SetIcon(wxICON(aaaa)); // To Set App Icon
+#endif
     frame->Show(true);
 
     SetTopWindow(frame);
