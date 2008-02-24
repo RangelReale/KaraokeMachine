@@ -25,6 +25,7 @@ std::vector<std::string> kmutil_tokenize(const std::string& str,const std::strin
 std::string kmutil_getfilename(const std::string &path);
 std::string kmutil_getfileext(const std::string &path);
 void kmutil_copystream(std::istream &source, std::ostream &dest);
+void kmutil_usleep(unsigned int usecs);
 
 class KMException : public std::runtime_error
 {

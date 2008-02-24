@@ -42,6 +42,7 @@ bool KMPackageBuilderApp::OnInit()
 
     //// Create a document manager
     docManager_ = new wxDocManager;
+    docManager_->FileHistoryLoad(*wxConfigBase::Get());
 
     //// Template: Song
     (void) new wxDocTemplate((wxDocManager *) docManager_, wxT("Song Packages"), wxT("*.kms"), wxT(""), wxT("kms"),wxT("Songs Doc"), wxT("Songs View"),
@@ -66,6 +67,7 @@ bool KMPackageBuilderApp::OnInit()
 
 int KMPackageBuilderApp::OnExit(void)
 {
+    docManager_->FileHistorySave(*wxConfigBase::Get());
     delete docManager_;
     return 0;
 }
@@ -89,6 +91,8 @@ wxMDIChildFrame *KMPackageBuilderApp::CreateChildFrame(wxDocument *doc, wxView *
     fileMenu->AppendSeparator();
     fileMenu->Append(wxID_EXIT, _("E&xit\tAlt-F4"), _("Quit the application"));
     mbar->Append(fileMenu, _("&File"));
+
+    docManager_->FileHistoryUseMenu(fileMenu);
 
     wxMenu* helpMenu = new wxMenu(_T(""));
     helpMenu->Append(ID_MENUABOUT, _("&About\tF1"), _("Show info about this application"));

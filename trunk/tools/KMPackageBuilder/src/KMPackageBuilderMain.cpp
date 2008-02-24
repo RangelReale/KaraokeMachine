@@ -38,6 +38,8 @@ KMPackageBuilderFrame::KMPackageBuilderFrame(wxDocManager *manager, wxFrame *fra
     fileMenu->Append(wxID_EXIT, _("&Quit\tAlt-F4"), _("Quit the application"));
     mbar->Append(fileMenu, _("&File"));
 
+    manager->FileHistoryUseMenu(fileMenu);
+
     wxMenu* helpMenu = new wxMenu(_T(""));
     helpMenu->Append(ID_MENUABOUT, _("&About\tF1"), _("Show info about this application"));
     mbar->Append(helpMenu, _("&Help"));

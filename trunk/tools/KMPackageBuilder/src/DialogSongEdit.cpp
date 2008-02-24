@@ -40,6 +40,7 @@ wxEvent* KMPB_SongEditDialog_SongEvent::Clone() const
 
 void KMPB_SongEditDialog_Player::Play()
 {
+    wxCriticalSectionLocker lock(cs_);
     if (song_)
     {
         lastlyric_=-1;
@@ -50,6 +51,7 @@ void KMPB_SongEditDialog_Player::Play()
 
 void KMPB_SongEditDialog_Player::Stop()
 {
+    wxCriticalSectionLocker lock(cs_);
     if (song_)
     {
         lastlyric_=-1;
@@ -65,11 +67,12 @@ wxThread::ExitCode KMPB_SongEditDialog_Player::Entry()
     for (i=0; i<song_->GetTrackCount(); i++)
         lasttrackplay_.push_back(false);
 
-    while (!TestDestroy())
+    while (!TestDestroy() && !isfinish_)
     {
-        wxCriticalSectionLocker lock(cs_);
         if (song_ && isplaying_)
         {
+            wxCriticalSectionLocker lock(cs_);
+
             song_->Poll();
             if (parent_ && song_->GetLyricsCurrentLine()>-1 && song_->GetLyricsCurrentLine()!=lastlyric_)
             {
@@ -89,6 +92,8 @@ wxThread::ExitCode KMPB_SongEditDialog_Player::Entry()
 
             }
         }
+        //kmutil_usleep(100);
+        wxMicroSleep(100);
     }
     return 0;
 }
@@ -133,7 +138,12 @@ KMPB_SongEditDialog::KMPB_SongEditDialog( wxWindow* parent,
 KMPB_SongEditDialog::~KMPB_SongEditDialog()
 {
     if (player_)
-        player_->Delete();
+    {
+        player_->Finish();
+        player_->Wait();
+        //player_->Delete();
+        delete player_;
+    }
 
     if (song_)
         delete song_;
@@ -347,7 +357,10 @@ void KMPB_SongEditDialog::OnStop(wxCommandEvent &event)
 {
     if (player_)
     {
-        player_->Delete();
+        player_->Finish();
+        player_->Wait();
+        //player_->Delete();
+        delete player_;
         player_=NULL;
 
         wxStaticText *lyricctrl=(wxStaticText*)FindWindow(ID_LYRIC);
@@ -359,7 +372,10 @@ void KMPB_SongEditDialog::OnStop(wxCommandEvent &event)
 void KMPB_SongEditDialog::OnChangeMelodyTrack(wxSpinEvent &event)
 {
     if (player_)
+    {
+        SetTitle(wxString::Format(wxT("%d"), event.GetPosition()));
         player_->SetMelodyTrack(event.GetPosition()-1);
+    }
 }
 
 void KMPB_SongEditDialog::OnChangeTranspose(wxSpinEvent &event)
@@ -389,7 +405,9 @@ void KMPB_SongEditDialog::UpdateTrackPlay(int track)
 {
     wxWindowDC dc(this);
 
-    //wxString sd;
+    //static int ct=0;
+    //ct++;
+
     wxPoint pos(tracksi_->GetPosition());
 
     dc.SetBrush(*wxWHITE_BRUSH);
@@ -403,7 +421,9 @@ void KMPB_SongEditDialog::UpdateTrackPlay(int track)
         pos.x+=15;
     }
 
-    //dc.DrawText(sd, tracksi_->GetPosition().x, tracksi_->GetPosition().y);
+    //pos.x+=40;
+    //dc.DrawText(wxString::Format(wxT("%d"), ct), pos.x, pos.y);
+
     dc.SetBrush(wxNullBrush);
     dc.SetPen(wxNullPen);
 }

@@ -76,7 +76,7 @@ protected:
     bool Load(KMInputStream &stream);
 private:
     typedef std::map<TSE3::Clock, KMSong_TSE3_Lyric> lyrics_t;
-    typedef std::vector<bool> trackplay_t;
+    typedef std::vector<int> trackplay_t;
 
     void LoadLyrics();
 

@@ -2,6 +2,13 @@
 
 #include <cstdarg>
 
+#ifdef __WIN32__
+#include <windows.h>
+#endif
+#ifdef unix
+#include <unistd.h> // for usleep
+#endif
+
 namespace KaraokeMachine {
 
 #ifdef __WIN32__
@@ -101,6 +108,25 @@ void kmutil_copystream(std::istream &source, std::ostream &dest)
         if (source.eof()||source.fail())
             break;
     } while(true);
+}
+
+void kmutil_usleep(unsigned int usecs)
+{
+#ifdef __WIN32__
+   /* On Windows, round to the nearest millisecond, with a
+    * minimum of 1 millisecond if usleep was called with a
+    * a non-zero value. */
+   if (usecs > 500)
+    Sleep ((usecs+500)/1000);
+   else if (usecs > 0)
+     Sleep (1);
+   else
+     Sleep (0);
+#elif defined(unix)
+    usleep(usecs);
+#else
+    #error "Unknown platform"
+#endif
 }
 
 std::string KMTags::GetTags()

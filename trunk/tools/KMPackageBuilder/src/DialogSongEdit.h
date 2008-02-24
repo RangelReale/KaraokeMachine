@@ -57,12 +57,15 @@ class KMPB_SongEditDialog_Player : public wxThread
 {
 public:
     KMPB_SongEditDialog_Player(wxEvtHandler *parent, KMSong *song) :
-        wxThread(), parent_(parent), song_(song), isplaying_(false), cs_(),
+        wxThread(wxTHREAD_JOINABLE), parent_(parent), song_(song), isplaying_(false),
+        isfinish_(false), cs_(),
         lastlyric_(-1), lasttrackplay_() {}
     ~KMPB_SongEditDialog_Player() { if (song_) { song_->Stop(); delete song_; } }
 
     void Play();
     void Stop();
+
+    void Finish() { isfinish_=true; }
 
     void SetMelodyTrack(char v);
     void SetTranspose(char v);
@@ -72,7 +75,7 @@ private:
     typedef std::vector<bool> trackplay_t;
     wxEvtHandler *parent_;
     KMSong *song_;
-    bool isplaying_;
+    bool isplaying_, isfinish_;
     wxCriticalSection cs_;
     int lastlyric_;
     trackplay_t lasttrackplay_;

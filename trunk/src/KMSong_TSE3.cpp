@@ -20,10 +20,10 @@ public:
     virtual void 	Transport_MidiIn (TSE3::MidiCommand c) {
     }
     virtual void 	Transport_MidiOut (TSE3::MidiCommand c) {
-        if (c.status==TSE3::MidiCommand_NoteOn || c.status==TSE3::MidiCommand_NoteOff)
-        {
-            song_->trackplay_[c.channel]=c.status==TSE3::MidiCommand_NoteOn;
-        }
+        if (c.status==TSE3::MidiCommand_NoteOn)
+            song_->trackplay_[c.channel]++;
+        else if (c.status==TSE3::MidiCommand_NoteOff)
+            song_->trackplay_[c.channel]--;
     }
 private:
     KMSong_TSE3 *song_;
@@ -239,7 +239,7 @@ int KMSong_TSE3::GetTrackCount()
 
 bool KMSong_TSE3::GetTrackPlaying(int trackindex)
 {
-    return trackplay_[trackindex];
+    return trackplay_[trackindex]>0;
 }
 
 
