@@ -190,6 +190,8 @@ protected:
     void Loop();
 
     void DoStop();
+
+    virtual void PlaySong(KMSong *song);
 private:
     void ParseAddPlaylist(const std::string &id);
 

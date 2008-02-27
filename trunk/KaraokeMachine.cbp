@@ -22,7 +22,7 @@
 				<Option object_output="obj\Release\" />
 				<Option type="0" />
 				<Option compiler="gcc" />
-				<Option parameters='&quot;E:\transfer\karaoke\test.kps&quot;' />
+				<Option parameters='&quot;C:\transfer\files&quot;' />
 				<Compiler>
 					<Add option="-O2" />
 				</Compiler>

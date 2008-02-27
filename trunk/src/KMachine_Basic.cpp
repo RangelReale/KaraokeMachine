@@ -3,6 +3,24 @@
 
 namespace KaraokeMachine {
 
+class KMachinePlaySongProcess : public KMBackendThreadProcess
+{
+public:
+    KMachinePlaySongProcess(KMSong *song) : KMBackendThreadProcess(), song_(song) {};
+protected:
+    virtual void Run();
+private:
+    KMSong *song_;
+};
+
+void KMachinePlaySongProcess::Run()
+{
+    song_->Play();
+    while (song_->Poll())
+        kmutil_usleep(100);
+}
+
+
 KMachine_Basic::KMachine_Basic(KMBackend &backend) :
     KMachine(), backend_(&backend)
 {
@@ -30,6 +48,12 @@ void KMachine_Basic::DoRun()
     {
         Loop();
     }
+}
+
+void KMachine_Basic::PlaySong(KMSong *song)
+{
+    KMachinePlaySongProcess *ps=new KMachinePlaySongProcess(song);
+    backend_->CreateThread(ps);
 }
 
 };

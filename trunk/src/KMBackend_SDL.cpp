@@ -1,12 +1,13 @@
 #include <sstream>
 #include "KMBackend_SDL.h"
 
-
 namespace KaraokeMachine {
 
 KMBackend_SDL::KMBackend_SDL() :
     KMBackend(), screen_(NULL), bg_(NULL)
 {
+    FPS = lastFPS = pastFPS = past = 0;
+
     // initialize SDL video
     if ( SDL_Init( SDL_INIT_VIDEO ) < 0 )
     {
@@ -80,8 +81,6 @@ bool KMBackend_SDL::Loop(KMachine &machine)
     if(transport.status() != TSE3::Transport::Resting)
         transport.poll();
 */
-
-
 
     // message processing loop
     SDL_Event event;
@@ -190,6 +189,18 @@ bool KMBackend_SDL::Loop(KMachine &machine)
     }
 
     std::string pldesc;
+
+    // FPS
+    pldesc=kmutil_format("FPS: %d", lastFPS);
+
+    text_surface = TTF_RenderText_Blended(font_, pldesc.c_str(), black);
+    if (text_surface != NULL)
+    {
+        dst.y=dst.y+40;
+        SDL_BlitSurface(text_surface, NULL, screen_, &dst);
+        SDL_FreeSurface(text_surface);
+    }
+
     dstpl.x=200; dstpl.y=200;
     dstpl.w=600; dstpl.h=600;
     for (int i=0; i<machine.Playlist().GetCount(); i++)
@@ -271,10 +282,44 @@ bool KMBackend_SDL::Loop(KMachine &machine)
 
     // DRAWING ENDS HERE
 
+    int currentTime = SDL_GetTicks();
+
+    if ( currentTime - past >= 16 )
+    {
+      past = SDL_GetTicks();   // this should be done before redrawing screen
+
+      SDL_Flip( screen_ );
+      FPS++;
+      kmutil_usleep(15 * 1000);
+    }
+
+    if ( currentTime - pastFPS >= 1000 )
+    {
+      lastFPS = FPS;
+      FPS = 0;
+      pastFPS = currentTime;
+    }
+
     // finally, update the screen :)
-    SDL_Flip(screen_);
+    //SDL_Flip(screen_);
 
     return true;
+}
+
+int thread_func(void *data)
+{
+    KMBackendThread_SDL *t=(KMBackendThread_SDL *)data;
+    t->Run();
+    delete t;
+    return 0;
+}
+
+KMBackendThread* KMBackend_SDL::CreateThread(KMBackendThreadProcess *process)
+{
+    KMBackendThread_SDL *newt=new KMBackendThread_SDL(process);
+    SDL_Thread *thread = SDL_CreateThread(thread_func, newt);
+    newt->SetThread(thread);
+    return newt;
 }
 
 

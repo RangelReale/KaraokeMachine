@@ -17,6 +17,7 @@ public:
 
 protected:
     virtual void DoRun();
+    virtual void PlaySong(KMSong *song);
 private:
     KMBackend *backend_;
 };

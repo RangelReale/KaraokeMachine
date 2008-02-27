@@ -6,6 +6,7 @@
 #include "boost/filesystem.hpp"
 #include "boost/random.hpp"
 
+#include "KMBackend.h"
 #include "KMachine.h"
 #include "KMUtil.h"
 #include "KMSongFactory.h"
@@ -311,15 +312,18 @@ void KMachine::Loop()
     if (playing_)
     {
         //std::cout << "KMachine::Loop playing" << std::endl;
+/*
         if (!playing_->Poll())
         {
             DoStop();
         }
+*/
     }
 
     if (!playing_ && playlist_.GetCount()>0)
     {
         KMachinePlaylistSong ps=playlist_.Pop();
+
         std::stringstream filedata;
         ps.GetSong()->GetFileData(filedata);
         filedata.seekg(0);
@@ -327,7 +331,9 @@ void KMachine::Loop()
         playing_=KMSongFactory::Load(filedata);
         playing_->SetMelodyTrack(ps.GetSong()->GetMelodyTrack());
         playing_->SetTranspose(ps.GetSong()->GetTranspose());
-        playing_->Play();
+
+        PlaySong(playing_);
+        //playing_->Play();
     }
 }
 
@@ -341,5 +347,9 @@ void KMachine::DoStop()
     }
 }
 
+void KMachine::PlaySong(KMSong *song)
+{
+
+}
 
 };

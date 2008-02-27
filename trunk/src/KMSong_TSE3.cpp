@@ -73,7 +73,7 @@ bool KMSong_TSE3::Load(KMInputStream &stream)
 {
     TSE3::MidiFileImport mfi(stream);
 
-    transport_.filter()->setPort(128);
+    //transport_.filter()->setPort(128);
     transport_.attachCallback(new KMSong_TSE3_Callback(this));
 
     song_ = mfi.load();
