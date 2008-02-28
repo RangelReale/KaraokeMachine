@@ -1,0 +1,139 @@
+<html>
+
+  <head>
+    <title>The Notifier/Listener Framework</title>
+  </head>
+  
+  <!--TSE3-BODY-->
+
+    <h1>The Notifier/Listener Framework</h1>
+
+    <p>
+    The TSE3 library uses a version of the &quot;Observer&quot; design
+    pattern (GoF book), both as a part of it's public API and for internal
+    implementation.
+
+    <p>
+    This design pattern is a framework for publishing information about
+    events of interest. These events are multicast to every interested
+    object. Objects can register an interest and revoke this at any time.
+
+    <p>
+    In the TSE3 implementation, the object which multicasts the events
+    is of the <code>Notifier</code> class. Object which listen to these
+    events are <code>Listener</code> classes.
+
+    <p>
+    These classes are documented fully in the <code>tse3/Notifier.h</code>
+    header file. The system is flexible, and type safe. The multicast
+    'events' are implemented as callbacks on member functions. These
+    member functions may have any number of parameters of any type.
+    These methods are defined in abstract 'listener interfaces' (e.g.
+    <a href="api/TSE3__SongListener.html"><code>SongListener</code></a>).
+
+    <h3>How to use the <code>Notifier</code> framework</h3>
+
+    <p>
+    Essentially, for each specific <code>Notifier</code> type an interface
+    class is defined. This interface describes each of the possible events that
+    may be emitted by that <code>Notifier</code>. Let's call this interface
+    <code>interface_type</code>.
+
+    <p>
+    Now a class that can emit events inherits from
+    <code>Notifier&lt;interface_type&gt;</code>. The implementation of the
+    class can emit events by calling it's protected <code>notify</code>
+    method.
+
+    <p>
+    A class that listens to these events inherits from
+    <code>Listener&lt;interface_type&gt;</code>. This means that it also
+    inherits the <code>interface_type</code>, and so implements the
+    member functions that recieve events.
+
+    <p>
+    Now, a <code>Listener</code> can register an interest in events
+    by calling <code>Listener::attachTo</code> for the appropriate
+    <code>Notifier</code>, and revoke this interest with
+    <code>Listener::detachFrom</code>.
+
+    <h3>What you can do in an event handler</h3>
+
+    <p>
+    Note that callback handlers are called <i>synchronously</i> by the TSE3
+    library. This means that as soon as an event occurs (i.e.
+    <code>Notifier::notify</code> is called) every attached listener's handler
+    function gets called immediately (well, one after the other). Following
+    this, the code that called <code>notify</code> regains control.
+
+    <p>
+    This has some repurcussions on what you can/cannot do in an event
+    handler. Since you are called in the context of the TSE3 library is
+    best not to do too much processor intensive activity - you may cause
+    TSE3 performance to drop.
+
+    <p>
+    The <code>Notifier</code> framework allows you to safely <code>attach</code>
+    or <code>detach</code> from <code>Notifier</code> objects in an event
+    handler. This <i>can</i> be the currently notifying object.
+
+    <p>
+    Note that if you perform an operation that will itself raise an event (i.e.
+    perform a call to <code>Notifier::notify</code>) in your event handler, the
+    new event will be passed around and handled completely before processing
+    returns control to the original event handler.
+
+    <p>
+    Calling TSE3 modifying methods (e.g. most methods whose name starts with
+    'set') <i>may</i> therefore be unwise since they will probably perform a
+    <code>notify</code>.
+   
+    <p>
+    If the <code>Transport</code> polling is run in a background thread, some
+    of your callbacks will be called in that thread's context. It may therefore
+    be unsafe to perform certain operations, GUI updating for example.
+
+    <h3><code>Listener</code> header files</h3>
+
+    <p>
+    The <code>Listener</code> interface classes for each of the TSE3 classes is
+    in the <code>listen</code> subdirectory. For example the
+    <code>Transport</code> class is defined in <code>tse3/Transport.h</code>.
+    However, it's <code>Listener</code> interface class is defined in
+    <code>tse3/listen/Transport.h</code>.
+
+    <p>
+    Each <code>Listener</code> class header both defines the callback interface
+    and forward declares the relevant <code>Notifier</code> type. Using these
+    headers you can therefore avoid large include file depenancy in your own
+    project header files.
+    
+    <h3>History</h3>
+
+    <p>
+    In TSE3 versions 0.0.12 and later the <code>Notifier</code> framework is
+    considerably improved. The system is now a lot more safe, elegant and above 
+    all easy to use.
+    <p>
+    TSE3 version 0.0.22 saw some fixes to the Notifer framework that allows
+    you to safely call <code>attach</code> and <code>detach</code> in event
+    handlers.
+
+    <h3>See also</h3>
+
+    <p>
+    <a href="api/Notifier_h.html"><code>Notifier.h</code></a> for definitions
+    of the notifier framework classes.
+
+    <p>
+    The classes are described in the KDOC class documentation:
+    <ul>
+      <li><a href="api/TSE3__Notifier.html"><code>Notifier</code></a>
+      <li><a href="api/TSE3__Listener.html"><code>Listener</code></a>
+    </ul>
+
+    <!--TSE3-FOOTER-->
+    
+  </body>
+
+</html>

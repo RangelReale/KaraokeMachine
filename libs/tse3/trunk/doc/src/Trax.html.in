@@ -1,0 +1,65 @@
+<html>
+
+  <head>
+    <title>Author / About Trax Software</title>
+  </head>
+  
+  <!--TSE3-BODY-->
+
+    <h1>About Trax Software</h1>
+
+    <ul>
+        <p>
+        <table cellpadding=0 cellspacing=0 border=0><tr>
+        <td valign=top>
+          TSE3 is a Trax Software product.
+          <p>
+          Trax Software is a UK based software house.
+        </td>
+        <td width=30>&nbsp;</td>
+        <td>
+          <img src="trax.gif" alt="Trax Software logo">
+        </td>
+        </tr></table>
+    </ul>
+
+    <h1>TSE3 authors</h1>
+
+    <ul>
+        <p>
+        TSE3 is written by Pete Goodliffe.
+        <br>Contact: <a href="mailto:pete@cthree.org">pete@cthree.org</a>
+        <br>&nbsp;<br>
+        <img src="pete.jpeg" alt="pete" border=2>
+    </ul>
+
+    <h1>Dedication</h1>
+
+    <ul>
+      <p>
+      To my wife, Bryony.
+      <p>
+      In loving memory of my daughter Jessica.
+    </ul>
+
+    <h1>Thanks</h1>
+
+    <ul>
+      <li>Software
+      <ul>
+        <li>Takashi Iwai of SuSE for Alsa 0.9.x MidiScheduler adaption.
+        <li>Joerg Anders (much feedback)
+        <li>Stefan Westerfeld (aRts MidiScheduler code)
+      </ul>
+      <li>Hardware
+      <ul>
+        <li>Rik Hemsley
+        <li>Chris Reed
+      </ul>
+    </ul>
+
+    <!--TSE3-FOOTER-->
+    
+  </body>
+
+</html>

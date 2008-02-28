@@ -1,0 +1,125 @@
+<html>
+
+  <head>
+    <title>Cakewalk .ins files</title>
+  </head>
+  
+  <!--TSE3-BODY-->
+    
+    <h1>Cakewalk <i>.ins</i> files</h1>
+    
+    <h3>Introduction</h3>
+
+    <p>
+    The <code>Instrument</code> class provides support for instrument definitions (i.e. textual representations of the program/bank/controller names). These are read from the widely available <a href="http://www.cakewalk.com">Cakewalk</a> instrument definition format files. (Cakewalk is a PC sequencing package).
+
+    <h3>File format</h3>
+
+    <p>
+    These files generally have a <code>.ins</code> suffix and are of a textual nature.
+
+    <p>
+    Unfortunately, the file format is not documented anywhere by Cakewalk, so I have produced my own interpretation of the file format. If anyone knows of any better descriptions I'd love to know!
+
+    <hr>
+
+    <p>
+    <h1>Pete's interpretation of the Cakewalk <i>.ins</i> instrument file format</h1>
+
+    <h3>Overview</h3>
+
+    <p>
+    The file conists of a number of sections which begin with the following
+lines (they are generally found in this order, I doubt this is important):
+
+    <p>
+    <table cellspacing=0 cellpadding=2 border=0 align=center>
+        <tr><td><b>Section name</b></td><td><b>Description</b></td></tr>
+        <tr><td colspan=2><hr noshade height=2></td></tr>
+        <tr><td>".Patch Names"</td><td>Describes groups of patches</td></tr>
+        <tr><td>".Note Names"</td><td>Describes note names for some patch</td></tr>
+        <tr><td>".Controller Names"</td><td>Describes all controller names for some device</td></tr>
+        <tr><td>".RPN Names"</td><td>Describes RPN values for some device</td></tr>
+        <tr><td>".NRPN Names"</td><td>Describes NPRN values for some device</td></tr>
+        <tr><td>".Instrument Definitions"</td><td>Describes instruments based on above sections
+    </table>
+
+    <h3>Section contents</h3>
+
+    <p>
+    General file conventions:
+    <ul>
+        <li>Within each of these sections are subsections delimited by "[" and "]".
+        <li>Subsection names and other text values may contain spaces.
+        <li>Comments begin with a ";" and go to the end of the line. They may occur at any point in a line.
+        <li>Subsections may reference other subsections - case is sensitive.
+        <li>Patch values default to "0-127" rather than "1-128".
+    </ul>
+
+    <p>
+    The first 5 sections have practically identical format, and contain a number of subsections. These subsections define a mapping of number (0-127) to textual representation. All or only some of the numbers may be given a mapping. Unspecified entries default to an empty string.
+    <ul>
+        <li>Each subsection is introduced "[SomeSectionName]".
+        <li>The next line may be "BasedOn=" in which case this group of values refers to the named subsection. Any values from the 'base' may be later redefined in this section. The BasedOn 'base' subsection definition may be after of before this subsection in the file.
+        <li>There follows any number of lines of the format "<i>X</i>=<i>SomeName</i>" where <i>X</i> is a value 0-127 and <i>SomeName</i> is the text associated with that value.
+    </ul>
+
+    <p>
+    There are inbuilt patch names "0..127" and "1..128" which are defined as just the numbers.
+
+    <h3>The ".Instrument Definitions" section</h3>
+
+    <p>
+    The ".Instrument Definitions" section is different; it describes instruments based on the information in the previous sections.
+    <ul>
+        <li>There is a subsection for each instrument defined, the subsection name is the instrument name. The subsection heading is in the format "[SomeInstrument]".
+        <li>The definition consists of the following sections, which if removed have the indicated defaults. Each entry is described below.
+    </ul>
+
+    <p>
+    <table cellspacing=0 cellpadding=2 border=0 align=center width=80%>
+        <tr><td><b>Name</b></td><td><b>Default</b></td></tr>
+        <tr><td colspan=2><hr noshade height=2></td></tr>
+        <tr><td>"UseNotesAsControllers=1"</td><td>=0 </td></tr>
+        <tr><td>"Control="</td><td>No controllers for this instrument. </td></tr>
+        <tr><td>"RPN="</td><td>No RPNs defined</td></tr>
+        <tr><td>"NRPN="</td><td>No NRPNs defined</td></tr>
+        <tr><td>"BankSelMethod="</td><td>=0 </td></tr>
+        <tr><td>"Patch[#]="</td><td>No patch for # </td></tr>
+        <tr><td>"Key[#,%]="</td><td>No key definitions for #,% </td></tr>
+        <tr><td>"Drum[#,%]=1"</td><td>Drum[#,%]=0 </td></tr>
+        <tr><td colspan=2>
+             Notes
+             <ol>
+                 <li>"#" represents a bank select value. This is a composite value based on the bank select MSB and LSB which is equal to (MSB&lt;&lt;7)+LSB.
+                 <li>"%" represents a program change value.
+            </ol>
+        </td></tr>
+     </table>
+
+     <ul>
+        <li>The controller names definied for an instrument are given by the "Control=" line. Following the "=" is a subsection name from the ".Controller Names" section.
+        <li>The instrument patch names for a given bank value are defined by the "Patch[#]=" line. If # is a "*" then this matches for every bank select. There may be more than one "Patch[#]=" line.
+        <li>The "Key[#,%]=" line defines key names for a particular patch on a particular bank select.
+        <li>If the "Drum[#,%]=" line sets the drum flag for a patch/bank select value then the editor should default to a drum editor for this voice.
+        <li>"BankSelMethod=" takes a value from 0 to 3. These mean
+    </ul>
+
+    <table cellspacing=0 cellpadding=2 border=0 align=center>
+        <tr><td><b>Value</b></td><td><b>Meaning</b></td></tr>
+        <tr><td colspan=2><hr noshade height=2></td></tr>
+        <tr><td>0</td><td>Normal - bank select MSB and LSB matter </td></tr>
+        <tr><td>1</td><td>Only the MSB is used and defined </td></tr>
+        <tr><td>2</td><td>Only the LSB is used and defined </td></tr>
+        <tr><td>3</td><td>Only program changes are used and defined </td></tr>
+     </table>
+
+     <ul>
+        <li>The "UseNamesAsController=" line denotes useage as for the "Mackie OTTO-1604". I have no idea what this means ;-)
+    </ul>
+    
+    <!--TSE3-FOOTER-->
+    
+  </body>
+
+</html>

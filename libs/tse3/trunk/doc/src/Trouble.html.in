@@ -1,0 +1,63 @@
+<html>
+
+  <head>
+    <title>Troubleshooting</title>
+  </head>
+  
+  <!--TSE3-BODY-->
+
+    <h1>Troubleshooting</h1>
+
+    <p>
+    Below are listed some commonly found problems. If you can't get TSE3
+    working then look here. If you don't find the answer, then just ask!
+
+    <hr>
+
+    <dl>
+
+      <dt><b>I can't get any output</b></dt>
+      <dd>When you run <code>tse3play</code> do you get any errors? If so then
+          look for a description below.
+          <p>
+          If not, do you have your soundcard installed correctly? You can
+          run <code>tse3play</code> with the <code>--verbose</code> parameter
+          to get some diagnostics about the setup of your soundcard. If no
+          soundcard is listed then try reinstalling it.<br>
+          If you do have a soundcard installed and setup properly, is it's
+          volume raised, and have you got your speaker cable in the correct
+          socket?
+          <p>
+          Does the soundcard support both MIDI and audio output - the
+          <code>--verbose</code> output will tell you which output TSE3
+          uses by default; trying forcing it to another port with
+          <code>--force-port</code>.</dd>
+
+      <dt><b>I get the message "Opening FM patch file failed"</b></dt>
+      <dd>You have an FM soundcard and so TSE3 tries to load the FM patches
+          file on your computer to put sounds into your soundcard. The
+          files are commonly found in <code>/etc/midi</code>, however on
+          your system the files are not here.<br>
+          The files TSE3 is looking for are: <code>std.o3</code>,
+          <code>std.sb</code>, <code>drums.o3</code> and <code>drums.sb</code>.
+          If you locate this file, try running <code>tse3play</code> with
+          the <code>--patches-dir</code> parameter.</dd>
+
+      <dt><b>I get the message "Opening GUS patch file failed"</b></dt>
+      <dd>You have a GUS soundcard and so TSE3 tries to load the GUS patches
+          files on your compueter to put sounds into your soundcard. The
+          files are commonly found in <code>/etc/midi</code>, however on your
+          system the files are not here.<br>
+          The files TSE3 is looking for are <code>*.pat</code>, which
+          includes, for example, <code>acpiano.pat</code> and
+          <code>epiano1.pat</code>.
+          If you locate this file, try running <code>tse3play</code> with
+          the <code>--patches-dir</code> parameter.</dd>
+
+    </dl>
+
+    <!--TSE3-FOOTER-->
+    
+  </body>
+
+</html>

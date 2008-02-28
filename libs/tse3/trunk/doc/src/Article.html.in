@@ -1,0 +1,309 @@
+<html>
+  <head>
+    <title>Linux, MIDI and Anthem</title>
+  </head>
+  <!--TSE3-BODY-->
+    <h1>Linux, MIDI and Anthem</h1>
+
+    <center>
+    <table width=70% border=0><tr><td>
+    <center><b>This article originally appeared at the <a href="http://www.mstation.org/">Linux MusicStation</a>.<br>It appeared as a feature article for October 2000.</b></center>
+    </td></tr></table>
+    </center>
+
+    <p>
+    <i>Pete Goodliffe talks about the Anthem project, bringing usable MIDI sequencing to the Linux community.</i>
+
+
+
+    <h3>Introduction</h3>
+
+    <p>
+    The Linux and free software communities are currently enjoying rapid growth, quickly gaining in popularity. However, the music composition arena seems to lag somewhere behind this surge. In many ways this is quite normal, the musician community is much smaller than the hordes of desktop Linux users. However, we are beginning to see a critical mass of musical developers and users which is beginning to redress this balance.
+
+    <p>
+    There are now a number of projects devoted to bringing music composition tools to Linux (just have a quick glance at the multimedia section of sourceforge). However, they're all fairly immature, and many have not yet produced any useful code whatsoever.
+
+    <p>
+    There have always been audio editing tools of sorts for Linux, nothing that the average Windows user would find easy to use, though. And for a long time there have been MIDI sequencing packages - but again not up to the quality of the quality of the famous Windows sequencers.
+
+    <p>
+    So will we ever get there? Will any of these projects see fruition? The answer is yes - and in this article I'll describe one of our routes to the open source music paradise we seek.
+
+    <h3>The Anthem project</h3>
+
+    One of the many new projects developing MIDI sequencing functionality is Anthem.
+
+    <p>
+    OK, so now a disclaimer - I'm the guy who's written Anthem. I hope you don't find that this article turns into a banal marketing speil, but is able to give you a clear overview of where this project is going. In fact, I'd like to see other sequencers than just Anthem appear on Linux - the competition and choice is what will encourage computer musicians to the Linux platform.
+
+    <p>
+    So what of Anthem?
+
+    <p>
+    The aim of the project is to create a fully-fledged and top quality MIDI sequencing studio with audio capabilities, that is capable of rivalling products found on any other platform. Those are lofty goals.
+
+    <p>
+    Any project can claim to be something it's not, and many do. So why should we believe that this will ever happen? The most important factor should surely be, what state is Anthem in now? In a nutshell:
+
+    <ul>
+      <li> It's a long way into development. There is real code there. Working.
+      <li> All the MIDI playback and song structure functionality exists,
+        (there's a lot of it, and it's very advanced)
+      <li> No audio implementation exists at all
+      <li> Not all the low-level editors (e.g. piano-roll) exist yet
+    </ul>
+      
+    <p>
+    That is to say, a lot of Anthem is there, but it's certainly not complete yet! So if the program's not finished, why should you care about it?
+
+    <ul>
+    <li>
+    <b>1. The code is there</b>
+
+    <p>
+    Well, for a start, the code is not only written, but a lot of it is already being used in a number of other music projects (see below for the reasons why).
+
+    <p>
+    Secondly, one of the great things about the open source movement is the release early/release often mentality. You can go and download development versions of the Anthem sequencer and see how well it works, and feed back your comments about it.
+
+    <p><li>
+    <b>2. The code is mature</b>
+
+    <p>
+    The project is based on mature technology, with years of experience. A version of Anthem already exists. I wrote it. However, this original version is proprietary and closed source. It runs on the Acorn RISC OS platform. If you're really curious have a look at <a href="http://www.rcomp.co.uk/rci/sound/anthem/anthem.htm">www.rcomp.co.uk/rci/sound/anthem/anthem.htm</a>. <a href="#1" name="return-1">[1]</a>
+
+    <p>
+    However, this is a new, completely rewritten, much improved version of this original program. Its full title is therefore: "Anthem Open Source Edition".
+
+    <p>
+    Experience is key - the main problems have already been identified and solved once. The ride is a lot smoother this time around. Of course, experience is no guarantee that the final program will materialise...
+
+    <p>
+    It will, though!
+
+    <p><li>
+    <b>3. The project is well directed</b>
+
+    <p>
+    Now here's the interesting techie clincher: the project has been split into two parts. In the past (both on Linux and other platforms) I've seen far too many MIDI sequencer projects started the wrong way round: from the top downwards.
+
+    <p>
+    You simply cannot write a GUI and then try to hack in a song structure and MIDI playback framework underneath. It doesn't fit. The program will never get off the ground. But you may end up with a nice looking set of windows.
+
+    <p>
+    In this project the actual driving-force sequencer engine part has been written first; with careful consideration to the GUI aspects of the project (drawing on my experience having done this once already) but without the straight jacket of the quick-hack GUI mentality.
+
+    <p>
+    The goal isn't so much to get a sequencer on your screen rapidly as to produce the best, most flexible, most powerful sequencer possible.
+
+    <p><li>
+    <b>4. The project is being worked on</b>
+
+    <p>
+    The important thing to bear in mind about the Anthem project is that is is developing very quickly. In comparison to the vast majority of sequencing projects you can find out there, this one is being updated. Many projects have appeared to lie stagnant for many many months.
+
+    <p>
+    Other, older, sequencers are certainly functional now; but they still aren't developing so rapidly, and most Windows users would take one look at them a shudder. <a href="#2" name="return-2">[2]</a>
+
+    </ul>
+
+    <p>
+    So Anthem comprises two main sections, the TSE3 library and the Anthem program. Both are released under the terms of the GNU public license. Both are written in C++. But what are they and what do they mean to the open source music community?
+
+    <h3>The TSE3 library</h3>
+
+    <p>
+    TSE3 is a third generation sequencer engine core. That is, it handles playback, and recording. It provides an advanced object-oriented song structure. It provides real-time effects (transpose, etc) and allows you to edit music on-the-fly. However, there is not a window in sight.
+
+    <p>
+    All the necessary functionality has been designed in from the start, where it needs to be thought out properly:
+
+    <ul>
+      <li> It's portable - not Linux specific, it doesn't rely on any non-standard
+        C++ or C features or libraries
+      <li> It abstracts the playback system, so it could be OSS, it could be ALSA
+        or it could be something completely different (Timidity, anyone?)
+      <li> It is designed in such a way that a song can be safely edited as it is
+        played
+      <li> It has intimate support for a GUI - using the MVC pattern to inform of
+        changes
+      <li> It supports multi-level undo/redo
+    </ul>
+
+    <p>
+    It was developed first, before any flashy GUI stuff. It's been under development for a year and a half already. It's been carefully tweaked and honed, and is now a very powerful and rounded library. It's easy to use, fully documented and suitable for programs as simple as a MIDI file player to a fully featured MIDI sequencer (which is, of course, why it was written).
+
+    <p>
+    The library is mature - it's based on the TSE2 library which was in use in the original Anthem. However, it has many many improvements over TSE2 and is a complete rewrite from scratch.
+
+    <p>
+    So what does TSE3 give us? Here's a simple (and not comprehensive) summary:
+
+    <ul>
+      
+      <li> An object oriented data structure for a "Song".
+        This structure was acclaimed as an innovate and truly superior way of
+        working when it first appeared on the Acorn platform.
+      <li> File saving and loading based on this song type, as well as import/export
+        of industry standard MIDI files.
+      <li> Advanced playback system, with clever facilities such as synchro start,
+        punch-in recording, midi echo, GS/GM/XG support and tonnes more...
+      <li> A lot of application support, for example a command framework that allows
+        you to provide unlimited undo/redo, support for Cakewalk instrument
+        definition files for controller/program change information, and other
+        important application support facilities.
+    </ul>
+    
+    <p>
+    An application can use a little or as much of this library as it requires. A few examples of using TSE3 are included at the end of this article.
+
+    <p>
+    TSE3 is stable and at a beta stage of development now.
+
+    <h3>About Anthem</h3>
+
+    <p>
+    The part of this project that most end users will be interested in is the Anthem sequencer. This is the main program. Using the TSE3 library, the Anthem sequencer delivers the power of TSE3's advanced features to the desktop in a user-friendly manner. So that sounds like a load of old marketing rubbish? Is it true?
+
+    <p>
+    Well, see for yourself. Many users will back up that statement.
+
+    <p>
+    Anthem is built using the KDE2 environment. Of course, that doesn't mean that you have to run all of KDE2 to use the program; you can just as easily run it under Gnome, or any X11 window manager as long as you install the base KDE2 libraries. However, it does fully exploit the available KDE2 facilities where available.
+
+    <p>
+    <b>What state is it in now?</b>
+
+    <p>
+    So I've said that Anthem isn't finished yet. I guess it will be hard to ever say when the project's finished because there will always be new features to add. However as it stands, the program allows you to create your music, arrange it, load it, save it, everything you would expect.
+
+    <p>
+    The low-level music editors are not all implemented, though. There is a 'list editor', but the 'piano-roll' editor is still under development. It will come! Score editing will be provided too, however this will be provided via a third-party plugin.
+
+    <p>
+    The audio-editing facilities have not even been began though. This will disappoint a number of readers. However, I do not want to embark on this and get it wrong. I need to coordinate my work with experts in this field to ensure that the
+    audio facilities are as powerful and efficient as they can be. (See "How can you help", below.)
+
+    <p>
+    Anthem will see a 'plug-in' framework where a number of different types of editors and capabilities can be added according to taste. Audio is an example of this, perhaps we can incorporate video functionality as well.
+
+    <p>
+    <b>When will it be finished?</b>
+
+    <p>
+    There is no answer to this question. I guess the more important question is "when will it be usable?" To a large extent it already is. As more editors are added the usefulness of the program will increase. However, since I'm not working to a timetable and develop the program as a spare-time activity I can't answer fully.
+
+    <h3>How can you help?</h3>
+
+    <p>
+    So we've seen that Anthem is an ambitious and technically advanced project. It is already shown to work and is already in use. However, there are still areas needing work that volunteers may be interested in:
+
+    <ol>
+    <li>Audio/video integration
+
+    <p>
+    As I stated above, I'm not going to this on my own. Authors of HD recording systems and audio editing suites may like to coordinate our work.
+
+    <p>
+    <li>Use TSE3!
+
+    <p>
+    A number of sequencer developers have told me that they are using TSE3. Since its so flexible TSE3 can be used in more than one way. Anthem is being developed as the sort of sequencer that I want to use. Other developers may prefer a more Cakewalk-like style of working. There is a plenty of scope for other Linux sequencers. However, TSE3 provides a solid base for them all to be built on.
+
+    <p>
+    Likewise other multimedia projects which need MIDI playback support may consider using TSE3 for its stability and feature set.
+
+    <p>
+    <li>Use Anthem and feed back
+
+    <p>
+    A self explanatory way to help - I will always need feedback to improve the program. Also a large number of good quality demonstration songs would be useful.
+
+    <p>
+    <li>Sponsor the project
+
+    <p>
+    The last, but not the least, on this list.
+
+    <p>
+    Currently TSE3 and Anthem are being developed on a machine pulled out of a skip. In bits. Literally. Processing power greater than a P100, and a soundcard with more capabilities than an old ISA AWE32 would greatly enhance what can be done.
+
+    </ol>
+
+    <h3>Examples of using TSE3</h3>
+
+    <p>
+    I have been asked for a few simple examples of using the TSE3 library to show how easy it really is to use. So here they are...
+
+    <p>
+    First, this is how you load a standard MIDI file:
+
+    <pre>
+    void loadAMidiSong(const std::string &amp;filename)
+    {
+        TSE3::MidiFileImport mfi(filename);
+        TSE3::Song *song = mfi.load();
+    }
+    </pre>
+
+    <p>
+    The song variable now contains a TSE3 Song class with the contents of this MIDI file. In fact, if you just want to play the MIDI file, and don't want to work on the data in it, you don't even need to convert it to a TSE3 Song - you can just play it directly. The Transport class is used to perform playback:
+
+    <pre>
+    void playAMidiSong(const std::string &amp;filename, TSE3::Transport &amp;transport)
+    {
+        TSE3::MidiFileImport mfi(filename);
+        transport.play(mfi);
+        while (transport.status() == Playing)
+        {
+            transport.poll();
+            // Delay for a bit here to prevent processor hogging
+        }
+        // Playback has now finished
+    }
+    </pre>
+
+    <p>
+    Of course, there are more elegant ways of waiting for playback to stop than a clumsy loop, and TSE3 provides them to you.
+
+    <p>
+    Perhaps you want to send the different channels of the MIDI file to different MIDI ports (perhaps one to an external MIDI device, and one to the internal soundcard). We can use the MidiMapper to do this easily. This is how you would set it up (baring in mind the MIDI file will by default play from port 0):
+
+    <pre>
+    void setUpMidiMapper(TSE3::Transport &amp;transport)
+    {
+        // Set channel 0 port 0 to go to channel 1, port 2
+        transport.midiMapper()-&gt;setMap(0, 0, 1, 2);
+
+        // Set channel 1 port 0 to go to channel 0, port 1
+        transport.midiMapper()-&gt;setMap(1, 0, 0, 1);
+    }
+    </pre>
+
+    <p>
+    When you next play the MIDI file, the output will be routed accordingly. Facilities exist to find out what physical port is represented by each number. You can hide the numbers from the user and work with port names, too.
+
+    <p>
+    These are a few very simple examples of using TSE3 - it can do a whole lot more!
+
+    <h3>Footnotes</h3>
+
+    <p>
+    Pete Goodliffe is a Senior Software Engineer with Pace Microsystems plc, working on TSE3 and Anthem in his &lt;irony&gt;"copious" spare time&lt;/irony&gt;. He plays the keyboard, and is 'still' learning the harmonica (will someone please write a Linux device driver for it?).
+
+    <p>
+    You can visit the TSE3 website at <a href="http://TSE3.sourceforge.net">TSE3.sourceforge.net</a> and the Anthem site at <a href="http://anthem.sourceforge.net">anthem.sourceforge.net</a>.
+
+    <ul>
+    <p>
+    <a name="1"><a href="#return-1">[1]</a> Remember this is old technology and not fully representative of this cutting-edge project.</a>
+
+    <p>
+    <a name="2"><a href="#return-2">[2]</a> Don't get me wrong, I'm not trying to slag off any of these programs. But I firmly believe that in these enlightened times we can do a lot better!</a>
+    </ul>
+
+    <!--TSE3-FOOTER-->
+
+  </body>
+</html>

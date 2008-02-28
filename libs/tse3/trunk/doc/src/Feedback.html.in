@@ -1,0 +1,82 @@
+<html>
+
+  <head>
+    <title>Feedback</title>
+  </head>
+  
+  <!--TSE3-BODY-->
+
+    <h1>Feedback</h1>
+
+    <p>
+    If you have any comments, questions or contributions to TSE3 please contact
+    me at <a href="pete@cthree.org">pete@cthree.org</a>.
+    Feedback is always welcomed.
+
+    <h1>Bug reports</h1>
+
+    <p>
+    If you are submitting a bug report then please provide as much information
+    as possible. Including the form below would be very useful.
+    <p>
+    It would also be useful if you could include the output of running
+    <code>tse3play --verbose</code>.
+    
+    <pre>
+    --------------------------------------------------------------------------
+
+<b>
+    TSE3 bug report form
+    ====================
+</b>
+
+    <b>Name:</b>                              [e.g. Pete Goodliffe]
+    <b>Date:</b>                              [e.g. 2000-08-21]
+    <b>Email:</b>                             [e.g. pete@cthree.org]
+    <b>Your experience:</b>                   [e.g. experienced programmer in C/C++
+                                             experienced unix user
+                                             unix user
+                                             new unix user]
+
+    <b>TSE3 version number:</b>               [e.g. 0.0.7]
+    <b>OS name:</b>                           [e.g. gnu linux]
+    <b>OS distribution:</b>                   [e.g. Redhat]
+    <b>Run "uname -a":</b>                    [e.g. Linux solomon 2.2.12-20 #1 ...]
+    <b>Do you use OSS or ALSA:</b>            [e.g. Alsa 0.5.1]
+    <b>Compiler name and version:</b>         [e.g. gcc 2.95.2]
+
+    <b>Description of bug:</b>
+    
+    [e.g. When I run tse3play my computer explodes]
+
+    <b>How to (repeatably) reproduce the bug:</b>
+
+    [e.g. Perform a clean build and install, then type tse3play. The
+    computer explodes.]
+
+    <b>Any other comments:</b>
+
+    [e.g. You owe me a new computer ;-) ]
+
+    --------------------------------------------------------------------------
+    
+    <b>Please attach the output of "tse3play --verbose" below:</b>
+
+    [ tse3play --verbose output ]
+
+    --------------------------------------------------------------------------
+
+    <b>Please attach the output of "cat /dev/sndstat" and "cat /proc/asound/devices" below:</b>
+
+    [ output ]
+
+    --------------------------------------------------------------------------
+
+    </pre>
+    
+
+    <!--TSE3-FOOTER-->
+    
+  </body>
+
+</html>

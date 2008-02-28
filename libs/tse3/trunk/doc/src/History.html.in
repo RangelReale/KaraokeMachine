@@ -1,0 +1,56 @@
+<html>
+
+  <head>
+    <title>TSE3 library history</title>
+  </head>
+  
+  <!--TSE3-BODY-->
+
+    <h1>TSE3 library history</h1>
+
+    <p>
+    TSE is an acronym for the <b>Trax Sequencer Engine</b>. The developer, Pete
+    Goodliffe releases software under the moniker 'Trax Software'. TSE was
+    originally developed for a sequencing project provisionally titled
+    TraxSequencer.
+    <p>
+    TSE technology dates from 1996. The first version took a pattern based approach
+    to the song structure which limited it's flexibility.
+    <P>
+    TSE1 lead rapidly to TSE2 which was developed and improved between 1997-1999.
+    This was targetted at the Acorn RISC OS architecture only, although in theory
+    should have been fairly portable. TSE2 is a linear sequencer engine. You
+    record snatches of music called Phrases, and then place them inside Parts
+    which are further put into the Tracks of a Song. This approach was
+    considerably more flexible and powerful that the TSE1 approach.
+    <P>
+    TSE2 found its way into several RISC OS products. The first generation of
+    TSE2 powered the TraxSequencer product. Later revisions to TSE2 and the
+    user interface lead to the product Anthem. At its release Anthem was
+    acclaimed as a new powerful way of sequencing, challenging the accepted norm.
+    <P>
+    TSE2 based products were only available commercially. See the
+    <A href="http://www.rcomp.co.uk/rci/sound/anthem/anthem.htm">R-Comp</a>
+    website for more information.
+    <P>
+    TSE3 is a third generation project based on the experience of TSE2. It
+    includes the same revolutionary functionality but takes it into a new
+    generation of implementation. Based on experience with TSE2, TSE3 provides
+    a robust and powerful engine with greater extensability and portability.
+    It draws on experience with TSE2 use in it's partitioning of the sequencer engine logic,
+    the application support logic, the platform specific interfaces and the
+    application itself in the most appropriate manner.
+    <p>
+    The C++ code has been brought up to a much more modern standard, leveraging
+    the STL and other appropriate language features.
+    <p>
+    The other major difference between TSE2 and TSE3 is the release conditions. TSE3
+    is an open source project, allowing it to be used with few restrictions. It has been
+    designed to be used by as large an audience as possible; indeed to be the defacto
+    open source sequencer engine.
+
+    <!--TSE3-FOOTER-->
+    
+  </body>
+
+</html>

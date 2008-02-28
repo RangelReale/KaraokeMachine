@@ -1,0 +1,65 @@
+<html>
+  <head>
+    <title>TSE3 code examples</title>
+  </head>
+  <!--TSE3-BODY-->
+    <h1>TSE3 code examples</h1>
+
+    <p>
+    These are a few simple examples of using the TSE3 library to show how easy it really is to use. There are some more example programs in the TSE3 source tree, look in <code>tse3/src/examples</code> for more information.
+
+    <p>
+    First, this is how you load a standard MIDI file:
+
+    <pre>
+    void loadAMidiSong(const std::string &amp;filename)
+    {
+        TSE3::MidiFileImport mfi(filename);
+        TSE3::Song *song = mfi.load();
+    }
+    </pre>
+
+    <p>
+    The song variable now contains a TSE3 Song class with the contents of this MIDI file. In fact, if you just want to play the MIDI file, and don't want to work on the data in it, you don't even need to convert it to a TSE3 Song - you can just play it directly. The Transport class is used to perform playback:
+
+    <pre>
+    void playAMidiSong(const std::string &amp;filename, TSE3::Transport &amp;transport)
+    {
+        TSE3::MidiFileImport mfi(filename);
+        transport.play(mfi);
+        while (transport.status() == Playing)
+        {
+            transport.poll();
+            // Delay for a bit here to prevent processor hogging
+        }
+        // Playback has now finished
+    }
+    </pre>
+
+    <p>
+    Of course, there are more elegant ways of waiting for playback to stop than a clumsy loop, and TSE3 provides them to you. (See the TransportListener class for details).
+
+    <p>
+    Perhaps you want to send the different channels of the MIDI file to different MIDI ports (perhaps one to an external MIDI device, and one to the internal soundcard). We can use the MidiMapper to do this easily. This is how you would set it up (baring in mind the MIDI file will by default play from port 0):
+
+    <pre>
+    void setUpMidiMapper(TSE3::Transport &amp;transport)
+    {
+        // Set channel 0 port 0 to go to channel 1, port 2
+        transport.midiMapper()-&gt;setMap(0, 0, 1, 2);
+
+        // Set channel 1 port 0 to go to channel 0, port 1
+        transport.midiMapper()-&gt;setMap(1, 0, 0, 1);
+    }
+    </pre>
+
+    <p>
+    When you next play the MIDI file, the output will be routed accordingly. Facilities exist to find out what physical port is represented by each number. You can hide the numbers from the user and work with port names, too.
+
+    <p>
+    These are a few very simple examples of using TSE3 - it can do a whole lot more!
+
+    <!--TSE3-FOOTER-->
+
+  </body>
+</html>

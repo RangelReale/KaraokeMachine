@@ -1,0 +1,132 @@
+<html>
+
+  <head>
+    <title>Song class hierarchy</title>
+  </head>
+  
+  <!--TSE3-BODY-->
+
+    <h1>Song class hierarchy</h1>
+    
+    <p>
+    TSE3 has been designed in an object oriented fashion. Hence it takes an
+    object oriented approach to it's song structure. This provides a lot of the
+    powerful expressive features of the system.
+    
+    <p>
+    The follows a class diagram of the song structure, which is explained below.
+<pre><b>
+              +--------+                      1+----------------+
+              |  Song  |---------------+-------|   TempoTrack   |
+              +--------+               |       +----------------+
+               |      |                |
+               |      |                |      1+----------------+
+              *|      |                +-------|  TimeSigTrack  |
+        +---------+   |in PhraseList   |       +----------------+
+        |  Track  |   |                |
+        +---------+   |                |      1+----------------+
+             |        |                +-------|   FlagTrack    |
+ time ordered|        +------+                 +----------------+
+            *|              *|
+        +----+----+     1+----------+
+        |  Part   |------|  Phrase  |
+        +---------+      +----------+
+</b></pre>
+    <p>
+    The <b>Song</b> is a description of a particular piece of music. It consists
+    primarily of <b>Tracks</b>, <b>Parts</b> and <b>Phrases</b>. Tracks are the sections of a Song
+    that play simultaneously. They correspond loosely to the different people in
+    a band playing together. One Track can perhaps handle the melody whilst
+    another handles the bassline and yet another the drum beat.
+    
+    <p>
+    Phrases are (typically small) snatches of music. They are recorded by the
+    user can stored in a <b>PhraseList</b> in the Song. Once a Phrase has been recorded
+    it needs to be placed into a Track to make some sound during playback of the
+    Song. This is achieved with a Part.
+    
+    <p>
+    Parts represent the physical placement of a Phrase in a Track. Since you can
+    have any number of Parts in different Tracks using the same Phrase, it is
+    easy to edit the one Phrase and change how each Part sounds. There is no
+    messy ghosting or memory expensive copying of data.
+    
+    <p>
+    Both Tracks and Parts contain a number of parameters that can affect the MIDI
+    data that they produce. For example, Parts contain a number of real time
+    filters such as linear quantise and velocity window clipping. Both also have
+    a set of MIDI controls (such as pan, volume, program etc) that can be sent at
+    their start.
+    
+    <p>
+    In addition to these Song components, there are additional tracks known as
+    the <i>Master Tracks</i>. They are
+    
+    <dl>
+    
+      <dt><b>The TempoTrack</b></dt>
+      <dd>
+      This defines any tempo changes that occur in the Song. The TempoTrack can be
+      disabled preventing tempo changes from occurring during playback.
+      </dd>
+      
+      <dt><b>The TimeSig Track</b></dt>
+      <dd>
+      This defines any time signature changes that occur in the Song. A change in
+      time signature does not effect the recorded data but does affect the
+      metronome at playback. The TimeSigTrack can be disabled preventing time
+      signature changes from occurring during playback.
+      </dd>
+      
+      <dt><b>The FlagTrack</b></dt>
+      <dd>
+      This is a track holding a number of general purpose markers. They do not
+      affect playback in any way, but allow the user to mark certain positions to
+      find it easier to navigate to them.
+      </dd>
+      
+      <dt><b>The Left and Right Markers</b></dt>
+      <dd>
+      The Song also contains two marker positions about which 'repeat' takes place,
+      if enabled. When playback reaches the right marker it jumps to the position
+      of the left one.
+      </dd>
+      
+    </dl>
+
+    <h3>More on Phrases</h3>
+
+    <p>
+    Phrases are not an editable type: once you have created a Phrase that
+    MIDI data it contains will remain as it is until the Phrase is deleted.
+
+    <p>
+    To create a Phrase you use a <b>PhraseEdit</b> object. This is an editable type of
+    Phrase, which once editing is completed can be used to create a Phrase.
+
+    <p>
+    These classes both inherit from a base <b>MidiData</b> class as shown below.
+<pre><b>
+              +------------+
+              |  MidiData  |
+              +------------+
+               ^          ^
+               |          |
+     +----------+        +--------------+
+     |  Phrase  |        |  PhraseEdit  |
+     +----------+        +--------------+
+     | Title    |
+     +----------+
+</b></pre>
+
+    <p>
+    The effect of editing a Phrase is achieved by creating a new Phrase with the same name
+    as an existing Phrase, making all Parts that use the old Phrase now use the new Phrase,
+    deleting the old Phrase and putting the new Phrase into the PhraseList. This operation
+    is provided in the Song class.
+
+    <!--TSE3-FOOTER-->
+    
+  </body>
+
+</html>

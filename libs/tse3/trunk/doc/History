@@ -1,0 +1,1324 @@
+===============================================================================
+ TSE3 History File
+===============================================================================
+
+This history file documents the entire development of the TSE3 library. It
+includes every painstaking detail and so is ridiculously boring to read. It's
+only really here for my own benefit, and I haven't actually decided what that
+is yet.
+
+-------------------------------------------------------------------------------
+ Contents
+-------------------------------------------------------------------------------
+
+  - Daily development history
+  - TODO list
+
+-------------------------------------------------------------------------------
+ Daily development history
+-------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------
+May 1999
+
+14 Decided this was a good way to learn decent C++ and the STL, so embarked
+   on a rewrite of the proven TSE v2.00. I'll build this under Unix, and
+   document it well. ATM I'm going to use KDOC because it looks enough like
+   javadoc, and I can get it to work.
+17 Made a ridiculous build structure somewhat like the the Java one, with
+   separate build and src trees to try to keep things neat.
+20 Put in the Notifier/Listener framework taking ideas from Java. The funny
+   thing is that it flipping well works!
+24 Over the weekend extended how I think playback will work. Quite
+   different from TSE. I now have a Playable interface that everyhing
+   implements: from MidiParams right up to Song. The Transport class just
+   reads MIDI events from Song and schedules them. The implementation of
+   this means that each object can cache it's next event which saves
+   reevaluating them as much as in TSE2 (I think). Made this even neater
+   by adding meta events to the MidiEvent class so that tempo and timesig
+   chages can filter through this system too. The only thing that won't
+   fit into this framework now is audio.
+   Added the Tempo and TimeSigTracks.
+   Added NoteNoConversion class and wished that I didn't have to use stdio
+   features.
+25 Added the Metronome class, and made it return values through the
+   Playable interface. I toyed with making the TimeSigTrack responsible
+   for producing the metronome, after all it knows what the time sig is,
+   but decided against it since it doesn't know what the playing status
+   is. Also even if there were no more MIDI events in the Song it would
+   still return stuff, so Song could never return false to consume which
+   would be a shame: as it stands an auto stop facility should be fairly
+   easy...
+   First stab at some of the Transport functionality including drafting
+   a version of the playback/scheduling loop.
+   Started to include the Part. In my quest to make everything as general
+   as possible to beat TSE2 for sheer coolness, added the MidiEventFilter
+   class, and the SimpleMidiEventFilter.
+26 Got the Part class doing the Playable interface properly. It returns
+   any MidiParameters first, and then steps through the Phrase. Marvellous.
+   Work finishing off the PhraseList. Added the PhraseListener.
+   Fixed some rubbishness in my Notifier design.
+   Then came accross a big trip up in the notifier design: what if you have
+   one class inheriting from a notifing class that want to add it's
+   own notification. The use of Notifier get disgusting.
+27 Got Tracks and Songs implementing the Playable interface. Sorted!
+   Changed the Notifier design *again*. This time removed the templates
+   altogether. Now we only have a basic type of Listener and Notifier.
+   There is an integer code for the different types of event which means
+   that you have to work out what sort of Notifier just send you an
+   updated() and then switch on the event code. Not nice, but it scales
+   a little better.
+28 Added a simple version of the FileOperations class in order to load
+   a demo song so I have data to play with.
+
+-------------------------------------------------------------------------------
+June
+
+1  Got the Playable interfaces working better for Track and Part.
+   Put it into the EventTrack and then Tempo and TimeSig Tracks.
+2  Made the PlayableIterators more robust by handling the deleting of
+   their Playable objects. I'm not entirely sure how to test that code yet.
+3  Element-14 is sold to Pace. Marvellous. Maybe work will slow down on
+   TSE3 now ;-)
+7  Got the saving mechanism working using a Saveable interface. Created
+   a new 'TSE3MDL' which is a lot more verbose than TSEMDL, but who cares?
+8  Implemented loading of TSE3MDL files.
+9  Added TSE3MDL file decsripton document. It doesn't really tell you all
+   that much, but it kept me occupied.
+   Added Song::replacePhrase. Everything that was in SongUtilities in TSE2
+   belongs in appropriate classes in TSE3.
+   If MidiParams is going to implement forceNone, then it has to be a
+   MidiEventFilter.
+10 Oo look, there's an io manipulator called ws. Nice. There's also a
+   strstream class. I can get rid of <stdio.h> stuff. Better.
+   Had a first stab at the PhraseEdit::tidy method. It will probably be a
+   while until I can test it.
+   Fixed a core dumping bug where the MetronomeIterator couldn't cope
+   properly with the Metronome being deleted.
+   Started thinking about a TSE3 command design pattern implementation.
+11 Got the Commands working with the CommandHistory. Added the
+   PhraseUtilities class and implemented add/subtract.
+21 Put a hook into the MidiScheduler to handle MIDI remote control.
+   Added the Panic class drawing the information from TSE2. Started
+   implementing the PanicIterator class.
+22 Autostop flag in Transport class (it always did autostop, it's just now
+   configurable!)
+   FileOperations.cpp wasn't using the istrstream class. Does now.
+   Added saving and loadng to the Panic class. Implemented everything that
+   doesn't require sysex messages. Not sure how to do those yet.
+   Added a RepeatTrack to replace the left/right markers. Made the
+   SongIterator generate these, and the Transport act on them. Scheduler
+   had to implement moveTo, and Transport react to move updates from the
+   Scheduler. Fixed various bugs on the way.
+25 Spent some time looking for a segmentation fault. Didn't find the cause.
+   D'oh! However, a few minor things fixed, TrackIterators detach
+   themselves from Tracks etc.
+28 Added a status flag to Repeat events. *** UNTESTED ***
+30 Added the MidiFileImport class with code taken from TSE2 MidiImport.
+
+-------------------------------------------------------------------------------
+July
+
+1  Still investigating that segmentation fault. When a Track is deleted
+   a deleted callnack is being sent that is for a deleted object and
+   so the program crashes.
+2  Found out why the segmentation fault occurs. The MidiParamsIterator
+   didn't have a dtr that detached it from the object. So when the
+   Track was deleted, and it's MidiParams object a callback to the non
+   existent iterator caused a crash. Fixed now.
+5  Made the TempOTrack and the TimeSigTrack attach themselves to their
+   appropriate EventTrack. Put some notify()s in the EventTrack class.
+   Added copy constructors where relevant: some are just inline empty and
+   private. The Part has a decent copy constructor that attaches the new
+   Part to any used Phrase.
+
+-------------------------------------------------------------------------------
+July
+
+19 Added the MidiSchedulerFactory class and converted the meat of
+   MidiScheduler to a StreamMidiScheduler.
+20 Added a riscos (hypothetical) and linux MidiSchedulers and factories.
+   Added a NullMidiScheduler for when things go badly.
+   Added a Makefile.common that should do much of the mundane makefile
+   stuff.
+
+-------------------------------------------------------------------------------
+August
+
+3  Started trying to write a Cakewalk .ins file parser in a moment of
+   boredom. I've done it already for Anthem but wanted to do it properly -
+   I even found a document that sort of describes them rather than try
+   to work it out myself. I'm using a state machine style parser.
+...23
+   Got the parser working. It loads the whole file and allows you to
+   select an Instrument from the hierarchy. Realised this was far too heavy
+   weight - we only need to create a few of the many objects created for
+   the whole of a file like Yamaha.ins so in my clean up phase I decided
+   to work the parser into the Anthem form - only get from the file what
+   we need to.
+24 Finished off this work. The Instrument parser is now complete - it can
+   save .ins files as well as create them.
+25 Fixed STL list bug in new Instrument code.
+26 Started work on the MidiFileExport class.
+   Couldn't play back things trhough Playable interfaces. It's down to an
+   error in some load methods that don't test string::compare(..) == 0.
+   Twit.
+   next discovered bug: the priority_queue in Transport that I've copied
+   into MidiFileExport::writeMTrk_outputLoop is the wrong way up.
+31 Finished off MidiExport for type 0 files. It works nicely. Implemented
+   the type 1 format. Works. Good. Just need to slot in the code that
+   actually saves tempo/timesig events and it should be done...
+
+-------------------------------------------------------------------------------
+September
+
+1  Finally got the MidiExpoty working well. Not bad. The output seems to
+   be correct which is good - it proves that MidiExport works, but also
+   that my output iterator system works too. Marvellous!
+   Added a compact facility to shorten the file size.
+   Removed old <stdio.h> code from MidiImport constructor.
+7  Finally I have managed to get the soundcard spitting out MIDI commands!
+   This is a big step forward (this is using the AWE32 that Rik has donated
+   to the cause.)
+14 First time that I've got Linux to spit some MIDI output! I've got
+   song.tse3mdl playing (somewhat stutteringly, but it some form of output).
+   Hurrah! My big problem is returning the current clock time - I can't see
+   a way of polling /dev/sequencer to get it - and I can't see any other
+   MIDI programs that do it nicely (kooBase, for example, just seems to
+   return the time of the last scheduled note. Yuck).
+23 PhraseEdit.insert() is ridiculously slow. Hurray for the STL (and probably
+   my dodgy use of it). I've tried to add an insert position cache to the
+   class.
+24 Tidied up the code so that it compiles quietly under GCC with -Wall.
+27 Added the MidiMapper object.
+29 Gave TSE3Play the ability to produce snappy VU bar textual output. Cool!
+    
+-------------------------------------------------------------------------------
+October
+
+6  Moved public data members out of Song.
+7  Extended FileOperations_TSE2 (which was FileOperations_2) to be able to load
+   all of the TSE2MDL filetype. Made the FileRecogniser know about old TSEMDL
+   files. Made FileOperations_TSE2 into TSE2FileImport and gave it a
+   MidiFileImport-like interface.
+   Moved public data members out of Track and Part.
+
+-------------------------------------------------------------------------------
+November
+
+9  Moved the build tree into an autoconf/automake system. This will make it
+   easier for other people to build and install the libraries. I still haven't
+   figured out how to do shared libraries in this system; I don't appear to
+   libtool (which appears to be favoured) but do have ranlib. I'll work it out.
+   This work involved moving the directories around a bit. Now the commands
+   are in TSE3/commands and the different platforms' schedulers are in
+   TSE/platform. I think that overall this is more sensible.
+10 Fixed the MidiMapper - the defaults weren't being set in the constructor so
+   everything was just getting mapped to (0,0).
+   Put tempo handling into the Transport meta event handler.
+11 Moved the inline stuff from CommandHistory.h into .cpp and forced setLimit
+   to shorten the lists if necessary. Also added an 'infinity' choice.
+17 Added the application subdirextory of TSE3 with application support classes.
+   First ones in are the Application class and the ChoicesManager,
+   ChoiceHandler and implementations for Metronome and Application. This is a
+   neat way of trying to pull application logic out of the GUI front end.
+   Interestingly you can't create a ostream for "~/.anthem", you can for
+   "/home/pete/.anthem". I don't like that...
+18 ChoiceHandler for Transport class.
+19 Moved some of the stuff in the Saveable base class out into helper functions
+   so that I could more easily implement the choices saving - the ChoiceHandler
+   classes don't beong inherting from Saveable since they don't care about the
+   current Song. Put in the framework that allows the choices file chunks to
+   be regognised. Just need to actually prod the settings now.
+23 When implementing load for the ChoiceHandlers is became aparent that I'm
+   continually writing block parsing code. This checks for the closing },
+   sometimes checks for sub-blocks (when it always should) and parses data
+   lines. Created the FileBlockParser utility class to do the spade work for
+   me. This involved a lot of moving things around. Redesigned the layout of
+   te FileOperations classes to suit it better. The interface is now a lot
+   more logical. There is one entry point for file operations: the TSE3MDL
+   class. Nice. I created the Serializable base class to replace the
+   Saveable. A little more than just a name change, I'm trying to work out
+   how to remove the extra data (e.g. song pointer) that's passed around the
+   load calls - when loading choices there isn't a Song reference so it's
+   redundant. I'm trying to generalise the Serializeable mechanism as much
+   as possible.
+   Created lots of nice little helper FileItemParsers that are generic so that
+   you don't have to do too much tedious typing.
+24 Finished off the new FileOperations system. It works pretty nicely all
+   things considered. Or so it would seem. It's only really strange data
+   lines that you have to write explicit parsing code for now, and even
+   then you get given all the standard stuff (sub-blocks, closing brace).
+   In order to make the system better I added a catch-all FileItemParser to
+   the FileBlockParser. Next step is to completely remove the Saveable
+   interface and make all classes use Serializable. Big job.
+26 Finally I beilieve that I have finished adding the new Serializable
+   interface to the whole TSE3 Song hierarchy in place of the Saveable.
+   Various twiddles to bits such as the ChoicesManager::ChoicesChanceHandler
+   and so on, and some code reformatting, plus removing some methods which
+   were inline when they really shouldn't be (must have been when I started
+   and we too into Java ;-)
+27 Added a midi, gm, gs, and xg reset facility to tse3play.
+28 Fiddled the MidiEvent structure. I was never really happy using the two
+   Event<MidiCommands> because e.event.data.data1 is messier than
+   e.data.data1 which is what you'd write now. It was always a 'special'
+   kind of Event so now it's an easier to use special type of Event.
+   Added --oss and --stream to tse3play.
+30 Added a Win32 platform. It's not finished, but I was reading the docs.
+
+-------------------------------------------------------------------------------
+December
+
+1  Took out that nasty global stuff from OSS.h and made it a little neater.
+   The OSS API really does suck.
+4  At SYMS - added a lot of new stuff for soundcard support, AWE/GUS/FM stuff.
+   Added a VoicesManager - this code is based on the playmidi and kooBase
+   sources since the OSS documentation is sadly lacking. It's a real shame,
+   really - the API itself sucks, so working it out from (oddly formatted)
+   code and not documentation is a pain.
+   Added a start facility to tse3play so you can play from a given position.
+13 (On a plane over the US ;-) I've been working on FM support in the
+   OSSMidiScheduler (I've mainly been seeing how kooBase does it). The code is
+   looking a bit complex now - I'll have to sort that out. The patches aren't
+   perfect yet, but I get noise out. Time to sleep...
+17 During the Western Carble Show I've rejigged the OSSMidiScheduler class
+   heirarchy. I was incorporating all the different types of OSS device into the
+   one OSSMidiScheduler class since they have to share the nasty OSS API macros.
+   This system used a pointer to member jump table for each OSS device
+   available. This design smells to much like virtual function calls for comfort
+   the only reason they weren't being the need to share the data OSS buffer.
+   My alteration to this is to really make each driver a separate class and to
+   share the data using references. This is almost certainly the Right Way to
+   do it. It kept me occupied, anyway.
+
+-------------------------------------------------------------------------------
+January 2000
+
+17 Whilst waiting for the Pace exec to do anything interesting, played about a
+   bit with the command objects. Added a new VariableSetCommand to save all the
+   hard work with Song_SetTitle, Song_SetAuthor etc. Added new Song commands for
+   all the other things you can do with Songs. Added Song::searchForPhrase to
+   make undoing replacePhrase work.
+21 Changed the ugly src/TSE3 to tse3.
+
+-------------------------------------------------------------------------------
+February
+
+7  Fixes to the FileBlockParser, access to the amount of lookAhead in the
+   Transport class and a usleep in tse3play which takes processor usage down
+   from ~60% to very little. Harrah.
+14 Altered the build process to use libtool and install properly.
+.. Working on the website to upload to wherever I find.
+22 Added support for the solo track to the SongIterator.
+   Added --solo-track to tse3play to test it.
+24 Added a MidiEcho object (like TSE2).
+25 First stab at reading from /dev/sequencer - success! If only OSS was
+   documented... same old story.
+28 Tidied up the recording stuff, fixed MidiEcho. Bugfixes here and there.
+   Implemented Transport::ff and rew methods.
+   Made the OSS scheduler take the OSS timing rate into account in timing
+   calculations.
+   Added channel and port filters to the SimpleEventFilter, plus a time scaling
+   factor: it's anything but 'Simple' now.
+29 Implemented the recording mute facility. It's not as nice as in TSE2. In the
+   later you said 'record on channel 2'. In TSE3 you have to give the
+   SimpleMidiEventFilter for the Track that's being recorded on, so that it can
+   be muted. Euchy, but it works.
+
+-------------------------------------------------------------------------------
+March
+
+1  Wanted to sort out how to do the OSS immediate playback so that I can do the
+   MIDI echo sucessfully. The OSS documentation sucks. As ever. The new PDF
+   docs helpfully say (p70-1) there is an ioctl to do it. They don't tell you
+   what it is. Poured our the driver source until I worked out what it is and
+   how to use it. Say hello to SNDCTL_SEQ_OUTOFBAND.
+   There appears to be massive delays between input and output, though. Hmm.
+   Ha! Fixed the delay. I hadn't enclosed OSS:readInput in a loop, so it was
+   getting called many times for a single event (i.e. read time, read status
+   byte, read time, read data 1, read time, read data 2 and return an event).
+   It works very nicely now, and OSS tech support has still not bothered to
+   reply to me.
+   Added --sleep switch to tse3play. Doesn't seem to make the vu bars update
+   more responsively, though.
+3  Added the -ansi flag to the build. Fixed some minor things. Giving egcs
+   the -pedantic flag make it guff up on inline functions in the EventTrack
+   template class. I think that it shouldn't. Shame.
+8  Started on the KDE2 UI application. Serious problems: qt doesn't seem to
+   coexist with the STL at all. Hmm. Also, the KDE libs use the -pedantic
+   switch, so the EventTrack really screws up. Grr.
+9  Changed the bracket matching to exdented style, since I've been meaning to do
+   this for ages. Now my eyes hurt.
+   Fixed the nasty -pedantic problem. The introduction of a 'typename' was what
+   was needed.
+13 The 'Rule of Three' (RO3) needed following properly in TSE3, so added a whole
+   tonne of private copy constructors and operator= declarations. Added somei
+   more docs to constructors here and there.
+15 Fixed a really nasty timing bug in the OSS driver - if you say SEQ_WAIT_TIME
+   with the same value as the last one, it actually waits for a bit more, which
+   can skew playback royally.
+   Added colour to the tse3play application. Cheesy. Also added a flush to the
+   end of updateBars() which means that they redraw in real-time again now.
+16 Altered some function9f names and made documentation about objects taking
+   ownership clear - for example Track 'owns' inserted Parts, as does the
+   PhraseList for Phrases, etc.
+17 Created the tse3/adaptor directory and started working on the ListenerAdaptor
+   framework. Created a SongListenerAdaptor.
+18 A little work on the ListenerAdaptor idea.
+20 Integrated the ListenerAdaptor class into TSE3 and made a SongListener.
+21 Added a --mute-track flag to tse3play to help Joerg Anders diagnose dodgy
+   AWE64 playback.
+   Finished off the ListenerAdaptor work, and made the Song class use it.
+22 Added all of the ListenerAdaptor classes. Laborious but necessary.
+23 Added const to all the save methods.
+25 (At the JaCC conference) incorporated an 'adaptive look ahead' calculation
+   into the Transport class which works out the best lookAhead value according
+   to the frequency that poll is called. Also added the ability to record the
+   number of Transport break ups, and added a minimumLookAhead value to stop
+   it being set to zero (frightening).
+   Altered tse3play to show the current lookAhead value, and the number of
+   break ups. Also fixed the bug which meant that some vu bars got stuck on
+   the screen (the callback sets next[channe] to now[channel].
+   Got anal about const correctness and size_t.
+26 Finished off the size_t fixes - I had to add a couple of static_casts to
+   TrackIterator which is distasteful. Ho hum.
+   Added lastClock to Playable and implemented it in each Playable class.
+27 Fixed another const foible, and removed the \es from tse3play.cpp, replacing
+   them with a escChar static const - that removes all those nasty warnings.
+   (I wanted to remove them earlier, but couldn't find out what \e was!)
+   Created a simple progress bar in tse3play so you can see how far through the
+   Song you are. Altered the adaptive look ahead formula slightly so that it
+   doesn't break up on my desktop machine (which is more heavily loaded than
+   the laptop).
+   Fixed AWE drums bug: hurrah for undocumented OSS! AWE_DRUM_CHANNELS can only
+   set *one* channel, and you pass it (1<<channel) as the parameter. Ho hum.
+   Added a wee credits splash to tse3play, and a status message.
+29 Added inject to the Transport class so that we can write useful things like
+   on-screen keyboards.
+30 Add the PowerQuantise class. For such a cool class, it didn't take much
+   thinking since it just had to be converted from TSE2 to TSE3. It's much more
+   logical in TSE3 style, which must be a good thing.
+31 Added Mixer.cpp and Mixer.h with the Mixer, MixerPort and MixerChannel.
+   Altered the Transport callback handling so that I can attach more than
+   one callback (thinking specifically of the Mixer).
+   Altered Part::lastClock. It did cunningly return the time of the last
+   event, but I've had to alter that: there could be MidiCommand_NoteOffs
+   that ar any time after that. That's annoying, since the song could stop
+   before the lastClock because of that.
+
+-------------------------------------------------------------------------------
+April
+
+1  Wrote test harness for the Mixer - it appears to work. Converted Song::track
+   to oeprator[].
+2  Moved Utilities.h classes into a utilities directory. Changed EventTrack::
+   indexAtTime to index. Implemented Snap operator * that does the snap (I
+   can't believe I ommitted to implement that, but then I've not yet used this
+   kind of stuff). In doing this altered EventTrack::index to take a bool,
+   for round up/down.
+3  Began to integrate the TSE2 DeMIDIfy (putting it in the new utilities
+   directory).
+4  More ints to size_ts. Demidify.
+5  Finished off the Demidify port. Untested.
+6  Fixing and testing Demidify. It works, but I'm not convinced the output is
+   the same as for TSE2.
+7  Fixing and testing Demidify. I think that it produces the same output as the
+   TSE2 version now, but I can't play the output since I've stiffed my sound
+   card (sniff).
+19 Uploaded version 0.0.1 to sourceforge, put up the website, announced on
+   Freshmeat. Today is effectively the first public release.
+25 Started on the Phrase utility explode.
+
+-------------------------------------------------------------------------------
+May
+
+15 Added more documentation - specifically parameter and return values plus
+   other gems that confused users.
+16 More documentation and various minor fixes.
+17 Joerg had some bugs in his use of the library which cause me to alter
+   PhraseList::insert - you can now not insert a Phrase with no title.
+27 Updated the documentation drastically.
+30 Added the KeySigTrack. I'd never really thought that it was worth it, but
+   Joerg Anders needs to be able to import KeySig changes in noteedit, and
+   that's the final push I needed to make me add it.
+   Blimey, I've been doing this for over a year now!
+31 More work on the KeySigTrack, putting it in MidiFile import/export. Should
+   be complete now - just for Jeorg to OK it.
+   More kdoc following feedback.
+   Moved the KDOC output dir to doc/api to help integration with HTML
+   documentation and transfer to web site, also added the tse3-docs-clean
+   target.
+   Altered the Track class - it didn't send notification when the title is
+   altered.
+
+-------------------------------------------------------------------------------
+June
+
+2  Added the .cpp bits of the TrackListener which were missing.
+3  Added unknownChunk and unknownData to SerializableLoadInfo.
+   Walked around the API and tidied some of it up - renamed a few methods
+   and changed some capitalisation to make it consistent. Perhaps a bit
+   gratuitous, but it was worth it. Also changed the formatting of some
+   documentation and other comments.
+   Moved all of the MidiCommand_ definitions (et al) into enum definitions
+   to tidy the Midi.h file up a bit.
+4  Fixed the install path for the platform directory.
+5  Swapped 'MidiClock' for 'Clock' - it shouldn't really be called Midi since
+   it isn't exclusively for Midi bobbins.
+   Also moved the Scheduler.* files to MidiScheduler.* since they are the
+   only file names that don't match the class names.
+6  Linked the utilties subdir into the KDOC output. Put in more redundant ';'s
+   so that KDOC produces correct output. Grr. Improved the KDOCs by figuring
+   out how to use @libdoc.
+7  Implemented the GUS OSS device; largely based on the libkmid sources, but
+   then it looks like these are largely based on some other sources :-)
+   Added a --patches-dir switch to tse3play to be really useful.
+   Shipped a pre-release version to Joerg to see if the changes he need work.
+   Spent ages trying to put these changes into CVS over a trans-atlantic
+   dialup link...
+   Fixed bug in tse3play which was down to TSE3PlayVisual detaching a callback
+   from a deleted Transport. Every day I get closer to implementing the 'safe'
+   version of the observer pattern...
+   Added a --force-port switch to tse3play.
+   Fixed a 'MidiImport' bug that manifested itself randomly. It was actually
+   the hint cached iterator in the PhraseEdit class - the act of inserting a
+   new event invalidation the iterator, which made some inserts crash - my
+   guess is when the data is relocated when the vector grows (this only
+   showed up on reeeeeeeally big files). Fixed the problem by converting the
+   hint to an index.
+   Made Playable inherit from Notifier. This meant a little hassle and a few
+   changes to the inheritance heirarchy (specifically, I had to add a
+   FlagTrackIterator which does nothing). This prevents the warning of the
+   cross cast when Transport compares Playable* with Notifier* in deleted().
+   The only warning left in is in OSS.cpp - I can't remove that it's from the
+   awe_voice header file.
+   Started to create a MidiFileImportIterator that allows you to play a MIDI
+   file without importing it. Seemed like a clever way to avoid the massive
+   delay of import for big files. Got stuck when I realised that I can't match
+   note offs to the note ons reliably.
+8  Finished off the MidiFileImportIterator. Decided to ignore the note off
+   problem - just accept that it can't be done with any efficiency or
+   correctness. Either I pair up with the next note off that matches the note
+   on, which may not be the correct one, or I preprocess the MIDI file
+   prior to playing, which defeats the whole point of the iterator.
+   Linked this iterator into tse3play and added a facility to skip empty space
+   at the beginning of a MIDI file.
+   Added --fast-midi to tse3play.
+   Implemented MidiFileImport::lastClock which isn't as slow as I has expected.
+   Added a filter to Transport, which means that it's easier to force to port.
+   Fixed tse3play's broken --force-port - d'oh!
+9  0.0.4 public release
+12 Rew/ff in Resting mode. Fixed bug where shiftBy didn't alter the
+   lastScheduledClock.
+15 Fixes to recording after it failed on Joerg. Fixes to the OSS scheduler too.
+   It's hard to test this problem since I can't get MIDI input ehre in the
+   states. It will have to wait until I get back.
+16 Record timing was out, fixed by turning a += into a =. I wish all problems
+   were that simple.
+   The TrackIterator moveTo didn't interact properly with getNextEvent. The
+   set part pos was ignored, and reset to zero each time. The effect was that
+   playback from time PPQN*40, say, included all the events from 0 to that
+   point as well.
+18 When doing ff/rew in Anthem it became apparent that the Part and Track
+   iterators could only cope with playing from the beginning of a Part. Had
+   to do quite a bit of surgery to get to it work properly.
+19 Added the Record and PartSelection class declaration. Actually finished
+   off the TransportListener interface. Implemented the Recording class.
+   Changed MidiScheduler port references from ints to size_ts.
+20 0.0.5 release to sourceforge.
+   (At SFO) implemented the PartSelection class.
+   Added the _track member to the Part class and made Track it's friend so
+   that you can track which Track owns which Part. I'd always shied
+   away from this in the past, but it seems a reasonable addition for the
+   needs of Anthem.
+   Added index to the Song class so that you can recalculate the index of a
+   Track.
+22 (Back in England) Added song() to the Track class, to make a path up similar
+   to that I added in Part. I don't think I need it, but it's there anyway -
+   at least it ensures that you can only add a Track to one Song (was this
+   /really/ a problem anyway?).
+   Added the InsertAction to the Part class - although not fully implemented
+   yet.
+23 Moved all exception classes to Error.h. Rationalised their names, and
+   added each error code.
+   Wrote Error.html documenation page.
+24 Moved InsertAction to Part and put an extra parameter in setStart and setEnd.
+   Because the Part now knows it's Track I can write code that allows you to
+   set a Part's start/end whilst inserted - this is what the extra parameter
+   is for.
+   Added the DisplayParameters class and linked it into the Phrase and Part
+   classes.
+27 The MidiFileExport class didn't quite get around to writing key sig changes
+   (although it worked out when to send them and had the logic to do so). Fixed.
+   Added colour and setColour to DisplayParams.
+   Added Track::remove(int,int) and noPartsBetween(...) to help with the new
+   insert modes.
+   Altered default Metronome note to one that is within GM specs. I thought that
+   I had chosen such a drum sound, I guess TSE2 also had this problem!
+   Thanks to Joerg cards with synth and MIDI combined now work properly (my test
+   cards have one or the other but no both!) the problem was that synth and MIDI
+   don't share port address space, but each have their own starting at zero.
+   Implemented insert under for the Track::insert(Clock, Clock, InsertAction)
+   method. In doing so I added Track::prvInsertPart.
+28 In a shocking fit of good practise, tested the new Track insert methods and
+   applied appropriate bugfixes. Even 'Under' works properly now.
+   Implemented the thoughtful Part::setStart and setEnd that works correctly
+   if the Part is inserted in a Track. Also added Part::setStartEnd so that you
+   can move a Part without throwing exceptions, since I have also added
+   exceptions that are thrown if you set start > end (and v.v.) if the Part is
+   in a Track. Also added a ctor that takes time parameters.
+
+-------------------------------------------------------------------------------
+July
+
+3  Added the PartDisplay application class to help handle the dual source of
+   DisplayParams (in the Part and the Phrase).
+   Added DisplayParams loading to the Phrase.
+6  Added PhraseList::index.
+7  Implemented Application::addSong and Application::history. I'm now actually
+   using some of the command stuff which is nice. Made the Song info methods
+   send a notification. Added notifications to the CommandHistory class so I
+   can grey out buttons when there are no undo/redos left.
+8  Added the Track_SetInfo command.
+9  Finished the Track_SetInfo command.
+   Added the Part_SetInfo command.
+12 Added the Track_Snip command. Added Track::remove(size_t index).
+   I hadn;t notice this up to now: the SimpleMidiEventFilter offset was
+   being applied incorrectly - it should be subtracted, not added to times.
+   This only showed up when redrawing the contents of Parts!
+   Fixed some badly behaved uses of SEQ_BENDER in OSS.cpp, a bug found by
+   Joerg Anders.
+13 Fixed bug in PartSelection - didn't attach to Parts. Added some docs
+   on the TSE3_Commands.
+   Found a pretty difficult to spot bug: if a Listener gets an updated
+   message and decided to detach from the Notifier (e.g. PartSelection
+   when Part is unparented) then the Notifier's iterator is invalidated.
+   This can cause nasty crashes. I don't like the solution, but it's
+   to copy the Listener list and then iterator over this 'safe' copy. Euch.
+   Finally succame to the tempation to create Notifier.cpp.
+14 Added min and max Track index to PartSelection. Added the reparented stuff
+   to the Track class so that it has the same good stuff as the Part class.
+17 Fixed the PartSelection stuff which wasn't perfect.
+18 0.0.6 release
+19 Added a tse3-lib-local target to the top level Makefile, so it's easier
+   to link to a non-installed library. I wish I could get the libs to build
+   here straight out, but I can't see how to bully automake into it. I also
+   discover that TSE3 only builds on my box - some autoconf weirdness.
+26 Took out the Part::InsertAction and placed it into the utlities/Track.h
+   file - it was making the API to clumsy, and the commands too hard to
+   implement. The simple and sufficient API approach is better. Renamed
+   Track::indexAtTime to just Track::index - it's more logical (the 'at time'
+   bit is indicated by the Clock parameter, after all).
+31 Moved the TSE3_* namespaces into the TSE3 namespace and renamed them. Maybe a
+   gratutitous changes, but it's more logical for them to be contained, and it's
+   easier to use if they have shorter names.
+
+-------------------------------------------------------------------------------
+August
+
+2  Move the App/Plt/Cmd/Util subdirs to app/plt/cmd/util, to be consistent with
+   my file naming conventions. The StreamMidiScheduler TSE3 class had a
+   dependancy on the util lib which sucks. The neat solution is to move the
+   Stream and Null MidiSchedulers into the Util namespace/lib.
+   Moved the concrete MidiSchedulers to a Plt namespace.
+   Removed redundant "Commands" from the cmd/*Commands.* filenames. Did some
+   source formatting and added some more docs.
+16 Altered FileBlockParser::parse by simplifiying the code ("find" is your
+   friend ;-). Finally moved the Instrument classes to somewhere more logical,
+   a new Ins sub-namespace.
+   0.0.8 release
+17 Added operator= and copy ctr to PartSelection and docs on how to use to
+   avoid iterator invalidation.
+21 Added the Destination utility class.
+22 Added erase(int) to the EventTrack template for convenience. Also altered
+   the insert method so you can't insert two events at the same time - when
+   loading I was getting two timesigs at the same time, which mucked up my
+   redraw code.
+   (The code currently stands at 30692 lines and is 914k of source.)
+   Added barBeatPulse to the TimeSigTrack.
+29 Moved all that PartInsertAction stuff from util/Track.h to cmd/Part.h.
+   0.0.9 release
+30 Added Phrase_Merge for Joerg and took all the other Phrase bobbins
+   out of the silly class (that was a TSE2 hang-over).
+   Some code tidying and alteration of foo++ in ++foo all over the place.
+   In an attempt to decrease header dependancies and generally tidy up
+   split FileOperations.* into Serializable.* and TSE3MDL.*. Turned
+   TSE2Import to TSE2MDL and changed filename. I want to get any nasty
+   lingering code-changing bobbins out of the way quickly, ensure that the
+   entire library is consistent and correct and then move out of alpha ASAP.
+   Moved search and replace methods from Song to Util namespace. Put Pimpls
+   into Song, Track and Part.
+   Split EventFilter.* into MidiEventFilter.* and SimpleMidiEventFilter.*.
+   Loads of repercussions from these changes and other tidies.
+31 More of the same.
+   Goodness - the MidiCommandFilter was never used or compiled. Builds now.
+   SimpleMidiEventFilter was always a really unweildy name. So converted it
+   to MidiFilter. The base MidiEventFilter class is now just Filter. Nicer.
+
+-------------------------------------------------------------------------------
+September
+
+1  Release 0.0.10 (private)
+5  Added the CommandGroup class.
+   Added CommandHistory::undoCommand(size_t) and redoCommand(size_t) so I can
+   have a menu of recent commands.
+6  It seems as if the RepeatTrack was probably too grand an idea. You'd only
+   really ever use a left/right marker like TSE2, so took out the RepeatTrack
+   and put from/to/repeat into Song. Had to munge the SongIterator quite a
+   bit.
+7  Removed some cout diagnostics from App stuff.
+   Alterered the way SongIterator implements the soloTrack - now sets commands
+   to MidiCommand_Invalid rather than removing them completely. This means that
+   auto stop still works as you'd expect (otherwise if you soloed to an empty
+   Track the playback would stop).
+11 Removed all the *Iterator classes from the public API, since they're all
+   used via the PlayableIterator base class anyway. This makes the headers
+   smaller, and the KDOC nicer ;-)
+12 @bf in kdoc -> <b> As it turns out, that doesn't work either. Sigh.
+   0.0.11 Release
+   First bits of work at putting the new sexier Notifier framework in. It's
+   really much nicer, and safer. libtse3.so.0.0.0 size before hand is
+   5044711 for the record. The stuff gets a little messy around EventTrack
+   but that has alwasy been a notifier nightmare. Touched 20 files.
+13 More conversion to the new Notifier framework - it's a lot of hard work.   
+14 Finally finished the conversion to the new Notifier framework. Seems to
+   work really well. libtse3.so.0.0.0 is now 16522254. Erk.
+   Stupid change because gcc < 2.93.0 is broken. The XxxImpl structs in
+   Song.cpp, Part.cpp and Track.cpp should have members that default to
+   public, as C++ specifies. gcc defaults them to private so the compile
+   screws up. Duh. It wouldn't be too bad if the standard compiler versions for
+   RedHat 6.2 and SuSE 7.0 (at least) are included in this.
+15 Having been frightened by the huge template code bloat, implemented a much
+   simpler Notifier framework. That's a real shame, but can't be helped. As it
+   happens it's still much nicer than the original system (and more type safe)
+   so it's still a win. A lot of conversion work (but not as much as before).
+   KDOC bobbins: added @reimplemented in every conceivably unseful place.
+   After these major alterations the size of libtse3.so.0.0.0 is 809919. Phew.
+   Oh! No they're not - its still 16303602 bytes. Grr.
+18 Over the weekend did some investigation into this dumb sizing. It turns
+   out that it's all about link names. The 16m is due to use of the std::set
+   data type in a template base class. If I turn it into list, it does
+   down to about 8m and with vector lower than that. Sigh.
+   The solution was to create a hacky void_list Impl class and cast all
+   Notifier and Listener pointers to void* so store then in it, casting them
+   back when they're needed (need to be careful when passing c_notifier_types
+   that the recast type is correct ;-)
+   So put back in all the good Event stuff that means listener functions
+   can have any number of parameters. Things are nice again; good functionality
+   and it only costs arounf 5749141 bytes.
+   Put muldiv in the Impl namespace.
+   0.0.12 Pre-release
+22 Added a path delimiter to the OSSMidiScheduler patches directories so you
+   can have multiple search paths. This means I should be able to accomodate
+   SuSE and Redhat users better...
+   0.0.12 Release
+28 The Part copy ctor did evil things to the pimpl. Fixed.
+
+-------------------------------------------------------------------------------
+October
+
+2  Added the Mutex class and the related classes to provide TSE3 with
+   thread-safety. Added a bit of extra water-tightness to the Notifier class
+   by making void_list::attach return a boolean.
+11 Put a Destination class into the Application class.
+12 Massaged the Song_EraseTrack and Song_InsertTrack commands. Renamed
+   Song_EraseTrack to Song_RemoveTrack for consistency. Added Track_RemovePart.
+   Added Track::index(Part*p) for consistency (and because I needed it).
+13 Added threading support to the main TSE3 library; using the Impl::CritSec
+   class.
+14 Added TSE3_WITHOUT_MUTEX #define to the Mutex class so I can disable the
+   whole shown if needed. Added a check in configure.in for whether Mutex
+   support is needed.
+15 Started the UnixMidiSchedulerFactory, which can be used to create both
+   OSS and Alsa schedulers.
+   Work on autoconf malarky to determine whether OSS/ALSA support is either
+   wanted, or possible. Largely guesswork to see how to do it!
+16 Made the configure.in stuff /much/ nicer. Mmm.
+   Also, used the TSE3_WITH_OSS macro in the plt/OSS.* files.
+   Implemented the UnixMidiSchedulerFactory. Made tse3play use this, and
+   updated the documentation.
+   Added new Mutex and Build docs, plus some examples (ripped from my
+   article).
+   At home much more of the Alsa implementation.
+ * Release 0.0.13
+17 Jigged around with the docs somewhat, and relayed out this file for laughs.
+   Several minor doc changes. Fixed the make "tse3-lib-local" target.
+   src/tse3/Makefile.am still used an old libtse3oss for the test prog, which
+   has now gone. D'oh.
+18 Many people have complained that Alsa support won't work (when the
+   configure file clearly says at the end to build --without-alsa. I guess
+   that was being a bit hopeful. Hacked it out completely ATM.
+ * Release 0.0.14
+20 Added Instrument class management to the Destination class.
+23 Gratuituous change of Track::song() and Part::track() names, both to
+   parent() since it is much more descriptive.
+   Fixed bugs in Instrument loading routines.
+25 More error handling for save/load operations.
+26 Changes to the MidiScheduler interface: added portReadable and portWriteable.
+   Changed std::strings to const char *. Removed txByte and added txSysEx.
+   Added event in MidiSchedulerListener for when the number of ports changes.
+ * Release 0.0.15
+27 Added the App::Modified object.
+30 Hid MidiMapper data behind a pimpl and made it a MidiSchedulerListener.
+31 Application class handles Songs being deleted.
+
+-------------------------------------------------------------------------------
+November
+
+3  Fixed bug in new MidiMapper - scheduler wasn't being stored.
+7  Modified Part_Move so you can set the end and the start.
+8  Added a whole load of new selection mechanisms to the PartSelection class
+   (i.e. select all, invert etc). Also made a PartSelectionListener class.
+9  Fixed Modified class if you initially specify no song.
+10 Moved Modified into Util and altered Part_Move to it can also name itself
+   "resize part".
+13 Added the Progress class. Linked it to the Demidify utility, instead of
+   the DemidifyProgress class.
+   Linked this info the FileBlockParser and TSE3MDL classes.
+   Added Application::numSongs.
+   Added Progress to the TSE2MDL and MidiFileImport classes.
+14 Added Progress to the Ins::Instrument classes.
+15 The Instrument class remember's its filename - useful for the Application
+   choices stuff.
+   Added a preset colour capability to the DisplayParams object, and
+   added the PresetColours class. The Application now also manages one of these
+   objects.
+16 Updated the PartDisplay to cope with the new PresetColours stuff. Changed
+   the API slightly.
+17 Added DisplayParams::presetColourString().
+20 Modified's setModified goes public.
+ * Release 0.0.16
+21 D'oh! Progress.h was missing from src/tse/Makefile.am
+ * Release 0.0.17
+   Gave Phrase a parent() method to shadow Track and Part. You now can't
+   insert a previously inserted Phrase into a PhraseList.
+   Record now copes with start() being called when reset() isn't.
+   Implemented Cmd::Phrase_Insert.
+   Added Util::Phrase_Search, and used it to implement Cmd::Phrase_Remove.
+23 Removed Phrase_Search again, since there is already Song_SearchForPhrase.
+   More implementation of Phrase commands, including Phrase_Replace. Now
+   the App::Record object uses commands.
+   Improved Cmd namespace docs.
+25 Fixed Modified.setSong(0); it detached from s, not _song.
+   Phrase didn't save its DisplayParams.
+27 Merged the two PhraseEdit::reset methods.
+30 Improved documentation and added the Version file.
+
+-------------------------------------------------------------------------------
+December
+
+1  Added Destination class Instrument lookup by name. This is used by the
+   App choices file save/load mechanism. Began to implement Destination
+   choices file stuff.
+4  Destination defaults weren't set up.
+6  Got the Destination stuff saved in the App choices files. Now the
+   Instruments are saved and loaded properly. Also fixed the Choices loading
+   mechanism which didn't work properly.
+14 Bugfixed Destination choices saving.
+15 Transferred the build across computers - from solomon to a new beefy machine,
+   the build time is much faster! However this is a Red Hat 7.0 machine and
+   there are a number of build problems - autoconf/automake both behave a little
+   differently. PACKAGE and VERSION strings don't work, and libtool is set up
+   incorrectly by autoconf.
+   Finally go the build into a sane state with autoconf. I now know how to
+   check out the pristine sources and run the correct commands to make the
+   whole thing build OK.
+17 Fixed bug in Destination saving for when instrument pointer is zero.
+   Added Progress to MidiFileExport.
+18 Fized grevious bug in TimeSigTempoKeyTrackIterator ctor which prevented
+   MidiFile export working.
+22 Updated tse3play verbose dignaostic MidiScheduler output.
+
+-------------------------------------------------------------------------------
+January 2001
+
+3  Fixed bug in Destination class - instruments array was not the correct
+   size leading to surreal application crashes.
+4  Added .cvsignore files to make "cvs -nq update" a lot less noisy.
+6  Lots of doc tidying and a few extra bits. Added consts to the Application
+   and Record classes where they were missing and ensured that all channel/port
+   params are in the same order.
+   Converted TSE3_Version/TSE3_Copyright to return a "const char *".
+   Moved App::ChoicesManager::ChoicesChoiceHandler from protected to private.
+8  A big shakeup in the documentation, it is now "built" which means that I can
+   put a standard header and footer onto it. Haven't worked out how to install
+   the docs yet.
+   Changed the licence to pure GPL (rather than library version).
+9  Moved CommandHistory internal data from protected to private.
+ * Release 0.0.18
+10 Added a version number to the Application class, and made the choices
+   file save both the application name and version - may be useful in the
+   future.
+   Added a ThisFileCreatedOn to the Application choices block too. It's cute.
+   It's also probably going to be useful for debug. If it it aint, well, wibble!
+16 Added Transport::playable(). Added htmlize.pl to doc/Makefile.am EXTRA_DIST.
+ * Release 0.0.19
+   Altered the RecordListener API so listeners can work out whether or not they
+   were recording (in case there are two both listening to the one Recording
+   object).
+17 Fixed PartDisplay for empty Parts (i.e. with no Phrases).
+   Added the TrackSelection class, an analogue of the PartSelection class.
+   Tidied the PartSelection and TrackSelection together, this required some
+   horrible nastiness in the the respective header files that I am not proud
+   of.
+22 Improved Notifier documentation.
+   Rolled the libtse3util and libtse3plt into the main libtse3, since they are
+   almost always used together anyway (you'd practically need one of either
+   plt and util for a MidiScheduler, anyway, and neither are /that/ big).
+   Library structure changed: now TSE3 is one big libtse3.so rather than
+   many smaller libraries.
+23 Added buffer flushing methods to CommandHistory.
+   Fixed bug where TrackSelection could dereference a 0 minTrack pointer after
+   recalculateEnds mucked the object state up.
+   Added a whole pile of stuff to PhraseEdit to handle selections more
+   gracefully and gave it good documentation.
+24 Implemented the good PhraseEdit selection caching.
+   Added PhraseEdit::eraseSelection.
+   Put a whole load of modification status stuff into PhraseEdit and created a
+   callback event for it.
+ * Release 0.0.20
+25 Forgot to remove some references to old libraries in tse3play makefile.
+ * Release 0.0.20a
+   A lot of investigation to see if I could get the Notifier framework any
+   better - not possible! It was interesting, though :-)
+26 Moved all Listener interfaces into the "listen" subdirectory. This prevents
+   class users from having to include a whole class and everything that it
+   depends on when using the Listener interface.
+27 Tidied up some more arthermath of the restructuring.
+   Now the documentation gets installed properly with the rest of the library.
+28 More tidying. Moved Modified into TSE3::App.
+   Moved TransportCallback into listen/Transport.h
+29 More tidying.
+   File loading may throw exceptions for bad format. The TSE3MDL load is
+   now safe if an exception is thrown (no memory leak for the Song). It
+   also uses a FileBlockParser for the top level.
+   Altered TSE3MDL slightly: now everything is inside a chunk. Now it's
+   completely orthogonal.
+   Modified app/Choices.cpp similarly. Added noChunks to SerializableLoadInfo.
+   Made FileBlockParser a little more tollerant - can now have comments
+   twixt chunk name and opening brace, and empty lines too.
+30 Discovered that autoconf enables debugging by default. The little critter.
+   Put a huge warning for this in the configure.in file. This takes the combined
+   lib size down from 6109854 to 1257958 bytes. Phew.
+   The FileRecogniser now has a load() method to prevent the same code being
+   written thousands of times.
+   Made the installation of documentation a compile time option. Finished off
+   the TSE3 spec file, I can now build an RPM of the TSE3 library. I needed
+   to make the docs configurable 'cause otherwise the RPM installation
+   generated two sets of documentation.
+
+-------------------------------------------------------------------------------
+February
+
+1  Installed ALSA. Ouch. I don't have a card with supported synth capabilities.
+2  Imported Matt Gerassimoff's work on the Alsa driver, got it compiling and
+   patched it properly into the build system. UnixMidiSchedulerFactory can now
+   create Alsa devices.
+5  Began to tidy up some of Matt's work, bringing the code into line with the
+   rest of the TSE3 style.
+6  A lot of rework of the Alsa stuff - reading the Alsa library API and trying
+   to implement it in a much cleaner way. Many implementation methods have moved
+   into the AlsaImpl class.
+   Just discovered that TSE3 0.0.17 and Anthem have made it into SuSE 7.1
+   (alongside NoteEdit).
+   The code currently stands at 42290 lines and is 1207k of source, not
+   including documentation.
+7  Alsa: Ports enumerate OK, and the timer stuff now works. No output goes to
+   my MIDI device, though.
+8  Got Alsa timing working. Got both Alsa input and output working.
+   The original Alsa stuff that Matt wrote has now been completely ripped up and
+   replaced. It all appears to work nicely now.
+10 Fixed Alsa.cpp so it compiles queitly on a non-Alsa machine.
+16 Fixed hienous bug in MidiFileExport - all files created were broken
+   because of the tse3Message being saved with the incorrect length. This has
+   been bust for a while, and is down to the fact I swapped a std::string for
+   a const char *, and some accidental sizeof behaviour.
+ * Release 0.0.21
+   Added some more docs to the Part class to describe more clearly the need
+   to set the start and end times - forgetting to do this is a common mistake.
+   Put some more cunningness into PhraseEdit::createPhrase - you can now specify
+   a PhraseList and get the Phrase automatically named and inserted. Maybe this
+   won't get used much, maybe it will. Either way, it emphasised the need to
+   name a Phrase before inserting it in a PhraseList.
+   Added some extra docs to the Phrase class too.
+   Rearchitected some of the Phrase stuff, now Phrases CANNOT exist outside of
+   a PhraseList which will prevent a whole class of library user error.
+   This required changes to PhraseEdit, PhraseList and Phrase.
+   Changed me mind slightly, allowed you to remove and reinsert Phrases
+   from the PhraseList - but you now can't use them if you do so - all Parts
+   will ignore a reparented Phrase and you can't Part::setPhrase for an
+   unparented Phrase.
+   At home, added exceptions to Phrase_SetInfo, and did more work on the
+   other Phrase commands and the Record object. Not finished yet. Tidied
+   up other issues.
+17 New implementation of Cmd::Phrase_Replace. Used it in the App::Record
+   class again.
+18 Bugfixing the updated command. Added an extra parameter to the
+   Song_TrackRemoved event - the old Track's index.
+19 Song.cpp bugfix - insert(int) set the new Track's parent to zero. Goodness
+   knows why.
+   Added PhraseEdit::timeShift() so that recorded data can be normalised.
+   Made the App::Record class use timeShift().
+20 PhraseEdit::tidy bugfix - unmatched note off removal on an empty PhraseEdit
+   area would invalidate the data and cause weird segfaults. Doesn't now.
+   Part::setPhrase can no longer dereference 0. Fixed Part_Move command wrt
+   the newEnd time calculation, and fixed bug where ctor params shadow member
+   variables.
+   App::Record uses a CommandGroup for the insert Part section.
+21 Found an alarming Notifier problem. When a Phrase::setParent call is made
+   in one situation, not all Listeners get the event. In fact, if I send
+   two events one after the other, one listener gets one event the first time
+   it's sent. The other listener gets it the second time. my hair is getting
+   pulled out...
+22 PhraseList new title base names no longer include a trailing space, so
+   the first suggestion is no longer "Phrase ".
+   Fixed the messy Notifier problem. The issue was listeners detaching
+   themselves in a callback - whilst the "listeners" void_list is being used.
+   The for loop that iterates over it couldn't cope, and so had the ability
+   to skip some listeners. The fix is a bit nasty - take a copy of the listeners
+   list and iterate over that. Of course, some listeners might have removed
+   themsleves, so I need to test each listener in the copy_list as it's iterated
+   over with the real list, just to check that it still wants to receive the
+   event. Sigh. It was a lot to get my head around, but it's working again now.
+   Tidied up and gave more docs to the void_list.
+   Updated the Notifer HTML docs.
+   PhraseEdit::reset always sends a notification and always updates the
+   selection information.
+   Following a fault report, added #include <cstddef> to every header file
+   that uses size_t. I was presuming that stl headers include it, which is
+   somewhat bogus.
+   Fixed Cmd::Phrase_SetInfo - if the title is the same as the old one, it
+   was throwing an exception when it needn't. Fixed this problem.
+
+-------------------------------------------------------------------------------
+March
+
+5  Fixed PhraseEdit::tidy() - used size() in a couple of places where it should
+   have been size()-1. This was reported by Claus-Justus Heine.
+   Tidied up the Alsa pimpl tx method slightly.
+6  Joerg has discovered the bug which made Alsa timing dodgy - I did a bad
+   calculation to get from nanoseconds to milliseconds in AlsaMidiScheduler::tx.
+   Fixing this makes the AlsaMidiScheduler usable for the first time.
+   Transport ctor sets _breakUps to 0.
+ * Release 0.0.22
+   Arse! I missed a zero from plt/Alsa.cpp. Fixed.
+ * Release 0.0.22a
+13 Updated the OSSMidiScheduler - hid all the nasty implementation classes from
+   the public header file, and moved the patch setting APIs into the
+   OSSMidiScheduler class.
+19 Changed to a much nicer set of default preset colours, and coloured in the
+   demo song.
+21 Slight efficiency improvement in Notifier.h: in the Event class, the
+   parameters are now held by reference, rather than copied.
+   Applied a "work around" for an Alsa 0.5.x flaw in Alsa.cpp - the number
+   of clock nanoseconds can be a ludicrous number, so its now checked by TSE3.
+22 Small mod to StreamMidiScheduler so that clock() only increments the clock
+   when it's running. I've been using it to debug Anthem, and the clock
+   drifts when the scheduler is stopped which is quite disconcerting. Doesn't
+   now.
+   Joerg pointed out that my Alsa bug workaround was insufficient. The correct
+   fix is now in place.
+   Bugfixes for the Panic object - it now plays events properly. Still doesn't
+   do the GM/GS/XG malarky, but that's really because I haven't got a decent
+   streamable sysex facility in TSE3 yet...
+   Gave the Part and Phrase listener interfaces windows into the changed
+   events of their subcomponents (DisplayParams et al). This proved to be
+   needed by Anthem.
+   Added a DisplayParams object to Track. Updated Track_SetInfo. Gave the Track
+   class the same forwarding event as I did the Phrase class.
+23 Fixed annoying playback bug where the MidiParams weren't being filtered in
+   either the Track or Part iterators.
+   Added a whole pile more demo songs, and installed them in the Makefile.
+   Added Type_Error to the FileRecogniser class for filenames that don't
+   exist.
+   Added the Melody PresetColour.
+   The Alsa bug work around in plt/Alsa.cpp has become much more hideous. It
+   was contributed Joerg Anders.
+ * Release 0.0.23
+27 More thoughts about sysex, as documented in Playable.html. Extended this
+   doc file to describe the Midi.h definitons.
+   Implemented GM resets in Panic.cpp using this new scheme.
+28 Added running status to the OSSMidiScheduler so that sysex events will work.
+   Implemented GM/GS/XG resets in the PanicIterator. Correctly handled the
+   GS/XG device ID masks. Made the StreamMidiScheduler mention meta events
+   (particularly invalid events).
+   Got sysex working in the AlsaMidiScheduler. Cripes it was tedious. If only
+   the sysex Alsa interface was documented. It turns out that even if you
+   call it a sysex stream, you still need to include the start and end status
+   bytes.
+30 Bugfix (and semantics fix) to Cmd::Phrase_Erase.
+   Fixed insideous little error in Song::remove(Track *t). It delegated
+   the removal to Song::remove(size_t). However, it sent a Removed notification.
+   Mostly worked as expected, but two notifictions got sent. This caused a
+   very odd bit of behaviour in Anthem's TrackList and was quite tricky to
+   find!
+ * Release 0.0.24
+
+-------------------------------------------------------------------------------
+April
+
+1  Made link lines in makefiles cleaner.
+9  A lot of reworking of the Instrument class (and related classes) to make
+   information access a whole bunch easier.
+23 Added #define _GNU_SOURCE to the top of plt/Alsa.cpp which fixes errors
+   in the linux headers on some platforms.
+
+-------------------------------------------------------------------------------
+May
+
+11 Made a concerted effort to incorporate Stefan Westerfeld's aRts scheduler
+   code into the TSE3 code base. I'd only put it off because I though it
+   involved some hairy MCOP stuff, but thankfully it didn't.
+   It's gone in OK, but I can't get it to work yet.
+14 Random tse3play errors are in fact a non-handled switch statement for the
+   new error case from FileRecogniser. Fixed. Still can't get aRts to work.
+   Added ArtsMidiScheduler support to UnixMidiSchedulerFactory.
+16 Fixed bug when playing TSE2 files.
+   Demo TSE2 file added to the misc directory. Doesn't install, though.
+ * Release 0.0.25
+31 Got the instrument name lookup stuff working quite nicely. Proved this by
+   using it in Anthem.
+
+-------------------------------------------------------------------------------
+June
+
+30 Added the ability to get at an Instrument's ControlData and NrpnData.
+
+-------------------------------------------------------------------------------
+July
+
+-
+11 More documentation.
+   Moved to beat release
+ * 0.1.0 release
+19 Started a marathon stint of work getting TSE3 to compile under gcc 3.0. The
+   new compiler is /much/ stricter and there are a number of areas TSE3 was
+   loose on. The most common (and easiest to fix) is the tightened use of the
+   std namespace.
+20 More gcc 3.0 work. Got it to compile, but can't yet run because the rest of
+   my system is not built with gcc 3.0. Out of interest the file sizes are,
+                             gcc 2.95.3        gcc 3.0
+           debug build       6571618           9176054
+           non-debug build   1372042           1403374
+   That looks quite poor!
+24 Started planning for improved serialization and MidiScheduler frameworks.
+ * 0.1.1 release
+
+-------------------------------------------------------------------------------
+August
+
+6  Work on a new MidiScheduler architecture that is more flexible.
+10 Work on a more XML-like file structure - thinking of removing the
+   Serializable class completely
+
+-------------------------------------------------------------------------------
+September
+
+Somewhat distracted by other events
+
+-------------------------------------------------------------------------------
+October
+
+9  Fiddled the MidiFileExport so that you give it a filename, as you do
+   for import and TSE3MDL save/load. Added the MidiFileExportError.
+   Fixed bug in MidiEvent constructor for NoteOns that meant no note
+   off events were ever being created.
+   Fixed bug in MidiData::lastClock which deferenced data.end() - that's
+   an invalid data member.
+   Added a new example - creating a scale, playing it and saving it as a
+   MIDI file on request by a user.
+...Work on a new MidiScheduler framework, and XML file loading (saving
+   is complete)
+
+-------------------------------------------------------------------------------
+November
+
+28 Added RPNs to the Instrument class, added the RpnData class and fixed the
+   way NRPNs are loaded. Updated the Cakewalk ins format documentation too.
+   Added the examples/midifile example.
+ * 0.1.2 release (no new MidiScheduler stuff yet)
+29 Added docs about MidiFile import/export exceptions.
+   Added a reimplemetion of the standard "what" function to the Error class.
+   Fixed the configure search for arts midi header files.
+
+-------------------------------------------------------------------------------
+December
+
+3  Added work around for OSS MidiScheduler code: it appears that OSS doesn't
+   support running status for AWE emulated MIDI ports properly. The
+   MidiScheduler now detects them and attempts to work around this limitation.
+   Put check for the ALSA verison into configure.in and Alsa.cpp.
+
+-------------------------------------------------------------------------------
+January 2002
+
+3  Concerted effort to get the new MidiScheduler framework into the build
+   properly, making pragmatic design decisions.
+4  Incorporated Jose Maria Sanchez Saez' work on a Win32 MidiScheduler.
+   Moved muldiv from MidiScheduler.cpp into Util namespace
+5  Working from a pre-new MidiScheduler tree, sorted out the
+   MidiSchedulerFactory. There are now no subclasses, just the one class that
+   has different implementations on different platforms. That keeps things a
+   little more simple. Used it in tse3play.
+   Worked out how to detect cygwin on Win32, and added tests for this to
+   the configure script, and patched into the build system for the plt
+   directory. Now the Win32 scheduler code should be built on those
+   platforms. I can't test this here, so I'll send it to Jose to see how it
+   works for him.
+
+-------------------------------------------------------------------------------
+February
+
+20 Added the contents example.
+
+-------------------------------------------------------------------------------
+March 2002
+
+27 [ASIDE]
+   Branched 0.1.2 for an Alsa 0.9.x maintenance release. A lot of build
+   work to correctly regonise Alsa and the various different Alsa versions.
+   Split implementations of Alsa up into different files Alsa-XXX.cpp.
+   Integrated 0.9.x work kindly done by Takashi Iwai of SuSE.
+   Modified configure.in for aRts header detection too.
+ * 0.1.3 release (branched version)
+28 Merged 0.1.3 branch onto trunk.
+
+-------------------------------------------------------------------------------
+April
+
+4  Added port to Panic
+8  Ported OSS MidiScheduler to new implementation.
+10 Added concept of "all ports" port number and "no port" port number.
+   Began the porting work for Alsa code.
+16 Ported Alsa 0.5 to new MidiScheduler framework. Added $KDEDIRS linkage
+   to configure.in for aRts library.
+17 Implemented AllPorts and NoPort in the MidiScheduler. Added the
+   MidiScheduler::portNumber API for simplicity.
+   MidiEcho implementation of port/channel acceptance was wrong - it implemented
+   forcing to the specified destination, NOT filtering the source. Fixed,
+   and also prevented reliance on valid port numbers with the new MidiScheduler.
+22 Song::lastClock is now cached.
+   Changed Record ctor, since you don't need to specify a MidiScheduler (it is
+   available through Transport::scheduler()).
+   Fixed MidiScheduler.h bug: clock() didn't account for "_running == false"
+   Expanded MidiSchedulerListener to have _PortAdded and _PortRemoved.
+   Emitted these in the relevant places.
+25 Added time parameter to the EventTrackListener interfaces.
+   Added the Track_Sort command.
+26 Sped up Track_Sort considerably by moving away from a quicksort algorithm,
+   to a more careful and less track-swap-hungry approach.
+   The sort command now also reselects selected Tracks once they've all been
+   moved about.
+   EventTrack::insert returns a size_t index of the new event. Changed
+   the listener interface so that the parameter is the index.
+28 Named the anonymous enums in the MidiCommand class that describe "magic"
+   port and channel numbers - they were causing some compiler warnings.
+   Adjusted the demo songs so that they honour the magic channel/ports.
+29 Fixed MidiFilter in light of new magic port/channel numbers.
+ * Release 0.2.0
+
+-------------------------------------------------------------------------------
+May
+
+3  MidiEcho default channel is sensible. The Part_Move command correctly
+   names itself when Parts are moved between Tracks.
+   Late night hackery to get TSE3 to build under automake 1.6.1. It does
+   some weird stuff with .deps which caused failures since I had a rule
+   libtse3plt_ls_SOURCES_alsa = Alsa-$(TSE3_ALSA_VERSION).cpp
+7  Some fixes for building with Alsa 0.9.
+   More documentation for command classes - placing it into the standard
+   classes documentation for reference. In doing this realised that
+   Song_ReplacePhrase clashed with Phrase_Replace. Removed former.
+8  Moved the "misc" directory to "demos".
+ * Release 0.2.1
+9  Added MidiScheduler::numberToIndex(). MidiFilter has sensible
+   default port and channel.
+   Alsa 0.9 build fixes and aRts fixes under SuSe 8.0.
+ * Release 0.2.2 
+13 Fixed some issues: MidiFilter.cpp - removed run time check that was replaced
+   by a compile-time check. PartIterator::Part_PhraseAltered doesn't resend
+   the MidiParams.
+   Sorted out SerializableLoadIterator ctor so that it works with gcc 3.0.x -
+   initialising an int with a negative number in an initialiser list doesn't
+   work. Sigh.
+   PhraseList is more careful if Phrase creation fails during load.
+   A little more thoughtful dealing with MidiParams in the PartIterator during
+   moves.
+14 Fixed crash in Anthem when it is closed whilst playing - the TrackIterator
+   didn't check that _track hadn't been deleted when doing a "moveTo".
+16 Fixed the PartIterator so that it doesn't throw away the first event
+   of the Phrase.
+17 Added "-l" option to tse3play, this was Joerg's suggestion.
+   Added ports example. Fixed MidiEcho bug.
+ * Release 0.2.3 
+21 Added more docs to MidiEcho to make it clear what setChannel/setPort do.
+
+-------------------------------------------------------------------------------
+July
+
+10 MidiFileExport and TSE3MDL can save to an ostream as well as a filename.
+   You can specify "-" as tse3play output parameters.
+11 Got MidiFileExport ofstream flags right, so file gets truncated.
+16 configure.in fix thanks to Sébastien Prud'homme.
+28 Changed email address away from old Pace one since I no longer work there.
+ * Release 0.2.4 
+
+-------------------------------------------------------------------------------
+August
+
+22 MidiFile.cpp patch so that it compiles under gcc 3.2.
+ * Release 0.2.5 
+
+-------------------------------------------------------------------------------
+October
+
+22 Bug fix tse3play, default port is NoPort
+   Added a MidiScheduler concept of internal and external ports.
+   Updated the implementation accordingly.
+   Made tse3play a lot more clever in which ports it picks for playback.
+23 Added Doxyfile
+24 More MidiScheduler implementation docs.
+30 Put the doxygen documentation completely in the distribution
+ * Release 0.2.6 
+
+-------------------------------------------------------------------------------
+February 2003
+
+10 Tidied tse3play so you don't need to open the MIDI devices to convert
+   files.
+
+-------------------------------------------------------------------------------
+March
+
+6  Added MIDI record example application.
+7  Added definition of TSE3::Clock::PPQN to Midi.cpp
+ * Release 0.2.7
+12 Fixed compilation error ni Alsa-0.9.cpp
+
+-------------------------------------------------------------------------------
+ TODO
+-------------------------------------------------------------------------------
+
+Core TSE3 library 
+  * AllChannels/NoChannels in MidiScheduler - or punt out?
+  * XML file format loading
+  * Check use of EventTrack::index, now there's a bool parameter, can some
+    redundant logic be removed?
+  * Lyric track
+  * Plugin interface for audio/video tracks
+  * Load any type of file utility
+  * PowerQuantise with groove taken from another Phrase/Track.
+  * Finish off the Demidify utility.
+  * Mixer architecture needs sorting out now ports can be arbitary numbers
+  * MidiScheduler catches sysex into a bit bucket, and then sends it out
+    wholesale
+
+tse3play
+  * Reset sent on ctrl-c
+
+Issues
+  * disable RepeatTrack, iterator moves to 0, _more == false. Enable it,
+    it will move to 0 which will be wrong.
+        - I've done some thinking about this - see paper notes (somewhere).
+
+-------------------------------------------------------------------------------

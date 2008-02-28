@@ -1,0 +1,112 @@
+<html>
+
+  <head>
+    <title>Building the TSE3 library</title>
+  </head>
+  
+  <!--TSE3-BODY-->
+
+    <h1>Building the TSE3 library</h1>
+
+    <p>
+    If you haven't yet built the TSE3 library, then this page describes how
+    to do so.
+
+    <h3>Simple instructions</h3>
+
+    <p>
+    See the INSTALL file in the root of the source package for detailed
+    instructions on how to install TSE3.
+    <p>
+    As you'd expect it is a simple case of typing:
+    <pre>
+        ./configure
+        make
+        make install
+    </pre>
+
+    <h3>To install or not to install?</h3>
+
+    <p>
+    You may not want to install TSE3 on your system; it is still possible to use
+    without installing. Once you have done a <code>make</code> you can type
+    <pre>
+        make tse3-lib-local
+    </pre>
+    to create a <code>lib</code> directory with symlinks to all the built
+    library files. Using this you can easily link other programs to your
+    non-installed TSE3 libraries by specifying the <code>lib</code> directory to
+    the linker.
+
+    <p>
+    You may want to see the documentation for your TSE3-aware application for
+    more information on doing so.
+
+    <p>
+    You can remove this local directory by typing
+    <pre>
+        make tse3-lib-local-clean
+    </pre>
+
+    <h3>Advanced options</h3>
+
+    <p>
+    It is possible to supply extra parameters to the <code>./configure</code>
+    command to customise how the TSE3 library is built. You can type
+    <code>./configure --help</code> to get a summary of these options. You will
+    see a lot of standard configure options as well as the TSE3 specific ones.
+
+    <p>
+    New users may safely ignore these extra advanced options.
+
+    <p>
+    The TSE3 specific options are listed below. They all have an opposite
+    version. The opposite is the default value. <code>--with-mutex</code> is
+    the default so you don't need to specify it, for example.
+
+    <ul>
+      <li><code><b>--without-mutex</b></code>
+        Disables the support for multiple threads in TSE3. You may find that
+        this makes the TSE3 library run with slightly better performance.
+        However TSE3 will not safeguard it's internal data structures against
+        access by multiple threads. You are advised to only use this option if
+        you know what you are doing, or don't care what you're doing!
+        
+      <li><code><b>--without-oss</b></code>
+        Disables support for the Open Sound System (OSS) (and/or OSS/Free).
+        This is the most common MIDI interface standard on modern Linux (and
+        most other Unix) distributions. If you disable this the
+        <code>OSSMidiScheduler</code> class will still be built, however it
+        will do nothing, and you will not be able to create an object of this
+        type (an exception will be thrown).
+        
+      <li><code><b>--without-alsa</b></code>
+        Disables support for the Advanced Linux Sound Architecture (ALSA). This
+        is a popular new, developing, sound interface standard. However, it is
+        still at an experimental stage. If you disable this the
+        <code>AlsaMidiScheduler</code> class will still be built, however it
+        will do nothing, and you will not be able to create an object of this
+        type (an exception will be thrown).
+        
+      <li><code><b>--without-arts</b></code>
+        Disables support for the aRts, KDE soundserver MIDI interface.
+    </ul>
+
+    If your Unix platform does not support either OSS/Alsa then the
+    corresponding <code>MidiScheduler</code> facility will not be built into
+    the TSE3 library.
+
+    <h3>Building documentation</h3>
+
+    <p>
+    There is a set of online programmer's reference documents that can be
+    built automatically, using the KDOC program.
+
+    <p>
+    See the <a href="KDOC.html">KDOC</a> page for more information.
+
+    <!--TSE3-FOOTER-->
+    
+  </body>
+
+</html>

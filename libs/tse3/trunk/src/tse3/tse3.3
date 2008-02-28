@@ -1,0 +1,37 @@
+.\" Process this file with
+.\" groff -man -Tascii foo.1
+.\"
+.TH TSE3PLAY 3 "FEBRUARY 2001" "Trax Software" "Programmer Manuals"
+.SH NAME
+tse3 \- Trax Sequencer Engine library version 3.0
+.SH SYNOPSIS
+#include files from tse3/*.h.
+.SH DESCRIPTION
+The
+.SM TSE3
+library is a powerful third generation sequencer engine written in C++. It is a 'sequencer engine' because it provides the actual driving force elements of a sequencer but provides no form of fancy interface. Sequencer applications or multimedia presentation packages will incorporate the 
+.SM TSE3
+libraries to provide a user with MIDI sequencing facilities.
+
+.SM TSE3
+is a mature library based on a lot of experience. Whilst not providing the user interface, it provides a lot of assistance to a UI.
+.SM TSE3
+is supplied with a suite of utilities that act on songs (or parts of a song) as well as common application support services (such as undo/redoable commands).
+
+.SM TSE3
+uses an advanced, acclaimed 'object-oriented' song structure and incorporates functionality including a mixing desk, real time song alteration, song file save/load (both standard MIDI files and proprietary format) and so on.
+
+For more documentation on the 
+.SM TSE3
+library look in the 'doc' directory in the source distribution package.
+
+.SH BUGS
+Naturally,
+.SM TSE3
+is completely bug free. However, if you do find something goes wrong then contact the author. The program can only be improved with your feedback.
+.SH COPYRIGHT
+Copyright (c) 2000,2001 Pete Goodliffe. See the license file in the TSE3 doc diirectory for a complete license statement.
+.SH AUTHOR
+Pete Goodliffe <pete@cthree.org>
+
+Trax Software 2001

@@ -1,0 +1,36 @@
+<html>
+
+  <head>
+    <title>Known bugs and issues</title>
+  </head>
+  
+  <!--TSE3-BODY-->
+
+    <h1>Known bugs and issues</h1>
+
+    <p>
+    The TSE3 library is constantly under development. All
+    <a href="Feedback.html">feedback</a> is welcomed to help improve the
+    library.
+
+    <p>
+    There follows a list of the <i>known</i> bug and issues. If you can inform
+    me of any other problems then I will be grateful.
+
+    <p>
+    <ul>
+      <li>A number of integer size checks need to be added to the build
+          process. If your machine has int &lt; 32 bits then the library will
+          not work.
+      <li>The <code>DeMIDIfy</code> utility class is not proven to work
+          properly (this will wait until the graphical visualisation).
+      <li>The application and commands classes are not very complete yet.
+          These will be added as and when I need them whilst writing the
+          Anthem sequencer, which uses this library.
+    </ul>
+
+    <!--TSE3-FOOTER-->
+    
+  </body>
+
+</html>

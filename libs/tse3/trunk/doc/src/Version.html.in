@@ -1,0 +1,332 @@
+<html>
+
+  <head>
+    <title>TSE3 version history</title>
+  </head>
+  
+  <!--TSE3-BODY-->
+
+    <p align=center>
+    <h1>About TSE3 version numbers</h1>
+
+    <p>
+    The TSE3 library version number describes the release you are using. It
+    is split into three components, <b><code>a.b.c</code></b>. For each minor
+    release that is API compatible with the previous release, the
+    <b><code>c</code></b> value increases. For any modification to a public API
+    that may require clients to modify their code the <b><code>b</code></b>
+    value is incremented. The <b><code>a</code></b> value is currently always
+    zero.
+
+    <p align=center>
+    <h1>TSE3 version history</h1>
+
+    <p align=center><b>
+    This is the TSE3 library version: 
+    <!--TSE3-VERSION-->
+    </b>
+
+    <p>
+    This file lists the major changes between releases of TSE3. There is another much more detailed (perhaps too detailed) history file which is found in the TSE3 source package (in the file <code>doc/History</code>).
+
+    <hr>
+    <h3>version 0.2.7 (2003-03-07)</h3>
+    
+    <ul>
+      <li>tse3play doesn't need to open MIDI devices to just convert files
+      <li>New MIDI recording example code
+      <li>gcc 3.2 compatibility
+    </ul>
+
+    <hr>
+    <h3>version 0.2.6 (2002-10-30)</h3>
+    
+    <ul>
+      <li>tse3play picks the playback port much more cleverly
+      <li>Doxygen documentation supported
+      <li>Bugfixes for tse3play
+    </ul>
+
+    <hr>
+    <h3>version 0.2.5 (2002-08-22)</h3>
+    
+    <ul>
+      <li>Compiles under gcc 3.2
+    </ul>
+
+    <hr>
+    <h3>version 0.2.4 (2002-07-28)</h3>
+    
+    <ul>
+      <li>API extensions
+      <li>Author contact details update
+    </ul>
+
+    <hr>
+    <h3>version 0.2.2 (2002-05-11)</h3>
+    
+    <ul>
+      <li>Essential build fixes
+      <li>Other minor bugfixes
+    </ul>
+
+    <hr>
+    <h3>version 0.2.1 (2002-05-08)</h3>
+    
+    <ul>
+      <li>Alsa 0.9 fixes
+      <li>Builds under latest auto-tools
+      <li>More documentation for command classes
+    </ul>
+
+    <hr>
+    <h3>Version 0.2.0 (2002-04-29)</h3>
+    
+    <ul>
+      <li><b>Major enhancement:</b>
+          A new MidiScheduler framework that is more extensible, robust, and
+          easier to use. The public API is mostly unchanged, but implementation
+          is far easier.
+      <li>New "magic" port/channel numbers for "all ports" "no port" etc.
+      <li>Improved (and fixed) MidiEcho.
+      <li>More command classes and utilities.
+      <li>Panic objects now have a port value.
+    </ul>
+
+    <hr>
+    <h3>version 0.1.3 (2002-03-28)</h3>
+    
+    <ul>
+      <li>alsa 0.9.x support
+      <li>build support for more linux distributions
+      <li>win32 platform support.
+      <li>error exceptions api extended.
+      <li>more example code.
+    </ul>
+
+    <hr>
+    <h3>Version 0.1.2 (2001-11-28)</h3>
+    
+    <ul>
+      <li>MidiEvent bug fixing
+      <li>Improved instrument file support
+      <li>More example code and documentation
+      <li>Imporved MidiFileExport API
+      <li>Introduction of XML file writing
+      <br><i>(This is a prerelease, the files cannot be read yet)</i>
+    </ul>
+
+    <hr>
+    <h3>Version 0.1.1 (2001-07-24)</h3>
+    
+    <ul>
+      <li>Builds cleanly under gcc 3.0
+    </ul>
+
+    <hr>
+    <h3>Version 0.1.0 (2001-07-10)</h3>
+    
+    <ul>
+      <li>Officially moved to <i>beta</i> status
+      <li>More complete instrument file support
+      <li>Various bug fixes
+    </ul>
+
+    <hr>
+    <h3>Version 0.0.25 (2001-05-16)</h3>
+    
+    <ul>
+      <li>Added <code>ArtsMidiScheduler</code>
+      <li>Alsa code compiles cleanly on a lot more platforms.
+      <li>tse3play can now play legacy TSE2 files
+    </ul>
+
+    <hr>
+    <h3>Version 0.0.24 (2001-03-30)</h3>
+    
+    <ul>
+      <li>Sysex handling has been implemented fully.
+      <li><code>Panic</code> class now does GM/GS/XG MIDI resets.
+      <li>Bugfixes.
+    </ul>
+
+    <hr>
+    <h3>Version 0.0.23 (2001-03-23)</h3>
+    
+    <ul>
+      <li>Alsa code greatly improved, with workarounds for Alsa 0.5.x bugs.
+      <li>Tidy up of the OSS interface code.
+      <li><code>Track</code>s now have a <code>DisplayParams</code> object.
+      <li>Playback bug fixes.
+      <li>Nicer set of <code>PresetColours</code>.
+      <li><code>FileRecogniser</code> handles error conditions better.
+      <li>Forwarding events for <code>Track</code>, <code>Part</code> and
+          <code>Phrase</code> subcomponent events.
+      <li>Improved <code>StreamMidiScheduler</code>.
+    </ul>
+
+    <hr>
+    <h3>Version 0.0.22 (2001-02-22)</h3>
+    
+    <ul>
+      <li>First fully operational <code>AlsaMidiScheduler</code>.
+      <li>Slight rearchitecture of <code>Phrase</code> management - <code>PhraseEdit</code> now creates you a <code>Phrase</code> directly <i>into</i> a <code>PhraseLis</code>t. This will prevent a common cause of user errors - creating <code>Phrases</code> but not putting them in the <code>PhraseLis</code>t. This leads to an unfortunate API change, but it's worthwhile. <code>Part</code>s will no longer accept <code>Phrase</code>s that aren't parented.
+      <li><code>Listener</code> classes can now safely call <code>Notifier::attach</code> and <code>Notifier::detach</code> in event handlers.
+      <li>Added <code>PhraseEdit::timeShift()</code> and used this in the <code>Record</code> object.
+      <li><code>PhraseEdit::tidy</code> fixing - last event recorded is no longer truncated.
+      <li>Bug fixes.
+      <li>More API documentation.
+    </ul>
+
+
+    <hr>
+    <h3>Version 0.0.21 (2001-02-16)</h3>
+    
+    <ul>
+      <li>First ALSA support.
+      <li>All listener interfaces in separate headers in "listen" directory.
+      <li>Documentation gets built and installed with the library now.
+      <li>TSE3MDL file format modification.
+      <li>MIDI file export bug fixed.
+    </ul>
+
+    <hr>
+    <h3>Version 0.0.20 (2001-01-24)</h3>
+    
+    <ul>
+      <li>New <code>TrackSelection</code> class, an analog of the <code>PartSelection</code>. These two can work together to ensure there is only ever one object selected.
+      <li><code>PhraseEdit</code> vastly improved for use with GUI <code>Phrase</code> editors. Can now manage the selection of events much more intelligently and maintains a 'modified' status flag.
+      <li>All separate tse3 libraries have been rolled together into one <code>libtse3</code> library for ease of use.
+      <li>Added buffer flushing to the <code>CommandHistory</code>.
+      <li>Extended <code>Record</code> class that is safer when multiple instances exist.
+      <li><code>PartDisplay</code> fix for case of empty <code>Part</code>.
+    </ul>
+
+    <hr>
+    <h3>Version 0.0.19 (2001-01-16)</h3>
+    
+    <ul>
+      <li>More information saved in choices files
+      <li>Transport class method <code>playable()</code> added
+      <li>Documentation building fixed
+    </ul>
+
+    <hr>
+    <h3>Version 0.0.18 (2001-01-09)</h3>
+    
+    <ul>
+      <li>More Command classes
+      <li>Greatly improved documentation
+      <li>Destination and Instrument system used by Application support (can be saved in configuration files)
+      <li>General bugfixes
+    </ul>
+
+    <hr>
+    <h3>Version 0.0.17 (2000-11-21)</h3>
+    
+    <p>
+    This is a minor release which includes a missing file, Progress.h.
+
+    <hr>
+    <h3>Version 0.0.16 (2000-11-20)</h3>
+    
+    <p>
+    This sees a lot of work involving application support. Many issues have been addressed following application development from TSE3 users.
+    <ul>
+      <li>TSE3 now reports the progress of slow operations so an application can display a progress dialogue.
+      <li>DisplayParams now has a range of PresetColours (for things such as intro/verse/bridge etc).
+      <li>Improved Destination class, manages Instrument definitons
+      <li>Improved MidiScheduler interface
+      <li>Util::Modified utility.
+    </ul>
+
+    <hr>
+    <h3>Version 0.0.14 (2000-10-17)</h3>
+    
+    <p>
+    This is a small delta release that removes some Alsa stuff since at the moment it is not fully operational. There have also been some documentation improvements.
+
+    <hr>
+    <h3>Version 0.0.13 (2000-10-16)</h3>
+    
+    <ul>
+      <li> Added multiple-thread support to TSE3 (see tse3/Mutex.h)
+      <li> Beginnings of support for the ALSA library
+      <li> New UnixMidiSchedulerFactory that chooses either OSS or ALSA depending on build flags and the system state
+      <li> Greatly improved build configurations (select OSS, Alsa, Mutex)
+      <li> Application class now how has a Destination object
+      <li> More Command classes
+      <li> Better docs
+      <li> Bug fixes (copying Parts broken)
+    </ul>
+
+    <hr>
+    <h3>Version 0.0.12 (2000-09-25)</h3>
+
+    <ul>
+      <li>A much improved Notifier class. TSE3 callbacks now have different methods for different events, with arbitrary numbers of parameters. This is a great improvement.
+      <li>Work-arounds for gcc bugs which caused errors for some people compiling 0.0.11.
+      <li><code>OSSMidiScheduler</code> can now have multiple paths specified for patches directories, separated by colons. This allows TSE3 to support Red Hat and SuSE installations straight out of the box.
+      <li>Improved documentation.
+    </ul>
+
+
+    <hr>
+    <h3>Version 0.0.11 (2000-09-12)</h3>
+
+
+    <ul>
+      <li>New <code>CommandGroup</code> command class that can logically group a number of commands for a single undo/redo operation.
+      <li>New <code>Phrase_Merge</code> utility,
+      <li>Improved file organisation and naming.
+      <li>The removal of the <code>RepeatTrack</code> for a simpler to use left/rightrepeat marker system.
+      <li>The <code>Song</code> implementation of the solo track more robust.
+      <li>Removal of all the iterator classes from public API.
+    </ul>
+
+    <hr>
+    <h3>Version 0.0.9 (2000-08-29)</h3>
+
+    The 0.0.9 brings better structured API documentation; as well as the comprehensive reference, you can now browse one section per namespace. Also minor improvements to the implementation.
+
+    <hr>
+    <h3>Version 0.0.8 (2000-08-16)</h3>
+
+    The 0.0.8 release sees a tidy up of some of the API. This means that some TSE3 bits have been renamed, and some files moved. In addition there are some new namespaces, and others have been renamed. In the run up to a stable 1.0 release these issues have been addressed. <i>(The changes should not affect any current users since they are in some of the more advanced parts of the library.)</i>
+    <p>In addition there is more application support and command class implementation.
+
+    <hr>
+    <h3>Version 0.0.6 (2000-07-18)</h3>
+
+    <ul>
+      <li>More reliable OSS driver
+      <li>Enhanced application support facilities
+      <li>Standardised internationalisable error handling
+      <li>New Part insert actions
+      <li>Improved documentation
+      <li>Plus other API enhancements
+    </ul>
+
+    <hr>
+    <h3>Version 0.0.5 (2000-06-20)</h3>
+
+    <ul>
+      <li>Rew/ff whilst resting.
+      <li>Better event timing.
+      <li>More application support.
+    </ul>
+
+    <hr>
+    
+    <h3>Version 0.0.1 to Version 0.0.4</h3>
+
+    <p>
+    See the verbose <code>doc/History</code> file, entries 2000-05-14 to
+    2000-06-98. These versions comprise very much the infancy of the version
+    3 TSE library.
+
+    <!--TSE3-FOOTER-->
+    
+  </body>
+
+</html>

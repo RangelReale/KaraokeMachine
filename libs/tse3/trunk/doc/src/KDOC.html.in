@@ -1,0 +1,75 @@
+<html>
+
+  <head>
+    <title>TSE3 library API reference</title>
+  </head>
+  
+  <!--TSE3-BODY-->
+
+    <h1>TSE3 library API reference</h1>
+
+    <p>
+    The TSE3 library provides extensive on-line documentation which is
+    extracted by the
+    <a href="http://www.ph.unimelb.edu.au/~ssk/kde/kdoc/">KDOC</a> or
+    the <a href="http://www.doxygen.org/">Doxygen</a> tool. The format
+    of each tool's output is different; you may prefer one to the other.
+    The information contained in each should be identical. Doxygen output
+    may generate inheritance hierarchy diagrams (depending on your particular
+    installation) which you may find more useful.
+    
+    <p>
+    You must build the TSE3 documentation to access this information.
+
+    <h3>Building Doxygen documentation</h3>
+
+    <p>
+    If you have Doxygen installed, you can enter the <code>doc</code>
+    directory, and type <code>make tse3-doxygen</code>.
+
+    <h3>Building KDOC documentation</h3>
+
+    <p>
+    You do this by entering the <code>doc</code> directory and
+    typing <code>make tse3-kdoc</code>. This builds the main TSE3 API
+    reference which details every single class in TSE3. You can also
+    build a reference for each namespace individually, type <code>make
+    tse3-kdoc-libs</code>.
+
+    <p>
+    The easy way is to do a <code>make tse3-kdoc-all</code> which builds
+    both.
+   
+    <p>
+    You will need to have a copy of KDOC installed that correctly handles
+    namespaces (2.0a35 or later works).
+
+    <p>
+    The comprehensive KDOC API reference provides the following information.
+    <ul>
+      <li><a href="api/index.html">Index</a> (start here)
+      <li><a href="api/index-long.html">Annotated list</a>
+      <li><a href="api/header-list.html">File list</a>
+      <li><a href="api/all-globals.html">Globals</a>
+      <li><a href="api/hier.html">Inheritance hierarchy</a>
+    </ul>
+
+    <p>
+    The individual namespace references are:
+    <ul>
+      <li><a href="api/lib.TSE3/index.html">TSE3 namespace</a>
+      <li><a href="api/lib.App/index.html">App namespace</a>
+      <li><a href="api/lib.Cmd/index.html">Cmd namespace</a>
+      <li><a href="api/lib.Plt/index.html">Plt namespace</a>
+      <li><a href="api/lib.Util/index.html">Util namespace</a>
+    </ul>
+
+    <p>
+    You can remove all of the documentation using
+    <code>make tse3-kdoc-clean</code>.
+
+    <!--TSE3-FOOTER-->
+    
+  </body>
+
+</html>

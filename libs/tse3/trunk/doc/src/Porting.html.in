@@ -1,0 +1,43 @@
+<html>
+
+  <head>
+    <title>Porting TSE3</title>
+  </head>
+  
+  <!--TSE3-BODY-->
+
+    <h1>Porting TSE3</h1>
+
+    <p>
+    Porting TSE3 to another platform is a relatively simple task. Since it
+    is written in modern, standards-compliant C++ the majority of the code
+    will compile without problem.
+
+    <p>
+    Whilst TSE3 was developed on Linux, it has already been sucessfully
+    compiled on BSD, RISC OS, and Windows operating systems.
+
+    <p>
+    The main porting concern is to implement the
+    <a href="api/TSE3__MidiScheduler.html"><code>MidiScheduler</code></a> class.
+    This is the library interface to the underlying MIDI platform. You will
+    need to consult the documentation for your platform for information on how
+    to do this, you can see the existing implementations for inspiration.
+
+    <p>
+    If you are compiling on a unix-based platform then the build structure
+    should work for you already - the autotools should cope OK. Other
+    build environments may be required for different platforms.
+
+    <h3>See also</h3>
+
+    <ul>
+      <li><a href="api/MidiScheduler_h.html"><code>MidiScheduler.h</code></a>
+           for The MidiScheduler API
+    </ul>
+
+    <!--TSE3-FOOTER-->
+    
+  </body>
+
+</html>

@@ -1,0 +1,111 @@
+<html>
+  <head>
+    <title>TSE3 Whitepaper</title>
+  </head>
+  <body>
+    <table width=100% cellpadding=0 cellspacing=0 border=0><tr>
+      <td width=80 valign=top rowspan=2><img src="tse3logo.png" width=76 height=71></td>
+      <td valign=top><h1>TSE3 Sequencer Engine</h1></td>
+    </tr><tr>
+      <td valign=top><b>P r o d u c t &nbsp; w h i t e p a p e r</b></td>
+    </tr></table>
+    <p>
+    <table width=100% cellpadding=0 cellspacing=0 border=0><tr>
+      <td width=50% valign=top>
+
+        <!-- Start: Text column -->
+        TSE3 is a next generation sequencer core. Based on proven technology
+        and implemented in a modern standard C++ library, TSE3 provides base
+        MIDI sequencing functionality for a range of applications.
+        <p><b>Key features</b>
+        <ul>
+          <li>Powerful linear sequencer
+          <li>Cross platform architecture
+          <li>Strong application integration
+          <li>Simple and coherent C++ API
+          <li>Stable code base
+        </ul>
+        <p><b>Example applications</b>
+        <ul>
+          <li>MIDI playback utility
+          <li>Embedded web-based MIDI player
+          <li>Full featured sequencer application
+        </ul>
+        <p><b>Availablity</b>
+        <ul>
+          TSE3 is a Trax Software product.
+          <br>The TSE3 homepage is: <a href="http://TSE3.sourceforge.net/">http://TSE3.sourceforge.net/</a>
+        </ul>
+        <!-- End: Text column -->
+
+      </td>
+      <td width=50% valign=top>
+        <!-- Start: Specs column -->
+        <table width=100% cellpadding=0 cellspacing=3 bgcolor=#000000 border=0><tr><td>
+        <table width=100% cellpadding=0 cellspacing=0 bgcolor=#ffffff border=0><tr><td>
+        <tr bgcolor=#ff0000><td>
+          <table cellpadding=4 cellspacing=0 border=0>
+            <tr><td><h4><font color=#ffffff>SPECIFICATIONS</font></h4></td></tr>
+          </table>
+        </td></tr>
+        <tr bgcolor=#ffffff><td>
+        <table cellpadding=4 cellspacing=0 border=0>
+        <tr>
+          <td valign=top><b>Version</b></td>
+          <td valign=top>
+            <!--TSE3-VERSION-->
+          </td>
+        </tr><tr>
+          <td valign=top><b>Language</b></td>
+          <td valign=top>C++</td>
+        </tr><tr>
+          <td valign=top><b>Platforms</b></td>
+          <td valign=top>
+            <li>Linux, and other Unixes
+            <li>Acorn RISC OS
+            <li>Win32 under development
+          </td>
+        </tr><tr>
+          <td valign=top><b>Facilities</b></td>
+          <td valign=top>The following is a non-exclusive list
+          <ul>
+            <li>Songs editable whilst playing
+            <li>Command classes
+            <br>(full undo/redo capabilities)
+            <li>Cakewalk intrument file support
+            <br>(selects voices etc by name)
+            <li>Standard MIDI file import/export
+            <br>(type 0 and type 1)
+            <li>Thread-aware
+            <li>GM/XG/GS support
+            <li>Powerful sequencer features such as syncro start, punch-in recording, real time effects
+            <li>Command-line playback/file conversion tool
+          </ul></td>
+        </tr><tr>
+          <td valign=top><b>Documentation</b></td>
+          <td valign=top>Full API documentation plus overview documents and example code</td>
+        </tr><tr>
+          <td valign=top><b>Interfaces</b></td>
+          <td valign=top>
+            <li>High level C++ API, with additional APIs for extensive application support
+            <li>Low level MIDI hardware access APIs for easy porting to new platforms
+          </td>
+        </tr><tr>
+          <td valign=top><b>Licence</b></td>
+          <td valign=top>GPL for non commercial use<br>Contact Trax Software for commercial use</td>
+        </tr><tr>
+          <td valign=top><b>Metrics</b></td>
+          <td valign=top>
+            49000 Lines of code
+            <br>177 Classes
+            <br>Typically 1.3M shared library
+          </td>
+        </tr>
+        </table>
+        </td></tr></table>
+        </td></tr></table>
+        <!-- End: Specs column -->
+      </td>
+    </tr></table>
+  </body>
+</html>

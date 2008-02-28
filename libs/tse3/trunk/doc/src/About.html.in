@@ -1,0 +1,70 @@
+<html>
+
+  <head>
+    <title>About the TSE3 library</title>
+  </head>
+  
+  <!--TSE3-BODY-->
+
+    <h1>About the TSE3 library</h1>
+
+    <p>
+    TSE3 is a portable open source 'sequencer engine' written in C++.
+    It provides programmers with rich and powerful sequencing capabilities.
+    It is a 'sequencer engine' becuase it provides the actual driving force
+    elements of a sequencer but provides no form of user interface.
+    <p>
+    TSE3 is a mature library based on a lot of experience. Versions of TSE have
+    been in use for a number of years. Whilst not providing the user interface, it
+    provides a lot of assistance to a UI, attempting to provide as much functionality
+    as possible in as generic a manner as possible.
+
+    <p>
+    TSE3 is a product of Trax Software, written by Pete Goodliffe.
+
+    <h3>Features</h3>
+
+    <p>
+    TSE3 provides a feature packed system, with a simple coherent API for application useage.
+    It's advanced sequencer engine features include:
+    <ul>
+        <li>Powerful linear sequencer
+        <li>Flexible object-oriented song structure
+        <li>Handles import and export of standard MIDI files (both type 0 and type 1)
+        <li>Provides own extensible song format (TSE3MDL)
+        <li>Threading support for background playback
+        <li>Playback with real time effects (remapping, quantise, velocity window clipping,
+            repeat, offset etc)
+        <li>GM/GS/XG support
+        <li>Synchro start of playback
+        <li>Powerful utilities for song manipulation: power quantise, arpeggiator etc.
+        <li>Highly configurable metronome
+        <li>MIDI echo facility
+        <li>MIDI command filters
+        <li>Imports Cakewalk instrument definition files
+        <li>Flag points in timeline
+    </ul>
+    <p>
+    Addtionally, TSE3 provides a level of application support. Common tasks that a sequencing
+    application would implement that can be taken out of the user interface logic and placed at
+    a higher level are provided within the TSE3 library. It therefore also offers the following
+    facilities:
+    <ul>
+        <li>Command pattern for operations, providing a flexible undo/redo facility.
+        <li>Support for an extensible choices file that can be saved on program start/stop or
+            at any other time. Common TSE3 features are saved, and the application can attach
+            further blocks of specific choices.
+    </ul>
+
+    <h3>tse3play - the multi-format playback utility</h3>
+
+    <p>
+    The TSE3 library also comes with a sample application that uses the library,
+    <b>tse3play</b>. This program is a command-line TSE3MDL and MIDI file player
+    with a host of control features.
+
+    <!--TSE3-FOOTER-->
+    
+  </body>
+
+</html>

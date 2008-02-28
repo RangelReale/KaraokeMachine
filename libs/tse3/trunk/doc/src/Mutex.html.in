@@ -1,0 +1,34 @@
+<html>
+
+  <head>
+    <title>Support for multiple threads in TSE3</title>
+  </head>
+  
+  <!--TSE3-BODY-->
+
+    <h1>Support for multiple threads in TSE3</h1>
+
+    <p>
+    The TSE3 library provides support for multi-threaded applications and guards its internal data structures against concurrent access by more than one thread.
+   
+   <p>
+   It is possible to disable this support by configuring the code with the <code>--without-mutex</code> configure flag.
+
+    <p>
+    The threading support is implemented in the <code>tse3/Mutex.h</code> header file.
+
+    <p>
+    Even if the multi-threading support is enabled (as per default) the library will not be thread-safe unless you supply a platform-specific implementation of a <i>mutex</i> (which is a data structure used to prevent concurrent access to critical sections of code). You do this by providing a subclass of the <code>TSE3::Impl::MutexImpl</code> class and providing it to the TSE3 library (using the <code>TSE3::Impl::Mutex</code> class).
+   
+   <p>
+   The KDOC documentation contains clear details on how to do this (look at the MutexImpl and Mutex class. If you have built the TSE3 documentation (see <a href="KDOC.html">here</a> for details) then the following links will take you directly to the documentation:
+       <ul>
+         <li><a href="api/TSE3__Impl__MutexImpl.html">MutexImpl</a>
+         <li><a href="api/TSE3__Impl__Mutex.html">Mutex</a>
+       </ul>
+    
+    <!--TSE3-FOOTER-->
+    
+  </body>
+
+</html>

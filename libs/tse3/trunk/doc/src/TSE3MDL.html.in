@@ -1,0 +1,251 @@
+<html>
+
+  <head>
+  </head>
+  
+  <!--TSE3-BODY-->
+    
+    <center>
+    <img src="tse3.gif">
+    <h1>File Format for TSE3 Music Description Language (TSE3MDL)</h1>
+    
+    <h3>Pete Goodliffe
+    <br>Issue 1.01
+    <br>9th June 1999</h3>
+    </center>
+    <hr>
+    
+    <h3>Introduction</h3>
+    
+    <p>
+    The TSE3 Music Description Language provides an object-oriented description of a piece of music as MIDI data, in a linear sequencer form.
+    
+    <p>
+    It is designed for use with TSE3, the Trax Sequencer Engine v3.00 and so parallels its song structure closely.
+    
+    <p>
+    This file format is for use with TSE version 3.00 and later. Specifically, it is incompatible with the earlier format known as TSEMDL which was used with TSE v2.00.
+
+    <p>
+    TSE3MDL files commonly have a file extension of <code>.tse3</code> although the format can be deduced from the file contents: the first eight bytes are <code><b>&quot;TSE3MDL\n&quot;</b></code>
+
+    <h3>TSE3MDL file conventions</h3>
+    
+    <p>
+    TSE3MDL files are plain text files readable in any text editor. The data is arranged into hierarchical <i>chunks</i> which closely parallel the TSE3 Song class hierarchy.
+
+    <p>
+    Because TSE3MDL files are in text, all numbers are in ASCII decimal form. Times are represented in <i>pulses</i>, as integer values.
+
+    <p>
+    Each line of a TSE3MDL file may contain any amount of whitespace at it's start which is ignored. This is commonly used to enhance the readablilty of the chunk hierarchy. Additionally, any lines which start with a hash (#) symbol (after any whitespace) are ignored as comment lines.
+
+    <p>
+    Case is important when recognising identifiers.
+
+    <p>
+    Each file chunk follows a standard format. This is as shown below:
+
+    <ul><pre><b>
+CHUNK_TAG_IDENTIFIER
+{
+    DATA_IDENTIFIER:DATA
+}
+    </b></pre></ul>
+
+    <p>
+    The CHUNK_TAG_IDENTIFIER is a single word containing any characters except '<code>:</code>'. If an identifier of this format is found then it signifies the beginning of a new chunk. The opening and closing braces will be on separate lines. Within the chunk data is commonly indented by four spaces, but this is not mandatory. Chunks can be hierarchically arranged - chunks can contain chunks. Chunk tag identifiers correspond the their related object names in the TSE3 Song hierarchy.
+
+    <p>
+    Lines other than CHUNK_TAG_IDENTIFIERs must be DATA_IDENTIFIER lines. These consist of a single word identifier which can contain any characters except '<code>:</code>' followed by a '<code>:</code>' and then the data associated with that identifier. The identifier name is local to each type of chunk. For example, there are several types of chunk with identifiers <code>Status</code>. In each chunk this refers to a different type of setting.
+
+    <p>
+    If you encounter a chunk that is not recognised then it should be ignored. You may warn the user if required. Similarly, if you encounter a data identifier that you do not recognise you should ignore it.
+
+    <h3>File header</h3>
+    
+    <p>
+    The TSE3MDL file consists of a single chunk, with a number of sub-chunks.
+
+    <p>
+    The top level chunk has tag identifier <pre>TSE3MDL</pre>, with the rest of the file contents contained in it's pair of braces. As a special case, the first line cannot be prefixed by ant whitespace.
+
+    <p>
+    This first line identifies the file type as being TSE3MDL. To check whether a file is in TSE3MDL you only need to check the first eight bytes (don't forget the carriage return following the tag).
+
+    <p>
+    Insider this <pre>TSE3MDL</pre> chunk there is usually a Header chunk, followed by a Song chunk.
+
+    <h3>Header chunk</h3>
+
+    <p>
+    A Header chunk has chunk tag identifier <code>Header</code> and is defined to contain the following identifiers.
+
+    <p>
+    <table align="center">
+      <tr><td><b>Identifier</b></td><td><b>Description</b></td><td><b>Default if not present</b></td></tr>
+      <tr><td><code>Version-Major</code></td><td>Major version number of this file * 100</td><td>100</td></tr>
+      <tr><td><code>Version-Minor</code></td><td>Minor version number of this file * 100</td><td>100</td></tr>
+      <tr><td><code>Originator</code></td><td>Identity of the program that created this file.</td><td>n/a</td></tr>
+      <tr><td><code>PPQN</code></td><td>PPQN resolution timestamps in this file are based upon.</td><td>96</td></tr>
+    </table>
+
+    <h3>Song chunk</h3>
+
+    <p>
+    A Song chunk has chunk tag identifier <code>Song</code> and is defined to contain the following identifiers.
+
+    <p>
+    <table align="center">
+      <tr><td><b>Identifier</b></td><td><b>Description</b></td><td><b>Default if not present</b></td></tr>
+      <tr><td><code>Title</code></td><td>String containing the title of this Song</td><td>empty</td></tr>
+      <tr><td><code>Author</code></td><td>String containing the author of this Song</td><td>empty</td></tr>
+      <tr><td><code>Copyright</code></td><td>String containing the copyright message for this Song</td><td>empty</td></tr>
+      <tr><td><code>Date</code></td><td>String containing the date of this Song</td><td>empty</td></tr>
+      <tr><td><code>NoTracks</code></td><td>Number of Tracks in the Song. ???</td><td>empty</td></tr>
+    </table>
+
+    <p>
+    A Song is also defined to contain TempoTrack, TimeSigTrack, FlagTrack, Phrase and Track chunks.
+
+    <h3>TempoTrack chunk</h3>
+
+    <p>
+    A TempoTrack chunk has chunk tag identifier <code>TempoTrack</code> and is defined to contain the following identifiers.
+
+    <p>
+    <table align="center">
+      <tr><td><b>Identifier</b></td><td><b>Description</b></td><td><b>Default if not present</b></td></tr>
+      <tr><td><code>Status</code></td><td>'On' if tempo changes are enabled, or 'Off' disabled.</td><td>On</td></tr>
+    </table>
+
+    <p>
+    There then follows another chunk with identifier <code>Events</code> containing the TempoTrack events. There is one event per line in the form <code>TIME:TEMPO</code> where TIME and TEMPO are integer values.
+
+    <h3>TimeSigTrack chunk</h3>
+
+    <p>
+    A TimeSigTrack chunk has chunk tag identifier <code>TimeSigTrack</code> and is defined to contain the following identifiers.
+
+    <p>
+    <table align="center">
+      <tr><td><b>Identifier</b></td><td><b>Description</b></td><td><b>Default if not present</b></td></tr>
+      <tr><td><code>Status</code></td><td>'On' if timesig changes are enabled, or 'Off' disabled.</td><td>On</td></tr>
+    </table>
+
+    <p>
+    There then follows another chunk with identifier <code>Events</code> containing the TimeSigTrack events. There is one event per line in the form <code>TIME:TOP/BOTTOM</code> where TIME, TOP and BOTTOM are integer values.
+
+    <h3>FlagTrack chunk</h3>
+
+    <p>
+    A FlagTrack chunk has chunk tag identifier <code>FlagTrack</code> and is defined to contain no identifiers.
+
+    <p>
+    It contains another chunk with identifier <code>Events</code> containing the FlagTrack events. There is one event per line in the form <code>TIME:STRING</code> where TIME is a integer value and STRING is the associated flag string..
+
+    <h3>Phrase chunk</h3>
+
+    <p>
+    A Phrase chunk has chunk tag identifier <code>Phrase</code> and is defined to contain the following identifiers.
+
+    <p>
+    <table align="center">
+      <tr><td><b>Identifier</b></td><td><b>Description</b></td><td><b>Default if not present</b></td></tr>
+      <tr><td><code>Title</code></td><td>String containing unique reference name of this Phrase.</td><td>n/a</td></tr>
+    </table>
+
+    <p>
+    There then follows another chunk with identifier <code>Events</code> containing the Phrase events.
+
+    <p>
+    There is one event per line in the form <code>TIME:STATUS/DATA1/DATA2/CHANNEL/PORT</code> where all values are integers. STATUS contains the MidiCommand status nybble, DATA1 and DATA2 contain the data bytes (which will not have bit 7 set), CHANNEL contains a value from 0-15 and PORT the computer MIDI port number to send the data on.
+
+    <p>
+    If the MidiCommand is a MidiCommand_NoteOn (STATUS == 9) then the line is followed by <code>-OFFTIME:OFFSTATUS/OFFDATA1/OFFDATA2/OFFCHANNEL/OFFPORT</code> which contains the balancing MidiCommand_NoteOff. All values are as for the previous MidiCommand_NoteOn.
+
+    <h3>Track chunk</h3>
+
+    <p>
+    A Track chunk has chunk tag identifier <code>Track</code> and is defined to contain the following identifiers.
+
+    <p>
+    <table align="center">
+      <tr><td><b>Identifier</b></td><td><b>Description</b></td><td><b>Default if not present</b></td></tr>
+      <tr><td><code>Title</code></td><td>String containing name of this Track.</td><td>empty</td></tr>
+      <tr><td><code>NoParts</code></td><td>Number of Parts in this Track ???</td><td>empty</td></tr>
+    </table>
+
+    <p>
+    The Track chunk is defined to contain MidiFilter, MidiParams and Part chunks.
+
+    <h3>MidiFilter chunk</h3>
+
+    <p>
+    A MidiFilter chunk has chunk tag identifier <code>MidiFilter</code> and is defined to contain the following identifiers.
+
+    <p>
+    <table align="center">
+      <tr><td><b>Identifier</b></td><td><b>Description</b></td><td><b>Default if not present</b></td></tr>
+      <tr><td><code>Status</code></td><td>'On' to allow events to be generated by parent, false to mute the parent.</td><td>On</td></tr>
+      <tr><td><code>Channel</code></td><td>Channel to force MIDI events to be produced on. -1 to disable.</td><td>-1</td></tr>
+      <tr><td><code>Port</code></td><td>Port to force MIDI events to be produced on. -1 to disable.</td><td>-1</td></tr>
+      <tr><td><code>Quantise</code></td><td>Linear quantise value to snap events to. 0 has no effect.</td><td>0</td></tr>
+      <tr><td><code>Transpose</code></td><td>Transpose value (added to note values, -127-127).</td><td>0</td></tr>
+      <tr><td><code>MinVelocity</code></td><td>Min velocity clip window value.</td><td>0</td></tr>
+      <tr><td><code>MaxVelocity</code></td><td>Max velocity clip window value.</td><td>127</td></tr>
+      <tr><td><code>VelocityScale</code></td><td>Velocity scale percentage, 1 - 200. 0 disables</td><td>0</td></tr>
+    </table>
+
+    <h3>MidiParams chunk</h3>
+
+    <p>
+    A MidiParams chunk has chunk tag identifier <code>MidiParams</code> and is defined to contain the following identifiers. These identifiers have values 0-127, or -1 to disable.
+
+    <p>
+    <table align="center">
+      <tr><td><b>Identifier</b></td><td><b>Description</b></td><td><b>Default if not present</b></td></tr>
+      <tr><td><code>BankLSB</code></td><td>Bank LSB byte sent at beginning of parent.</td><td>-1</td></tr>
+      <tr><td><code>BankMSB</code></td><td>Bank MSB byte sent at beginning of parent.</td><td>-1</td></tr>
+      <tr><td><code>Program</code></td><td>Program change sent at beginning of parent.</td><td>-1</td></tr>
+      <tr><td><code>Pan</code></td><td>Pan controller sent at beginning of parent.</td><td>-1</td></tr>
+      <tr><td><code>Reverb</code></td><td>Reverb controller sent at beginning of parent.</td><td>-1</td></tr>
+      <tr><td><code>Chorus</code></td><td>Chorus controller sent at beginning of parent.</td><td>-1</td></tr>
+      <tr><td><code>Volume</code></td><td>Volume controller sent at beginning of parent.</td><td>-1</td></tr>
+    </table>
+
+    <h3>Part chunk</h3>
+
+    <p>
+    A Part chunk has chunk tag identifier <code>Part</code> and is defined to contain the following identifiers.
+
+    <p>
+    <table align="center">
+      <tr><td><b>Identifier</b></td><td><b>Description</b></td><td><b>Default if not present</b></td></tr>
+      <tr><td><code>Phrase</code></td><td>Title of Phrase used by this Part.</td><td>n/a</td></tr>
+      <tr><td><code>Start</code></td><td>Start time of Part</td><td>n/a</td></tr>
+      <tr><td><code>End</code></td><td>End time of Part</td><td>n/a</td></tr>
+      <tr><td><code>Repeat</code></td><td>Repeat time value of Part</td><td>n/a</td></tr>
+      <tr><td><code>Offset</code></td><td>Offset time value of Part</td><td>n/a</td></tr>
+    </table>
+
+    <p>
+    The Part chunk is defined to contain MidiFilter and MidiParams chunks.
+
+    <h3>See also</h3>
+    The MIDI Specification Level 1.0 for descriptions of MIDI commands.
+
+    <h3>Revision history</h3>
+
+    <p>
+    <table align="center">
+      <tr><td>9 June 1999</td><td>1.00</td><td>First version. Implemented in TSE3.</td></tr>
+      <tr><td>1 September 2000</td><td>1.01</td><td>Changed SimpleMidiEventFilter to MidiFilter.</td></tr>
+      <tr><td>29 January 2001</td><td>1.02</td><td>Whole file is one big chunk. Comments.</td></tr>
+    </table>
+
+    <!--TSE3-FOOTER-->
+
+  </body>
+
+</html>

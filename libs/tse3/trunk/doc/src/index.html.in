@@ -1,0 +1,150 @@
+<html>
+
+  <!-- The TSE3 documentation is provided in HTML format.                 -->
+  <!-- It has been designed to be viewed as local files since it contains -->
+  <!-- a number of hard coded links to files in the tse3 build tree.      -->
+  <!-- In order to use the links to the API reference documentation it    -->
+  <!-- must be built (in the same build tree directory)                   -->
+  <!--                                                                    -->
+  <!-- Pete Goodliffe                                                     -->
+
+  <head>
+    <title>TSE3 library documentation</title>
+  </head>
+
+  <body bgcolor=#ffffff texdt=#000000>
+
+    <!-- TSE3 library documentation header -->
+    <table width=100% cellspacing=6 cellpadding=1 border=0>
+    <tr>
+    <td width=100> <img src="tse3logo.png" alt="TSE3"> </td>
+    <td align=center>
+      <hr noshade height=2>
+      <font size=+4><b>TSE3 library documentation</b></font>
+      <hr noshade height=2>
+    </td>
+    </tr>
+    </table>
+
+    <!-- Index into documentation -->
+
+    <p>
+    <center>
+
+    <table width=90% cellspacing=6 cellpadding=1 border=0>
+
+    <tr>
+    <td bgcolor=#000000 width=50%><table width=100% cellspacing=0 cellpadding=0 border=0><tr><td valign=center bgcolor=#c8d559><center><b>About TSE3 version
+        <!--TSE3-VERSION-->
+        </b></center></td></tr></table></td>
+    <td bgcolor=#000000 width=50%><table width=100% cellspacing=0 cellpadding=0 border=0><tr><td valign=center bgcolor=#c8d559><center><b>Getting started</b></center></td></tr></table></td>
+    </tr>
+
+    <tr>
+
+    <td valign=top>
+      <!-- "About TSE3" section-->
+
+      <ul>
+        <li><a href="About.html">About TSE3</a>
+        <li><a href="History.html">A brief history</a>
+        <li><a href="Version.html">Version history</a>
+        <li><a href="Whitepaper.html">Product whitepaper</a>
+      </ul>
+    </td>
+
+    <td valign=top>
+      <!-- "Getting started" section -->
+      <ul>
+        <li><a href="Build.html">Building TSE3</a>
+        <li><a href="HOWTO.html">How to use the API to perform common tasks.</a>
+        <li><a href="Trouble.html">Troubleshooting</a>
+        <li><A href="Examples.html">Examples</a>
+      </ul>
+    </td>
+
+    </tr>
+
+    <tr>
+    <td bgcolor=#000000 width=50%><table width=100% cellspacing=0 cellpadding=0 border=0><tr><td valign=center bgcolor=#c8d559><center><b>API reference</b>&nbsp;&nbsp;&nbsp;&nbsp;<font size=-2>(see <a href="KDOC.html">here</a>)</font></center></td></tr></table></td>
+    <td bgcolor=#000000 width=50%><table width=100% cellspacing=0 cellpadding=0 border=0><tr><td valign=center bgcolor=#c8d559><center><b>Further documentation</b></center></td></tr></table></td>
+    </tr>
+
+    <tr>
+    
+    <td valign=top>
+      <!-- "API reference" section -->
+      <ul>
+      <li><b>Doxygen API reference</b>
+      <ul>
+        <li><a href="doxygen/index.html">TSE3 library reference page</a>
+      </ul>
+      <li><b>Specific TSE3 namespaces</b>
+      <ul>
+        <li><a href="doxygen/namespaceTSE3.html">TSE3 namespace</a>
+        <li><a href="doxygen/namespaceTSE3_1_1App.html">App namespace</a>
+        <li><a href="doxygen/namespaceTSE3_1_1Cmd.html">Cmd namespace</a>
+        <li><a href="doxygen/namespaceTSE3_1_1Ins.html">Ins namespace</a>
+        <li><a href="doxygen/namespaceTSE3_1_1Plt.html">Plt namespace</a>
+        <li><a href="doxygen/namespaceTSE3_1_1Util.html">Util namespace</a>
+      </ul>
+      <li><b>KDOC TSE3 API reference</b>
+      <br><i>(Same information, different presentation)</i>
+      <ul>
+        <li><a href="api/index.html">Index</a> (start here)
+      </ul>
+    </td>
+
+    <td valign=top>
+      <!-- "API reference" section -->
+      <ul>
+        <li><a href="Song.html">The Song class structure.</a>
+        <li><a href="Playable.html">MIDI data and the Playable interface.</a>
+        <li><a href="Notifier.html">The TSE3 Notifier/Listener framework.</a>
+        <li><a href="Error.html">TSE3 error handling.</a>
+        <li><a href="Mutex.html">Support for multiple threads in TSE3.</a>
+        <li><a href="TSE3MDL.html">The TSE3MDL file format.</a>
+        <li><a href="Commands.html">The TSE3 Commands.</a>
+        <li><a href="InsFiles.html">Cakewalk <i>.ins</i> files.</a>
+        <br>&nbsp;
+        <li><a href="Article.html">Feature article on TSE3</a>
+      </ul>
+    </td>
+    
+    </tr>
+
+    <tr>
+    <td bgcolor=#000000 width=50%><table width=100% cellspacing=0 cellpadding=0 border=0><tr><td valign=center bgcolor=#c8d559><center><b>Trax Software</b></center></td></tr></table></td>
+    <td bgcolor=#000000 width=50%><table width=100% cellspacing=0 cellpadding=0 border=0><tr><td valign=center bgcolor=#c8d559><center><b>Admin</b></center></td></tr></table></td>
+    </tr>
+
+    <tr>
+
+    <td valign=top>
+      <!-- "Trax Software" section -->
+      <ul>
+        <li><a href="Trax.html">Author / About Trax Software</a>
+        <li><a href="Feedback.html">How to comment/report a bug</a>
+        <li><a href="http://lists.sourceforge.net/lists/listinfo/tse3-devel">Mailing list information</a>
+      </ul>
+    </td>
+
+    <td valign=top>
+      <!-- "Admin" section -->
+      <ul>
+        <li><a href="http://TSE3.sourceforge.net">Homepage</a>
+        <li><a href="Copyright.html">Copyright details</a>
+        <li><a href="Bugs.html">Known bugs and issues</a>
+      </ul>
+    </td>
+    
+    </tr>
+
+    </table>
+    </center>
+
+    <p>
+    <!--TSE3-FOOTER-->
+
+  </body>
+</html>

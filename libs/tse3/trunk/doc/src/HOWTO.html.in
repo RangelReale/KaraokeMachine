@@ -1,0 +1,75 @@
+<html>
+
+  <head>
+    <title>TSE3 library HOWTO</title>
+  </head>
+  
+  <!--TSE3-BODY-->
+
+    <h1>TSE3 library HOWTO</h1>
+    
+    <p>
+    This document provides simple descriptions of how to use the TSE3 API to perform common tasks.
+
+    <hr>
+
+    <h3>Including library headers</h3>
+    <p>
+    To use the library you should have you compiler set to point to the
+    appropriate include directory. TSE3 header files should be included with a
+    line like:
+    <p>
+    <pre>
+    #include "tse3/Midi.h"
+    </pre>
+    <p>
+    Note the <code><b>tse3/</b></code> section. This will ensure that TSE3
+    header file names do not clash with other library paths.
+    <p>
+    Where you do not need to <code>#include</code> a header (for example, you
+    do not inherit directly from a TSE3 class, just use pointers to it in your
+    class' interface) you are urged to forward declare TSE3 classes rather than
+    pull in the header file. For example:
+    <p>
+    <pre>
+    namespace TSE3
+    {
+        class Song;
+        class Track;
+    }
+    </pre>
+
+    <h3>Load a Song</h3>
+    <p>The TSE3 library can save and load standard MIDI files as well as song files in it's own filetype (<a href="TSE3MDL.html">TSE3MDL</a>). There are benefits and drawbacks of both types. MIDI files are portable - practically any other sequencing/multimedia package will be able to interpret them. However, MIDI files are not expressive enough to describe TSE3's advanced Song structure and so use of the TSE3MDL format is recommended where possible.
+    <ul>
+        <li><b>TSE3MDL files</b><br>
+        Use the <code>TSE3MDL</code> object (in <code>TSE3MDL.h</code>). The KDOC documentation explains how to use it. <i>Do not</i> use the <code>Serializable</code> interface of the <code>Song</code> class directly, you will not create a complete TSE3MDL file.
+        <li><b>Standard MIDI files</b><br>
+        Use the <code>MidiFileImport</code> object (in <code>MidiFile.h</code>). The KDOC documentation explains how to use it.
+        <li><b>TSE2MDL files</b><br>
+        These are files as created by the older TSE version 2 library. You use the <code>TSE2MDL</code> class (in <code>TSE2MDL.h</code>) to import these files.
+    </ul>
+
+    <h3>Save a Song</h3>
+    <p>To save as TSE3MDL or standard MIDI file is as easy as loading.
+    <ul>
+        <li><b>TSE3MDL files</b><br>
+        Use the <code>TSE3MDL</code> object.
+        <li><b>Standard MIDI files</b><br>
+        Use the <code>MidiFileExport</code> object (in <code>MidiFile.h</code>).
+    </ul>
+
+    <h3>Play a Song</h3>
+    <p>The <code>Transport</code> object (in <code>tse3/Transport.h</code>) is used to play a <code>Song</code> object (or in fact, any kind of object that implements the <code>Playable</code> interface). To use it you must also create a <code>MidiScheduler</code> object that knows how to play MIDI output on your computer. For example, Linux boxes with the Open Sound System will want to create an <code>OSSMidiScheduler</code> object using the <code>OSSMidiSchedulerFactory</code> class.
+    <p>As well as a <code>MidiScheduler</code> you must also create a <code>Metronome</code> object. If simply playing back a file, you may wish to switch the metronome 'tick' off using the documented API.
+    <p>Playing a <code>Song</code> is simply a matter of calling <code>play</code> on the <code>Transport</code> object. You can either poll the <code>Transport</code> object to find out when the playing has stopped, or implement the <code>TransportListener</code> interface to be told directly.
+
+    <h3>Any other questions?</h3>
+    <p>If you have any other questions, ask the author!
+    <p>(The tse3play program is a good example of how to use the library - you might find your answer there).
+
+    <!--TSE3-FOOTER-->
+    
+  </body>
+
+</html>

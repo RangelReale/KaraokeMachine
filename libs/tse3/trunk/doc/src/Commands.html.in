@@ -1,0 +1,85 @@
+<html>
+
+  <head>
+    <title>TSE3 Commands</title>
+  </head>
+  
+  <!--TSE3-BODY-->
+
+    <h1>TSE3 Commands</h1>
+
+    <p>
+    The <code>TSE3::Cmd</code> namespace contains classes that implement a
+    GoF <i>Command</i> pattern. You can use this in applications that use the
+    TSE3 library to provide a command history with undo/redo facilities.
+
+    <p>
+    However, in order to use these classes there are a number of provisos
+    that you <b>must</b> take care to note:
+
+    <ul>
+      <li><b>The commands</b>
+          <br>
+          There is a <code>TSE3::Cmd</code> class for every useful operation
+          on the <code>Song</code> data structure and it's subcomponents. There
+          are not commands for alterations to the state of objects like
+          <code>Transport</code> and <code>Metronome</code> since they are
+          system wide settings, not <code>Song</code> alterations.
+      <li><b>The <code>CommandHistory</code> class</b>
+          <br>
+          The <code>CommandHistory</code> class holds the list of commands.
+          For any operation, you create a <code>Command</code> object for it
+          (with <code>new</code>), call <code>execute()</code> on the command,
+          and then <code>add</code> it to the <code>CommandHistory</code> class.
+          For now on you can call <code>undo</code> and <code>redo</code> on the
+          <code>CommandHistory</code> to undo/redo the history of operations.
+          Remember that your application will be kept up to date with the
+          resulting changes to the <code>Song</code> through the
+          <code>Notifier</code> interface mechanism.
+      <li><b>Multiple <code>Song</code>s</b>
+          <br>
+          If you support multiple <code>Song</code> objects in your application
+          you can either use one <code>CommandHistory</code> class for all
+          operations, or create a separate <code>CommandHistory</code> for
+          each <code>Song</code>. It is this latter operation that is the most
+          logical, and the <code>TSE3_Application::Application</code> class
+          contains support for it.
+      <li><b>If you use commands, don't directly use the TSE3 API</b>
+          <br>
+          If you are using TSE3 Commands then any change to a <code>Song</code>
+          or it's subcomponents <b>must</b> be done through commands. Otherwise,
+          if the state of the <code>Song</code> changes between a command
+          being <code>execute</code>d and <code>undo</code>ne unpredicatable
+          results may occur.
+      <li><b>Writing your own commands</b>
+          <br>
+          If you implement your own commands that are creational or destrutional
+          (if that is a word ;-) you must take care. If you, for example, create
+          a new <code>Part</code> in <code>execute</code> you should not
+          delete it in <code>undo</code> and then create a different
+          <code>Part</code> in a subsequent call to <code>execute</code>. Why?
+          If any subsequent commands act on that <code>Part</code> and take a
+          <code>Part*</code> parameter to identify it, by deleting the
+          <code>Part</code> and creating a new different one on a 'redo' you
+          will cause the later command to be invalid.
+          <br>Creational patterns should create objects in the constructors,
+          put them into the <code>Song</code> in undo, and delete the object
+          in the destructor <i>only</i> if the object is deleted after having
+          been undone.
+          <br>Destructional commands should merely remove the object in
+          <code>execute</code> and put the same object back in in
+          <code>undo</code>. The object may only be deleted in the destructor
+          if the command has not been undone.
+    </ul>
+
+    <p>
+    However, despite these provisos and the extra care that you must take when
+    using the command pattern in your application, the benefits are great:
+    the undo/redo facility is a really user-friendly useful facility that sets
+    a good application appart from a great one.
+
+    <!--TSE3-FOOTER-->
+    
+  </body>
+
+</html>

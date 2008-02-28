@@ -1,0 +1,148 @@
+<html>
+
+  <head>
+    <title>TSE3 library class structure</title>
+  </head>
+  
+  <!--TSE3-BODY-->
+
+    <h1>TSE3 library class structure</h1>
+    
+    <p>
+    Since TSE3 is a powerful and full-featured library it contains a large 
+    number of classes. These can be split into several categories of class.
+
+    <p>
+    These categories of class reside in a number of namespaces. This is
+    described below.
+
+    <dl>
+
+      <dt><h3>Song classes</h3></dt>
+      <dd>
+      These are the 'data' classes in the TSE3 library. They contain the
+      representation of the Song information. The top level class is the
+      <code>Song</code> class, it contains all the other objects. These include
+      <code>Track</code>, <code>Part</code> and <code>Phrase</code>. 
+      <p>
+      These are described <A href="Song.html">here</a>. They reside in the
+      <code>TSE3</code> namespace.
+      </dd>
+      
+      <dt><h3>Transport classes</h3></dt>
+      <dd>
+      These are the classes that are used to playback and record songs. This
+      includes the following objects:
+      <table>
+        <tr><td><code>Transport</code></td>
+        <td>Deals with the playback/redord operations</td></tr>
+        <tr><td><code>MidiScheduler</code></td>
+        <td>Provides access to the computer's MIDI ports</td></tr>
+        <tr><td><code>Metronome</code></td>
+        <td>Provides a configurable metronome facility</td></tr>
+        <tr><td><code>MidiEcho</code></td>
+        <td>A software MIDI thru port</td></tr>
+        <tr><td><code>MidiFilter</code></td>
+        <td>Configurable filter for MIDI commands</td></tr>
+      </table>
+
+      <p>
+      They reside in the <code>TSE3</code> namespace.
+      </dd>
+
+      <dt><h3>Instrument classes</h3></dt>
+      <dd>
+      These classes provide the ability to read Cakewalk .ins files. See
+      <a href="InsFiles.html">here</a> for more information. They reside in
+      the <code>TSE3::Ins</code> namespace.
+      </dd>
+
+      <dt><h3>Utility classes</h3></dt>
+      <dd>
+      A number of 'utilities' are provided. These are operations that are
+      performed on <code>Song</code>s which are more complex than the basic
+      object member functions (such as merging two <code>Phrase</code>s).
+      <p>
+      They reside in the <code>TSE3::Util</code> namespace.
+      </dd>
+
+      <dt><h3>Application classes</h3></dt>
+      <dd>
+      A selection of classes that provide support for application programemers.
+      The idea is to take as much of the generic (non-UI) application
+      functionality and place it in the TSE3 library.
+      <p>
+      They reside in the <code>TSE3::App</code> namespace.
+      </dd>
+
+      <dt><h3>Command classes</h3></dt>
+      <dd>
+      Classes that implement a 'command' design pattern. This provides application
+      programmers with a command history facility that allows you to provide
+      undo/redo of commands. See the
+      <a href="Commands.html">Commands documentation</a> for more details. The
+      command classes reside in the <code>TSE3::Cmd</code> namespace.
+      </dd>
+
+      <dt><h3>Listener classes</h3></dt>
+      <dd>
+      Many of the TSE3 objects can raise events which can be caught by client
+      code. This is described in the <a href="Notifier.html">Notifier</a>
+      documentation.
+      <p>
+      Each listener interface class resides in the namespace that it's Notifier
+      class resides in.
+      </dd>
+
+    </dl>
+
+    <p><hr>
+
+    <h1>Other API issues</h1>
+
+    <h3>Using TSE3 objects</h3>
+
+    Note that some TSE3 classes are 'value' classes, for instance
+    <code>MidiClock</code> and <code>MidiCommand</code>. It is fine to create
+    these on the stack, copy them etc. They 'behave like the <code>int</code>s
+    do'.
+    <p>
+    Others must be created on the heap (i.e. via <code>new</code>), like
+    <code>Part</code> and <code>Phrase</code>. This is because you will pass
+    them into another object which will assume responsibility and ownership
+    of them. This 'owner' will take care of deleting the object when it is
+    no longer needed. If you created this object on the stack then such a
+    delete will cause Undefined Behaviour.
+    <p>
+    Value classes are documented as such to avoid confusion.
+
+    <h3>Using the Transport class</h3>
+
+    The <code>Transport</code> class is used to perform playback of
+    <code>Song</code> data. To use it you must repeatedly call it's <code>
+    poll()</code> method to allow it to perform MIDI input and output.
+    <p>
+    Perhaps you might like to call <code>sleep()</code> or some such function
+    inbetween calls to <code>poll()</code> so as not to load your system
+    unnecessarily.
+
+    <h3>MIDI note off commands</h3>
+
+    The TSE3 library has a convention for where MIDI note off commands are
+    stored. The <code>MidiEvent</code> class that is used to store MIDI data
+    has two entries, one for the MIDI event, and a second which is used to hold
+    a MIDI note off command if the first is a note on.
+    <p>
+    The two MIDI commands <b>must</b> be paired
+    together in the one <code>MidiEvent</code> for the TSE3 playback system
+    to work properly.
+    <p>
+    This will only be an issue to you if you are <b>creating</b> MIDI data
+    using the TSE3 library. See the <code>PhraseEdit</code> class for
+    information on how to create MIDI data.
+
+    <!--TSE3-FOOTER-->
+    
+  </body>
+
+</html>

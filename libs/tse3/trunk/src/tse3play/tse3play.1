@@ -1,0 +1,173 @@
+.\" Process this file with
+.\" groff -man -Tascii foo.1
+.\"
+.TH TSE3PLAY 1 "FEBRUARY 2001" "Trax Software" "User Manuals"
+.SH NAME
+tse3play \- play/convert music files (MIDI or TSE3MDL) using the
+.SM TSE3
+sequencer engine library
+.SH SYNOPSIS
+.B tse3play [\-h] [\-ver] [\-v] [\-list] [\-nv] [\-np] [\-l] [\-omidi
+.I output-midi-file
+.B ] [\-omidi0] [\-omidicomp] [\-otse3mdl
+.I output-tse3mdl-file
+.B ] [\-map
+.I from-midi-channel to-midi-channel
+.B ] [\-m] [\-r] [\-gmr] [\-gsr] [\-xgr] [\-unix] [\-oss] [\-alsa] [\-arts] [\-stream] [\-s
+.I start-time
+.B ] [\-solo
+.I track
+.B ] [\-sl
+.I usecs
+.B ] [ \-stop ] [ \-e ] [ \-mute
+.I channel
+.B ] [ \-pd
+.I dir
+.B ]
+.I file
+.B ] [ \-port
+.I port
+.B ] [ \-fast ]
+.SH DESCRIPTION
+.B tse3play
+plays TSE3MDL files and MIDI files using the
+.SM TSE3
+sequencer engine. It was originally developed as a test application for the
+.SM TSE3
+engine, but is now a fully featured playback application.
+
+.B tse3play
+can also convert files between the two supported formats. Whilst playing it provides text based visual feedback, or can stream an English representation of the contents of the file to standard output.
+
+.I MIDI files
+are a standard file format for the storage of musical (song) data that can be found in abundance on the internet. They don't contain the actual sounds played, but instructions on how to recreate the song (i.e. start note/stop note commands). MIDI files are most often created by a
+.I sequencer
+application (akin to a word processor for music). MIDI files often have the extension .mid or .midi
+
+.I TSE3MDL
+(
+.I TSE3 Music Description Langauge
+) files are a similar form of music file. They are created by sequencer applications based on the
+.SM TSE3
+sequencer engine library. The file format contains a great deal more information and harnesses the full power of the
+.SM TSE3
+library. TSE3MDL files often have the extension .tse3
+
+The type of the input file is automatically detected by
+.B tse3play
+\.
+.B tse3play
+can also load legacy
+.I TSE2MDL
+files from sequencers based on the older
+.SM TSE2
+sequencer library.
+.SH OPTIONS
+.IP "\-h, \-\-help"
+Provide help on the
+.B tse3play
+command line parameters.
+.IP "\-ver, \-\-version"
+Print version number and exit.
+.IP "\-v, \-\-verbose"
+Give verbose output on what 
+.B tse3play
+is trying to do.
+.IP "\-list, \-\-list\-ports"
+Lists the port numbers available on your platform.
+.IP "\-nv, \-\-novisual"
+Don't produce visual feedback (text-based output-level indicator).
+.IP "\-np, \-\-noplay"
+Don't play the input file (only perform a conversion - if one is specified).
+.IP "\-l, \-\-loop"
+Loop playback of the input file.
+.IP "\-omidi, \-\-out\-midi <filename>"
+Convert the loaded file to MIDI. File type will be MIDI type 1 unless
+.B \-omidi0
+is specified. The filename of the output follows this option. You can specify '-' to output on stdandard out.
+.IP "\-omidi0, \-\-out\-midi\-format\-0"
+If performing a MIDI conversion, produce an output file in MIDI type 0 format. For most cases the default (type 1) is recommended.
+.IP "\-omidicomp, \-\-out\-midi\-compact"
+Compact the converted MIDI file output. This removes any redundant information in the MIDI file that could be removed by using MIDI running status.
+.IP "\-otse3mdl, \-\-out\-tse3mdl FILENAME"
+Convert the file to tse3mdl format. The filename of the output follows this option. You can specify '-' to output on stdandard out.
+.IP "\-map, \-\-map\-channel F T"
+During playback, map MIDI channel F to MIDI channel T. Channel numbers start at zero.
+.IP "\-m, \-\-metronome"
+During playback, produce a metronome tick.
+.IP "\-r, \-\-reset"
+Send a basic MIDI reset message at playback start and end. This will send a reset message even if
+.B -np
+is specified.
+.IP "\-gmr, \-\-gmreset"
+Send a General MIDI reset message at playback start and end. This will send a reset message even if
+.B \-np
+is specified.
+.IP "\-gsr, \-\-gsreset"
+Send a GS reset message at playback start and end. This will send a reset message even if
+.B \-np
+is specified.
+.IP "\-xgr, \-\-xgreset"
+Send an XG reset message at playback start and end. This will send a reset message even if
+.B \-np
+is specified.
+.IP "\-unix, \-\-unix-scheduler"
+Selects the best Unix scheduler device (either OSS or ALSA) as the MIDI output method. This is the default behaviour.
+.IP "\-oss, \-\-oss-scheduler"
+Selects the Open Sound System interface as the MIDI output method.
+.IP "\-alsa, \-\-alsa-scheduler"
+Selects the ALSA interface as the MIDI output method. This will only work if you have ALSA installed on your computer.
+.IP "\-arts, \-\-arts-scheduler"
+Selects the aRts interface as the MIDI output method. This will only work if you have aRts installed on your computer.
+.IP "\-stream, \-\-stream-scheduler"
+Selects the standard output stream as the MIDI output method. An English interpretation of each MIDI command generated will appear on standard out.
+.IP "\-s, \-\-start"
+Begin playback at the specified clock pulse. The pulses are divisions of quarter notes.
+.B tse3play
+works to a resolution of 96 PPQN.
+.IP "\-solo, \-\-solo-track"
+Play with the specified input track 'soloed'. This will mute all the other tracks. Note that this option will mute the
+.B input
+track from the file, not the specified MIDI channel. Track numbers start at zero.
+.IP "\-sl, \-\-sleep"
+Sets the time period that
+.B tse3play
+returns control back to the operating system between updates. The parameter is a number of u-seconds. The default value is 100. Specifying a shorter time will make the real time vu bars update more responsively. A value of 0 disables the sleep.
+.IP "\-stop, \-\-no\-stop"
+Prevents
+.B tse3play
+from exiting once playback has finished. This can be used in conjunction with --echo and no specified filename to make the computer act as a MIDI Thru box.
+.IP "\-e, \-\-echo"
+Enable the MIDI echo facility, which is a soft MIDI Thru port. Anything received on the MIDI in connection will be immediately echoed on the MIDI out.
+.IP "\-mute, \-\-mute\-track"
+Mutes the specified track in the input file. The first track is track zero.
+.IP "\-pd, \-\-patches\-dir"
+Specifies the path to the directory in which FM or GUS patch files are to be found. This is used by the OSS driver to load sounds into the soundcard.
+.IP "\-port, \-\-force\-port"
+Forces all output to the specified port.
+.IP "\-fast, \-\-fast\-midi"
+Tells
+.B tse3play
+to use a faster MIDI file import routine. This will make the MIDI file playback
+start almost instantaneously (especially noticeable for very large MIDI files).
+You can only use this if you are not converting a file.
+
+It has a number of possible side effects; (i) The MIDI file's last time stamp
+is trusted to be correct (it might not be) (ii) Stopping playback half way
+through
+.I may
+produce 'hanging notes'
+.SH BUGS
+Naturally,
+.B tse3play
+is completely bug free. The
+.SM TSE3
+library upon which it is based is also completely bug free. However, if you do find something goes wrong then contact the author. The program can only be improved with your feedback.
+.SH COPYRIGHT
+Copyright (c) 2000,2001 Pete Goodliffe. See the license file in the TSE3 doc diirectory for a complete license statement.
+.SH AUTHOR
+Pete Goodliffe <pete@cthree.org>
+
+Trax Software 2001
+.SH "SEE ALSO"
+.BR playmidi "(1), " TSE3 (3)

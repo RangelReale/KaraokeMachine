@@ -1,0 +1,10 @@
+Doc dir README
+==============
+
+You need to build the documentation before you can read it properly.
+A simple "cd doc; make" will do.
+
+Ovbiously, this means that you can't read the HTML build docs before
+building :-( You can just read the file "src/Build.html.in" in a web
+browser, though.
+

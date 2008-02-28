@@ -1,0 +1,39 @@
+<html>
+
+  <head>
+    <title>TSE3 library copyright details</title>
+  </head>
+  
+  <!--TSE3-BODY-->
+
+    <h1>TSE3 library copyright details</h1>
+
+    <p>
+    TSE3 is released under the terms of the <b>GNU General Public
+    License</b>. See the COPYING file included in the
+    source package, or visit the <a href="http://www.gnu.org">GNU website</a>
+    for more information.
+    <p>
+    TSE3 is copyright &copy; Pete Goodliffe 2000-2003.
+    <p>
+    You may freely use TSE3 under the license terms. In addition to this, I request
+    that if you use the library you:
+    <ol>
+      <li>Tell me (so I can keep a track of how much it is being used, and
+          learn how I can improve it)
+      <li>Display a notice in the program (perhaps the <b>Help->About</b>
+          dialogue) and also in the documentation crediting use of the library.
+          Something like <i>'Uses TSE3 technology'</i> is sufficient. You should
+          provide access to the version strings in the <code>TSE3.h</code> file in the
+          program. I also have a small logo which you may wish to use.
+    </ol>
+
+    <p>
+    If you are interested in licensing TSE3 under a different conditions, then
+    contact the <a href="Trax.html">author</a>.
+
+    <!--TSE3-FOOTER-->
+    
+  </body>
+
+</html>
