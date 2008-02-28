@@ -1,0 +1,9 @@
+-------
+WINDOWS
+-------
+./configure CFLAGS="-g -O0" CXXFLAGS="-g -O0" LDFLAGS="-lwinmm" --without-oss --without-alsa --without-aRts --with-win32 --disable-shared --enable-static
+
+-------
+UNIX
+-------
+./configure CFLAGS="-g -O0" CXXFLAGS="-g -O0" --disable-shared --enable-static
