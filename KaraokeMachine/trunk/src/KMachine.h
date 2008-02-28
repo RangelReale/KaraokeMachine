@@ -5,6 +5,7 @@
 #include "linked_ptr.h"
 #include "KMSong.h"
 #include "KMImage.h"
+#include "KMOptions.h"
 
 namespace KaraokeMachine {
 
@@ -163,7 +164,8 @@ class KMachine {
 public:
     enum commant_t { KC_ADD, KC_STOP, KC_PAUSE, KC_SKIP, KC_SKIPIMAGE, KC_SONGKEYDOWN, KC_SONGKEYUP };
 
-    KMachine() : chars_(""), songs_(this), images_(this), playlist_(this), imagelist_(this), playing_(NULL) {}
+    KMachine() : chars_(""), songs_(this), images_(this), playlist_(this),
+        imagelist_(this), playing_(NULL), options_() {}
     virtual ~KMachine();
 
     virtual void Initialize();
@@ -184,6 +186,7 @@ public:
 
 
     KMSong *Playing() { return playing_; }
+    KMOptions &Options() { return options_; }
 protected:
     virtual void DoRun() = 0;
 
@@ -204,6 +207,7 @@ private:
     KMachinePlaylist playlist_;
     KMachineImageList imagelist_;
     KMSong *playing_;
+    KMOptions options_;
 };
 
 };

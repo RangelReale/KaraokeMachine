@@ -12,7 +12,6 @@
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Option use_console_runner="0" />
-				<Option parameters='&quot;E:\transfer\karaoke\test.kps&quot;' />
 				<Compiler>
 					<Add option="-g" />
 				</Compiler>
@@ -20,9 +19,9 @@
 			<Target title="Release">
 				<Option output="bin\Release\KaraokeMachine" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj\Release\" />
-				<Option type="0" />
+				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters='&quot;C:\transfer\files&quot;' />
+				<Option use_console_runner="0" />
 				<Compiler>
 					<Add option="-O2" />
 				</Compiler>
@@ -51,6 +50,7 @@
 			<Add library="winmm" />
 			<Add library="dxguid" />
 			<Add library="boost_filesystem-$(#boost.suffix)" />
+			<Add library="boost_program_options-$(#boost.suffix)" />
 			<Add directory="$(#sdl.lib)" />
 			<Add directory="$(#sdl_ttf.lib)" />
 			<Add directory="$(#tse3.lib)" />
@@ -65,6 +65,8 @@
 		<Unit filename="src\KMDefs.h" />
 		<Unit filename="src\KMImage.cpp" />
 		<Unit filename="src\KMImage.h" />
+		<Unit filename="src\KMOptions.cpp" />
+		<Unit filename="src\KMOptions.h" />
 		<Unit filename="src\KMSong.cpp" />
 		<Unit filename="src\KMSong.h" />
 		<Unit filename="src\KMSongFactory.cpp" />
@@ -83,7 +85,6 @@
 			<code_completion />
 			<envvars />
 			<debugger />
-			<lib_finder />
 		</Extensions>
 	</Project>
 </CodeBlocks_project_file>

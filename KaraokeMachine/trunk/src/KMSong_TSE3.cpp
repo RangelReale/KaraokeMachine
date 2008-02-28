@@ -69,12 +69,18 @@ KMSong_TSE3::~KMSong_TSE3()
     }
 }
 
+void KMSong_TSE3::LoadOptions(KMOptions &options)
+{
+    if (options.GetMidiPort()>-1)
+        transport_.filter()->setPort(options.GetMidiPort());
+}
+
 bool KMSong_TSE3::Load(KMInputStream &stream)
 {
     TSE3::MidiFileImport mfi(stream);
 
     //transport_.filter()->setPort(128);
-    transport_.attachCallback(new KMSong_TSE3_Callback(this));
+    //transport_.attachCallback(new KMSong_TSE3_Callback(this));
 
     song_ = mfi.load();
     trackplay_.clear();

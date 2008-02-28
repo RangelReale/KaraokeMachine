@@ -3,6 +3,7 @@
 
 #include "KMDefs.h"
 #include "KMUtil.h"
+#include "KMOptions.h"
 
 #include <string>
 #include <deque>
@@ -57,6 +58,8 @@ public:
     KMSong(const std::string &filename) : title_(""), lyrics_(),
         lyricscurrentline_(-1), lyricscurrentpospct_(-1), debug_("") { }
     virtual ~KMSong() {}
+
+    virtual void LoadOptions(KMOptions &options) {}
 
     virtual bool Play() = 0;
     virtual bool Stop() = 0;

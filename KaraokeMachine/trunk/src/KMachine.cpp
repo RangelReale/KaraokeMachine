@@ -329,6 +329,7 @@ void KMachine::Loop()
         filedata.seekg(0);
 
         playing_=KMSongFactory::Load(filedata);
+        playing_->LoadOptions(options_);
         playing_->SetMelodyTrack(ps.GetSong()->GetMelodyTrack());
         playing_->SetTranspose(ps.GetSong()->GetTranspose());
 

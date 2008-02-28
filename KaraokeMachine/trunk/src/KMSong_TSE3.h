@@ -61,6 +61,8 @@ public:
 
     virtual ~KMSong_TSE3();
 
+    virtual void LoadOptions(KMOptions &options);
+
     virtual bool Play();
     virtual bool Stop();
     virtual bool Pause();
