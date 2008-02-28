@@ -11,7 +11,6 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="0" />
 				<Option compiler="gcc" />
-				<Option parameters='&quot;/media/sda1/transfer/files/&quot; &quot;/media/hde1/transfer/karaoke/test.kps&quot;' />
 				<Compiler>
 					<Add option="-g" />
 				</Compiler>
@@ -21,7 +20,6 @@
 				<Option object_output="obj/Release/" />
 				<Option type="0" />
 				<Option compiler="gcc" />
-				<Option parameters='&quot;/media/sda1/transfer/files/&quot; &quot;/media/hde1/transfer/karaoke/test.kps&quot;' />
 				<Compiler>
 					<Add option="-O2" />
 				</Compiler>
@@ -45,6 +43,7 @@
 			<Add library="SDLmain" />
 			<Add library="tse3" />
 			<Add library="boost_filesystem-$(#boost.suffix)" />
+			<Add library="boost_program_options-$(#boost.suffix)" />
 			<Add directory="$(#sdl.lib)" />
 			<Add directory="$(#sdl_ttf.lib)" />
 			<Add directory="$(#tse3.lib)" />
@@ -58,6 +57,8 @@
 		<Unit filename="src/KMDefs.h" />
 		<Unit filename="src/KMImage.cpp" />
 		<Unit filename="src/KMImage.h" />
+		<Unit filename="src/KMOptions.cpp" />
+		<Unit filename="src/KMOptions.h" />
 		<Unit filename="src/KMSong.cpp" />
 		<Unit filename="src/KMSong.h" />
 		<Unit filename="src/KMSongFactory.cpp" />
