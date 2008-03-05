@@ -28,7 +28,7 @@ typedef long kmtime_t; // time in ms
 #define KMIMAGEPACKAGE_MAGIC_IMAGE   "KMII"
 #define KMIMAGEPACKAGE_MAGIC_IMAGE_SIZE   4
 
-typedef struct kmsongpackage_header_t
+typedef struct __attribute__ ((__packed__)) kmsongpackage_header_t
 {
     char sig[KMSONGPACKAGE_SIG_SIZE];
     unsigned short version;
@@ -39,7 +39,7 @@ typedef struct kmsongpackage_header_t
     unsigned short descriptionsize;
 };
 
-typedef struct kmsongpackage_song_t
+typedef struct __attribute__ ((__packed__)) kmsongpackage_song_t
 {
     char magic[4];
     unsigned short id;
@@ -56,7 +56,7 @@ typedef struct kmsongpackage_song_t
     unsigned int filesize;
 };
 
-typedef struct kmimagepackage_header_t
+typedef struct __attribute__ ((__packed__)) kmimagepackage_header_t
 {
     char sig[KMIMAGEPACKAGE_SIG_SIZE];
     unsigned short version;
@@ -66,7 +66,7 @@ typedef struct kmimagepackage_header_t
     unsigned short descriptionsize;
 };
 
-typedef struct kmimagepackage_image_t
+typedef struct __attribute__ ((__packed__)) kmimagepackage_image_t
 {
     char magic[4];
     unsigned short id;

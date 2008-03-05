@@ -117,8 +117,8 @@ void KMSongPackage::Load(KMInputStream &stream)
     // read head
     stream.read((char*)&head, sizeof(head));
     if (strncmp(head.sig, KMSONGPACKAGE_SIG, KMSONGPACKAGE_SIG_SIZE)!=0)
-        throw KMException("Invalid file");
-    defaultid_=head.packageid;
+        throw KMException("Invalid kms file (1)");
+    defaultid_=kmutil_endian_int(head.packageid);
 
     memset(tmp, 0, sizeof(tmp));
     strncpy(tmp, head.title, KMSONGPACKAGE_MAXTEXT);
@@ -129,26 +129,26 @@ void KMSongPackage::Load(KMInputStream &stream)
     author_=tmp;
 
     description_="";
-    if (head.descriptionsize>0)
+    if (kmutil_endian_short(head.descriptionsize)>0)
     {
-        std::auto_ptr<char> ddata(new char[head.descriptionsize+1]);
-        ddata.get()[head.descriptionsize]='\0';
-        stream.read((char*)ddata.get(), head.descriptionsize);
-        description_=ddata.get();
+        char ddata[kmutil_endian_short(head.descriptionsize)+1];
+        ddata[kmutil_endian_short(head.descriptionsize)]='\0';
+        stream.read(ddata, kmutil_endian_short(head.descriptionsize));
+        description_=ddata;
     }
 
     // read songs
     songs_.clear();
 
-    for (int i=0; i<head.songcount; i++)
+    for (int i=0; i<kmutil_endian_short(head.songcount); i++)
     {
         stream.read((char*)&song, sizeof(song));
         if (stream.gcount()!=sizeof(song))
-            throw KMException("Invalid file");
+            throw KMException("Invalid kms file (2)");
         if (strncmp(song.magic, KMSONGPACKAGE_MAGIC_SONG, KMSONGPACKAGE_MAGIC_SONG_SIZE)!=0)
-            throw KMException("Invalid file");
+            throw KMException("Invalid kms file (3)");
 
-        KMSongPackageItem *newsong=&Get(Add(song.id));
+        KMSongPackageItem *newsong=&Get(Add(kmutil_endian_short(song.id)));
 
         memset(tmp, 0, sizeof(tmp));
         strncpy(tmp, song.filename, KMSONGPACKAGE_MAXPATH);
@@ -185,9 +185,9 @@ void KMSongPackage::Load(KMInputStream &stream)
         newsong->melodytrack_=song.melodytrack;
         newsong->transpose_=song.transpose;
         newsong->filepos_=stream.tellg();
-        newsong->filesize_=song.filesize;
+        newsong->filesize_=kmutil_endian_int(song.filesize);
 
-        stream.seekg(song.filesize, std::ios::cur);
+        stream.seekg(kmutil_endian_int(song.filesize), std::ios::cur);
     }
 }
 

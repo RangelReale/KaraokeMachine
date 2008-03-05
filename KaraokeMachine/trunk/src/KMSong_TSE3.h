@@ -10,6 +10,8 @@
 #include "tse3/Transport.h"
 #ifdef __WIN32__
 #include "tse3/plt/Win32.h"
+#elif defined(GP2X)
+#include "tse3/plt/OSS.h"
 #elif defined(unix)
 //#include "tse3/plt/OSS.h"
 #include "tse3/plt/Alsa.h"
@@ -86,6 +88,9 @@ private:
     TSE3::Metronome                 metronome_;
 #ifdef __WIN32__
     static TSE3::Plt::Win32MidiScheduler   scheduler_;
+#elif defined(GP2X)
+    //static TSE3::Plt::OSSMidiScheduler      scheduler_;
+    static TSE3::Util::NullMidiScheduler         scheduler_;
 #elif defined(unix)
     //static TSE3::Plt::OSSMidiScheduler      scheduler_;
     static TSE3::Plt::AlsaMidiScheduler        scheduler_;

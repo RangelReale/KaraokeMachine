@@ -19,6 +19,53 @@ namespace KaraokeMachine {
     #error "Unknown platform"
 #endif
 
+
+int kmutil_endian()
+{
+    int i = 1;
+    char *p = (char *)&i;
+
+    if (p[0] == 1)
+        return KM_LITTLE_ENDIAN;
+    else
+        return KM_BIG_ENDIAN;
+}
+
+
+short kmutil_endian_short(short s)
+{
+    unsigned char c1, c2;
+
+    //if (kmutil_endian()==KM_BIG_ENDIAN) {
+        return s;
+/*
+    } else {
+        c1 = s & 255;
+        c2 = (s >> 8) & 255;
+
+        return (c1 << 8) + c2;
+    }
+*/
+}
+
+int kmutil_endian_int (int i)
+{
+    unsigned char c1, c2, c3, c4;
+
+    //if (kmutil_endian()==KM_BIG_ENDIAN) {
+        return i;
+/*
+    } else {
+        c1 = i & 255;
+        c2 = (i >> 8) & 255;
+        c3 = (i >> 16) & 255;
+        c4 = (i >> 24) & 255;
+
+        return ((int)c1 << 24) + ((int)c2 << 16) + ((int)c3 << 8) + c4;
+    }
+*/
+}
+
 std::string kmutil_format(const std::string &format, ...)
 {
     va_list argptr;

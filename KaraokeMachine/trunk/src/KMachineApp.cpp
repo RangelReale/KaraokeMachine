@@ -17,6 +17,12 @@ using namespace KaraokeMachine;
 
 int main ( int argc, char** argv )
 {
+    std::cout << "starting KaraokeMachine..." << std::endl;
+    if (kmutil_endian()==KM_BIG_ENDIAN)
+        std::cout << "big endian" << std::endl;
+    else
+        std::cout << "little endian" << std::endl;
+
     int midi_port=-1;
 
     // Declare a group of options that will be
@@ -65,11 +71,13 @@ int main ( int argc, char** argv )
     boost::program_options::notify(vm);
 
     if (vm.count("help")) {
+#ifdef __WIN32__
         // redirect stdout/stderr that SDL redirected
         freopen( "CON", "w", stdout );
         freopen( "CON", "w", stderr );
+#endif //__WIN32__
 
-        std::cout << visible << "\n";
+        std::cout << "help" << visible << "\n";
         return 1;
     }
 
@@ -77,9 +85,11 @@ int main ( int argc, char** argv )
     if (!vm.count("file-path"))
     //if (argc < 2)
     {
+#ifdef __WIN32__
         // redirect stdout/stderr that SDL redirected
         freopen( "CON", "w", stdout );
         freopen( "CON", "w", stderr );
+#endif //__WIN32__
 
         std::cout << "No file paths specified.\n";
         exit(1);
@@ -99,6 +109,9 @@ int main ( int argc, char** argv )
     std::vector<std::string> paths=vm["file-path"].as< std::vector<std::string> >();
     for (std::vector<std::string>::const_iterator ipath=paths.begin(); ipath!=paths.end(); ipath++)
     {
+        std::cout << "loading from path " << *ipath << "..." << std::endl;
+
+
         //machine.Songs().LoadPath(argv[1]);
         //machine.Images().LoadPath(argv[1]);
         machine.Songs().LoadPath(*ipath);

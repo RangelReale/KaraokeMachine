@@ -108,7 +108,7 @@ void KMImagePackage::Load(KMInputStream &stream)
     // read head
     stream.read((char*)&head, sizeof(head));
     if (strncmp(head.sig, KMIMAGEPACKAGE_SIG, KMIMAGEPACKAGE_SIG_SIZE)!=0)
-        throw KMException("Invalid file");
+        throw KMException("Invalid kmi file (1)");
 
     memset(tmp, 0, sizeof(tmp));
     strncpy(tmp, head.title, KMIMAGEPACKAGE_MAXTEXT);
@@ -119,24 +119,24 @@ void KMImagePackage::Load(KMInputStream &stream)
     author_=tmp;
 
     description_="";
-    if (head.descriptionsize>0)
+    if (kmutil_endian_short(head.descriptionsize>0))
     {
-        std::auto_ptr<char> ddata(new char[head.descriptionsize+1]);
-        ddata.get()[head.descriptionsize]='\0';
-        stream.read((char*)ddata.get(), head.descriptionsize);
+        std::auto_ptr<char> ddata(new char[kmutil_endian_short(head.descriptionsize)+1]);
+        ddata.get()[kmutil_endian_short(head.descriptionsize)]='\0';
+        stream.read((char*)ddata.get(), kmutil_endian_short(head.descriptionsize));
         description_=ddata.get();
     }
 
     // read images
     images_.clear();
 
-    for (int i=0; i<head.imagecount; i++)
+    for (int i=0; i<kmutil_endian_short(head.imagecount); i++)
     {
         stream.read((char*)&image, sizeof(image));
         if (stream.gcount()!=sizeof(image))
-            throw KMException("Invalid file");
+            throw KMException("Invalid kmi file (2)");
         if (strncmp(image.magic, KMIMAGEPACKAGE_MAGIC_IMAGE, KMIMAGEPACKAGE_MAGIC_IMAGE_SIZE)!=0)
-            throw KMException("Invalid file");
+            throw KMException("Invalid kmi file (3)");
 
         KMImagePackageItem *newimage=&Get(Add(image.id));
 
@@ -155,9 +155,9 @@ void KMImagePackage::Load(KMInputStream &stream)
         newimage->Tags().SetTags(tmp);
 
         newimage->filepos_=stream.tellg();
-        newimage->filesize_=image.filesize;
+        newimage->filesize_=kmutil_endian_int(image.filesize);
 
-        stream.seekg(image.filesize, std::ios::cur);
+        stream.seekg(kmutil_endian_int(image.filesize), std::ios::cur);
     }
 }
 

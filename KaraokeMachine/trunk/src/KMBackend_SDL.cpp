@@ -9,17 +9,33 @@ KMBackend_SDL::KMBackend_SDL() :
     FPS = lastFPS = pastFPS = past = 0;
 
     // initialize SDL video
-    if ( SDL_Init( SDL_INIT_VIDEO ) < 0 )
+    int sdlflags=SDL_INIT_VIDEO;
+#ifdef GP2X
+    sdlflags|=SDL_INIT_JOYSTICK;
+#endif
+
+    if ( SDL_Init( sdlflags ) < 0 )
     {
         throw KMException( kmutil_format("Unable to init SDL: %s", SDL_GetError()) );
     }
+#ifdef GP2X
+    SDL_JoystickOpen(0);
+#endif
 
     // make sure SDL cleans up before exit
     atexit(SDL_Quit);
 
     // create a new window
-    screen_ = SDL_SetVideoMode(800, 600, 16,
-                                           SDL_HWSURFACE|SDL_DOUBLEBUF);
+#ifdef GP2X
+    screen_ = SDL_SetVideoMode(800, 600, 16, SDL_HWSURFACE|SDL_DOUBLEBUF);
+#else
+    screen_ = SDL_SetVideoMode(320, 240, 16, SDL_FULLSCREEN);
+#endif //GP2X
+
+
+    SDL_ShowCursor(0);
+
+
     if ( !screen_ )
     {
         throw KMException( kmutil_format("Unable to set 640x480 video: %s", SDL_GetError()));
@@ -33,6 +49,8 @@ KMBackend_SDL::KMBackend_SDL() :
 
 #ifdef __WIN32__
     font_=TTF_OpenFont("c:\\windows\\fonts\\LUCON.TTF", 22);
+#elif defined(GP2X)
+    font_=TTF_OpenFont("/mnt/sd/game/app/k/fonts/dejavusans.ttf", 22);
 #elif defined(unix)
     font_=TTF_OpenFont("/usr/share/fonts/truetype/freefont/FreeSans.ttf", 22);
 #else
@@ -140,6 +158,35 @@ bool KMBackend_SDL::Loop(KMachine &machine)
                 }
                 break;
             }
+#ifdef GP2X
+        case SDL_JOYBUTTONDOWN:
+            {
+                switch(event.jbutton.button)
+                {
+                    case GP2X_VK_FX: /* X pressed */
+                      {
+                        machine.AddString("5532*3");
+                        break;
+                      }
+                    case GP2X_VK_FY: /* L pressed */
+                        machine.DoCommand(KMachine::KC_ADD);
+                        break;
+                    case GP2X_VK_START:
+                        return false;
+                    case GP2X_VK_FR:
+                        machine.DoCommand(KMachine::KC_SKIP);
+                        break;
+                    case GP2X_VK_SELECT:
+                        machine.DoCommand(KMachine::KC_SKIPIMAGE);
+                        break;
+                }
+            }
+        case SDL_JOYBUTTONUP:
+            {
+
+            }
+
+#endif
         } // end switch
     } // end of message processing
 

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="KaraokeMachine GP2x" />
+		<Option pch_mode="2" />
+		<Option compiler="devkitgp2x" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin\GP2xDebug\KaraokeMachine.gpe" prefix_auto="1" extension_auto="0" />
+				<Option object_output="obj\Debug\" />
+				<Option type="0" />
+				<Option compiler="devkitgp2x" />
+				<Option parameters='&quot;/media/sda1/transfer/files/&quot; &quot;/media/hde1/transfer/karaoke/test.kps&quot;' />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin\GP2xRelease\K.gpe" prefix_auto="0" extension_auto="0" />
+				<Option object_output="obj\Release\" />
+				<Option type="0" />
+				<Option compiler="devkitgp2x" />
+				<Option parameters='&quot;/media/sda1/transfer/files/&quot; &quot;/media/hde1/transfer/karaoke/test.kps&quot;' />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-Wno-non-virtual-dtor" />
+			<Add option="-DGP2X" />
+			<Add directory="$(#sdl.include)" />
+			<Add directory="$(#sdl_ttf.include)" />
+			<Add directory="$(#tse3.include)" />
+			<Add directory="$(#sdl_image.include)" />
+			<Add directory="$(#boost.include)" />
+		</Compiler>
+		<Linker>
+			<Add option="-static -lgcc -lm -lc -lpthread -msoft-float" />
+			<Add library="SDL_image" />
+			<Add library="SDL_ttf" />
+			<Add library="SDLmain" />
+			<Add library="SDL" />
+			<Add library="tse3" />
+			<Add library="boost_filesystem-$(#boost.suffix)" />
+			<Add library="boost_program_options-$(#boost.suffix)" />
+			<Add library="jpeg" />
+			<Add library="z" />
+			<Add library="png12" />
+			<Add library="freetype" />
+			<Add directory="$(#sdl.lib)" />
+			<Add directory="$(#sdl_ttf.lib)" />
+			<Add directory="$(#tse3.lib)" />
+			<Add directory="$(#sdl_image.lib)" />
+			<Add directory="$(#boost.lib)" />
+		</Linker>
+		<Unit filename="src\KMBackend.cpp" />
+		<Unit filename="src\KMBackend.h" />
+		<Unit filename="src\KMBackend_SDL.cpp" />
+		<Unit filename="src\KMBackend_SDL.h" />
+		<Unit filename="src\KMDefs.h" />
+		<Unit filename="src\KMImage.cpp" />
+		<Unit filename="src\KMImage.h" />
+		<Unit filename="src\KMSong.cpp" />
+		<Unit filename="src\KMSong.h" />
+		<Unit filename="src\KMSongFactory.cpp" />
+		<Unit filename="src\KMSongFactory.h" />
+		<Unit filename="src\KMSong_TSE3.cpp" />
+		<Unit filename="src\KMSong_TSE3.h" />
+		<Unit filename="src\KMUtil.cpp" />
+		<Unit filename="src\KMUtil.h" />
+		<Unit filename="src\KMachine.cpp" />
+		<Unit filename="src\KMachine.h" />
+		<Unit filename="src\KMachineApp.cpp" />
+		<Unit filename="src\KMachine_Basic.cpp" />
+		<Unit filename="src\KMachine_Basic.h" />
+		<Unit filename="src\linked_ptr.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

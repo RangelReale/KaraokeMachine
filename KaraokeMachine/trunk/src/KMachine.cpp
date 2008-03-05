@@ -248,6 +248,12 @@ void KMachine::AddChar(unsigned char c)
     chars_+=c;
 }
 
+void KMachine::AddString(const std::string s)
+{
+    for (unsigned int i=0; i<s.length(); i++)
+        AddChar(s[i]);
+}
+
 void KMachine::RemoveChar()
 {
     if (chars_.length()>0)

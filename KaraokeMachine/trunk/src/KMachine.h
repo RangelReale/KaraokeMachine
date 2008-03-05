@@ -173,6 +173,7 @@ public:
     void Run();
 
     virtual void AddChar(unsigned char c);
+    virtual void AddString(const std::string s);
     virtual void RemoveChar();
     virtual void DoCommand(commant_t command, int param = 0);
 

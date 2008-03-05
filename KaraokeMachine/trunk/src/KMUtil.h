@@ -20,6 +20,15 @@ namespace KaraokeMachine {
 
 typedef std::vector<int> KMArrayInt;
 
+#define KM_LITTLE_ENDIAN 0
+#define KM_BIG_ENDIAN    1
+
+// KaraokeMachine files uses big-endian
+
+int kmutil_endian();
+short kmutil_endian_short(short s);
+int kmutil_endian_int (int i);
+
 std::string kmutil_format(const std::string &format, ...);
 std::vector<std::string> kmutil_tokenize(const std::string& str,const std::string& delimiters);
 std::string kmutil_getfilename(const std::string &path);

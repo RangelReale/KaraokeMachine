@@ -35,6 +35,9 @@ private:
 /////////////////////////////////
 #ifdef __WIN32__
 TSE3::Plt::Win32MidiScheduler KMSong_TSE3::scheduler_;
+#elif defined(GP2X)
+//TSE3::Plt::OSSMidiScheduler KMSong_TSE3::scheduler_;
+TSE3::Util::NullMidiScheduler KMSong_TSE3::scheduler_;
 #elif defined(unix)
 //TSE3::Plt::OSSMidiScheduler KMSong_TSE3::scheduler_;
 TSE3::Plt::AlsaMidiScheduler KMSong_TSE3::scheduler_;
