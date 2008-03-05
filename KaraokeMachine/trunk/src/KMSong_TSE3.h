@@ -90,7 +90,7 @@ private:
     static TSE3::Plt::Win32MidiScheduler   scheduler_;
 #elif defined(GP2X)
     //static TSE3::Plt::OSSMidiScheduler      scheduler_;
-    static TSE3::Util::NullMidiScheduler         scheduler_;
+    static TSE3::Util::SimulatedMidiScheduler         scheduler_;
 #elif defined(unix)
     //static TSE3::Plt::OSSMidiScheduler      scheduler_;
     static TSE3::Plt::AlsaMidiScheduler        scheduler_;

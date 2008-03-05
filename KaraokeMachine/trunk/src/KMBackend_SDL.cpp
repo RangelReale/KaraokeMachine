@@ -37,9 +37,9 @@ KMBackend_SDL::KMBackend_SDL() :
 
     // create a new window
 #ifdef GP2X
-    screen_ = SDL_SetVideoMode(displaywidth_, displayheight_, 16, SDL_HWSURFACE|SDL_DOUBLEBUF);
+    screen_ = SDL_SetVideoMode(displaywidth_, displayheight_, 16, SDL_SWSURFACE|SDL_DOUBLEBUF);
 #else
-    screen_ = SDL_SetVideoMode(displaywidth_, displayheight_, 16, SDL_FULLSCREEN);
+    screen_ = SDL_SetVideoMode(displaywidth_, displayheight_, 16, SDL_HWSURFACE|SDL_DOUBLEBUF);
 #endif //GP2X
 
 
