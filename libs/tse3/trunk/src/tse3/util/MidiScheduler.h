@@ -218,6 +218,74 @@ namespace TSE3
 
                 Clock clock;
         };
+
+        /**
+         * Simulated scheduler, does nothing, but keeps the timing
+         *
+         * @short   Simulated MidiScheduler implementation (does nothing but counts time)
+         * @author  Rangel Reale
+         * @version 3.00
+         * @see     MidiScheduler
+         * @see     MidiSchedulerFactory
+         */
+        class SimulatedMidiScheduler : public NullMidiScheduler
+        {
+            public:
+
+                SimulatedMidiScheduler();
+                virtual ~SimulatedMidiScheduler();
+
+            protected:
+
+                /**
+                 * @reimplemented
+                 */
+                virtual const char *impl_implementationName() const;
+                /**
+                 * @reimplemented
+                 */
+                virtual const char *impl_portName(int port) const;
+                /**
+                 * @reimplemented
+                 */
+                virtual const char *impl_portType(int port) const;
+                /**
+                 * @reimplemented
+                 */
+                virtual void impl_start(Clock clock);
+                /**
+                 * @reimplemented
+                 */
+                virtual void impl_stop(Clock clock);
+                /**
+                 * @reimplemented
+                 */
+                virtual void impl_moveTo(Clock moveTime, Clock newTime);
+                /**
+                 * @reimplemented
+                 */
+                virtual Clock impl_clock();
+                /**
+                 * @reimplemented
+                 */
+                virtual int impl_msecs();
+                /**
+                 * @reimplemented
+                 */
+                virtual void impl_setTempo(int tempo, Clock changeTime);
+            private:
+                // ticks = number of milliseconds since OS initialization
+                void start_ticks();
+                int get_ticks();
+                void end_ticks();
+
+
+                SimulatedMidiScheduler &operator=(const SimulatedMidiScheduler &);
+                SimulatedMidiScheduler(const SimulatedMidiScheduler &);
+
+                //Clock clock;
+                Clock wstartClock;
+        };
     }
 }
 

@@ -20,6 +20,12 @@
 #include <iomanip>
 #include <iostream>
 
+#ifdef __WIN32__
+#include <windows.h>
+#elif defined(unix)
+#include <sys/time.h>
+#endif
+
 using namespace TSE3;
 using namespace TSE3::Util;
 
@@ -314,5 +320,125 @@ void NullMidiScheduler::impl_txSysEx(int /*port*/,
                                      const unsigned char * /*data*/,
                                      size_t /*size*/)
 {
+}
+
+/******************************************************************************
+ * SimulatedMidiScheduler class
+ *****************************************************************************/
+
+SimulatedMidiScheduler::SimulatedMidiScheduler() : wstartClock(0)
+{
+    addPort(0, 0);
+}
+
+
+SimulatedMidiScheduler::~SimulatedMidiScheduler()
+{
+}
+
+
+const char *SimulatedMidiScheduler::impl_implementationName() const
+{
+    return "SimulatedMidiScheduler version 0.00 [dev].";
+}
+
+
+const char *SimulatedMidiScheduler::impl_portName(int /*port*/) const
+{
+    return "SimulatedMidiScheduler port";
+}
+
+
+const char *SimulatedMidiScheduler::impl_portType(int /*port*/) const
+{
+    return "SimulatedMidiScheduler port";
+}
+
+
+void SimulatedMidiScheduler::impl_start(Clock start)
+{
+    if (!running()) {
+        start_ticks();
+
+       wstartClock = get_ticks();
+       clockStarted(start);
+    }
+}
+
+
+void SimulatedMidiScheduler::impl_stop(Clock stopTime)
+{
+    if (!running()) return;
+    end_ticks();
+    clockStopped(stopTime);
+}
+
+
+void SimulatedMidiScheduler::impl_moveTo(Clock moveTime, Clock newTime)
+{
+    clockMoved(moveTime, newTime);
+}
+
+
+Clock SimulatedMidiScheduler::impl_clock()
+{
+    int time = get_ticks() - wstartClock;
+    return msToClock(time);
+}
+
+
+int SimulatedMidiScheduler::impl_msecs()
+{
+    return get_ticks() - wstartClock;
+}
+
+
+void SimulatedMidiScheduler::impl_setTempo(int newTempo, Clock changeTime)
+{
+    tempoChanged(newTempo, changeTime);
+}
+
+void SimulatedMidiScheduler::start_ticks()
+{
+#ifdef __WIN32__
+    TIMECAPS timecaps;
+    timeGetDevCaps(&timecaps, sizeof(timecaps));
+    timeBeginPeriod(10);
+#endif
+}
+
+int SimulatedMidiScheduler::get_ticks()
+{
+#ifdef __WIN32__
+    return timeGetTime();
+#elif defined(unix)
+
+    // from SDL_GetTicks
+#if HAVE_CLOCK_GETTIME
+    Uint32 ticks;
+    struct timespec now;
+    clock_gettime(CLOCK_MONOTONIC, &now);
+    ticks =
+        (now.tv_sec) * 1000 + (now.tv_nsec) / 1000000;
+    return (ticks);
+#else
+    Uint32 ticks;
+    struct timeval now;
+    gettimeofday(&now, NULL);
+    ticks =
+        (now.tv_sec) * 1000 + (now.tv_usec) / 1000;
+    return (ticks);
+#endif
+
+#else
+    return 0;
+#endif
+}
+
+void SimulatedMidiScheduler::end_ticks()
+{
+#ifdef __WIN32__
+    timeEndPeriod(10);
+#endif
 }
 
