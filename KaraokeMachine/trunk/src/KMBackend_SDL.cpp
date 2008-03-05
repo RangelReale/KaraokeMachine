@@ -1,5 +1,8 @@
 #include <sstream>
 #include "KMBackend_SDL.h"
+#ifdef GP2X
+#include <SDL_rotozoom.h>
+#endif
 
 namespace KaraokeMachine {
 
@@ -11,7 +14,14 @@ KMBackend_SDL::KMBackend_SDL() :
     // initialize SDL video
     int sdlflags=SDL_INIT_VIDEO;
 #ifdef GP2X
+    displaywidth_=320;
+    displayheight_=240;
+    fontsize_=12;
     sdlflags|=SDL_INIT_JOYSTICK;
+#else
+    displaywidth_=800;
+    displayheight_=600;
+    fontsize_=22;
 #endif
 
     if ( SDL_Init( sdlflags ) < 0 )
@@ -27,9 +37,9 @@ KMBackend_SDL::KMBackend_SDL() :
 
     // create a new window
 #ifdef GP2X
-    screen_ = SDL_SetVideoMode(800, 600, 16, SDL_HWSURFACE|SDL_DOUBLEBUF);
+    screen_ = SDL_SetVideoMode(displaywidth_, displayheight_, 16, SDL_HWSURFACE|SDL_DOUBLEBUF);
 #else
-    screen_ = SDL_SetVideoMode(320, 240, 16, SDL_FULLSCREEN);
+    screen_ = SDL_SetVideoMode(displaywidth_, displayheight_, 16, SDL_FULLSCREEN);
 #endif //GP2X
 
 
@@ -48,11 +58,11 @@ KMBackend_SDL::KMBackend_SDL() :
 
 
 #ifdef __WIN32__
-    font_=TTF_OpenFont("c:\\windows\\fonts\\LUCON.TTF", 22);
+    font_=TTF_OpenFont("c:\\windows\\fonts\\LUCON.TTF", fontsize_);
 #elif defined(GP2X)
-    font_=TTF_OpenFont("/mnt/sd/game/app/k/fonts/dejavusans.ttf", 22);
+    font_=TTF_OpenFont("/mnt/sd/game/app/k/fonts/dejavusans.ttf", fontsize_);
 #elif defined(unix)
-    font_=TTF_OpenFont("/usr/share/fonts/truetype/freefont/FreeSans.ttf", 22);
+    font_=TTF_OpenFont("/usr/share/fonts/truetype/freefont/FreeSans.ttf", fontsize_);
 #else
     #error "Unknown platform"
 #endif
@@ -92,7 +102,11 @@ bool KMBackend_SDL::Loop(KMachine &machine)
     SDL_Surface *text_surface;
     SDL_Color black = {0xFF,0xFF,0xFF};
     SDL_Color red = {0xFF,0,0};
+#ifdef GP2X
+    SDL_Rect dst  = {10, 10, 30, 30}, dstpl, srcpl;
+#else
     SDL_Rect dst  = {100, 100, 300, 300}, dstpl, srcpl;
+#endif
 
     // program main loop
 /*
@@ -196,13 +210,30 @@ bool KMBackend_SDL::Loop(KMachine &machine)
         SDL_FreeSurface(bg_);
         bg_=NULL;
 
+        SDL_Surface *loadbg;
+
         std::stringstream imagedata;
         std::string sdata;
         machine.ImageList().GetRandom().GetImage()->GetFileData(imagedata);
         sdata=imagedata.str();
         SDL_RWops *sdlimage=SDL_RWFromConstMem(sdata.data(), sdata.length());
-        bg_=IMG_LoadJPG_RW(sdlimage);
+        loadbg=IMG_LoadJPG_RW(sdlimage);
         SDL_FreeRW(sdlimage);
+
+        if (loadbg)
+        {
+#ifdef GP2X
+            SDL_Surface *oldbg=loadbg;
+            loadbg=zoomSurface(oldbg, 0.3, 0.3, 0);
+            SDL_FreeSurface(oldbg);
+#else
+            //bg_=SDL_CreateRGBSurface(SDL_SWSURFACE, displaywidth_, displayheight_, 16, 0, 0, 0, 0);
+            //SDL_Rect irect = {0, 0, displaywidth_, displayheight_};
+            //SDL_BlitSurface(loadbg, NULL, bg_, NULL);
+#endif
+            bg_=SDL_DisplayFormat(loadbg);
+            SDL_FreeSurface(loadbg);
+        }
     }
 
 
@@ -213,7 +244,8 @@ bool KMBackend_SDL::Loop(KMachine &machine)
 
     if (bg_)
     {
-        SDL_BlitSurface(bg_, NULL, screen_, NULL);
+        SDL_Rect irect = {0, 0, displaywidth_, displayheight_};
+        SDL_BlitSurface(bg_, &irect, screen_, &irect);
     }
 
 
@@ -248,8 +280,13 @@ bool KMBackend_SDL::Loop(KMachine &machine)
         SDL_FreeSurface(text_surface);
     }
 
+#ifdef GP2X
+    dstpl.x=20; dstpl.y=20;
+    dstpl.w=130; dstpl.h=130;
+#else
     dstpl.x=200; dstpl.y=200;
     dstpl.w=600; dstpl.h=600;
+#endif
     for (int i=0; i<machine.Playlist().GetCount(); i++)
     {
         pldesc=kmutil_format("%d:%d - %s", machine.Playlist().Get(i).GetPackageId(),
@@ -267,12 +304,18 @@ bool KMBackend_SDL::Loop(KMachine &machine)
 
     if (machine.Playing())
     {
+#ifdef GP2X
+        dstpl.x=0; dstpl.y=20;
+        dstpl.w=130; dstpl.h=130;
+#else
         dstpl.x=0; dstpl.y=200;
         dstpl.w=600; dstpl.h=600;
+#endif
 
-        if (machine.Playing()->GetLyricsCurrentLine()>=0)
-        {
-            for (int i=machine.Playing()->GetLyricsCurrentLine(); i<machine.Playing()->Lyrics().GetCount(); i++)
+        //if (machine.Playing()->GetLyricsCurrentLine()>=0)
+        //{
+            for (int i=(machine.Playing()->GetLyricsCurrentLine()>=0?machine.Playing()->GetLyricsCurrentLine():0);
+                i<machine.Playing()->Lyrics().GetCount(); i++)
             {
                 text_surface = TTF_RenderText_Blended(font_, machine.Playing()->Lyrics().GetLine(i).GetLine().c_str(), black);
                 if (text_surface != NULL)
@@ -300,15 +343,20 @@ bool KMBackend_SDL::Loop(KMachine &machine)
                 dstpl.y+=15;
                 if (dstpl.y>600) break;
             }
-        }
+        //}
 
         if (!machine.Playing()->GetDebug().empty())
         {
             text_surface = TTF_RenderText_Blended(font_, machine.Playing()->GetDebug().c_str(), black);
             if (text_surface != NULL)
             {
+#ifdef GP2X
+                dstpl.x=110;
+                dstpl.y=0;
+#else
                 dstpl.x=300;
                 dstpl.y=0;
+#endif
                 SDL_BlitSurface(text_surface, NULL, screen_, &dstpl);
                 SDL_FreeSurface(text_surface);
             }
@@ -317,8 +365,13 @@ bool KMBackend_SDL::Loop(KMachine &machine)
         text_surface = TTF_RenderText_Blended(font_, kmutil_format("%d", machine.Playing()->GetLyricsCurrentPosPct()).c_str(), black);
         if (text_surface != NULL)
         {
+#ifdef GP2X
+            dstpl.x=110;
+            dstpl.y=5;
+#else
             dstpl.x=300;
             dstpl.y=25;
+#endif
             SDL_BlitSurface(text_surface, NULL, screen_, &dstpl);
             SDL_FreeSurface(text_surface);
         }
@@ -337,7 +390,7 @@ bool KMBackend_SDL::Loop(KMachine &machine)
 
       SDL_Flip( screen_ );
       FPS++;
-      kmutil_usleep(15 * 1000);
+      //kmutil_usleep(1 * 1000);
     }
 
     if ( currentTime - pastFPS >= 1000 )

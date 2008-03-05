@@ -33,6 +33,7 @@ public:
     virtual void SkipImage();
     virtual KMBackendThread* CreateThread(KMBackendThreadProcess *process);
 private:
+    int displaywidth_, displayheight_, fontsize_;
     int FPS, lastFPS, pastFPS, past;
     SDL_Surface *screen_, *bg_;
     TTF_Font *font_;

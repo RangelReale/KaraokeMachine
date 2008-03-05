@@ -34,30 +34,31 @@
 			<Add option="-Wall" />
 			<Add option="-Wno-non-virtual-dtor" />
 			<Add option="-DGP2X" />
-			<Add directory="$(#sdl.include)" />
-			<Add directory="$(#sdl_ttf.include)" />
-			<Add directory="$(#tse3.include)" />
-			<Add directory="$(#sdl_image.include)" />
-			<Add directory="$(#boost.include)" />
+			<Add directory="$(#gp2x_sdl.include)" />
+			<Add directory="$(#gp2x_sdl_ttf.include)" />
+			<Add directory="$(#gp2x_tse3.include)" />
+			<Add directory="$(#gp2x_sdl_image.include)" />
+			<Add directory="$(#gp2x_boost.include)" />
 		</Compiler>
 		<Linker>
 			<Add option="-static -lgcc -lm -lc -lpthread -msoft-float" />
 			<Add library="SDL_image" />
 			<Add library="SDL_ttf" />
+			<Add library="SDL_gfx" />
 			<Add library="SDLmain" />
 			<Add library="SDL" />
 			<Add library="tse3" />
-			<Add library="boost_filesystem-$(#boost.suffix)" />
-			<Add library="boost_program_options-$(#boost.suffix)" />
+			<Add library="boost_filesystem-$(#gp2x_boost.suffix)" />
+			<Add library="boost_program_options-$(#gp2x_boost.suffix)" />
 			<Add library="jpeg" />
 			<Add library="z" />
 			<Add library="png12" />
 			<Add library="freetype" />
-			<Add directory="$(#sdl.lib)" />
-			<Add directory="$(#sdl_ttf.lib)" />
-			<Add directory="$(#tse3.lib)" />
-			<Add directory="$(#sdl_image.lib)" />
-			<Add directory="$(#boost.lib)" />
+			<Add directory="$(#gp2x_sdl.lib)" />
+			<Add directory="$(#gp2x_sdl_ttf.lib)" />
+			<Add directory="$(#gp2x_tse3.lib)" />
+			<Add directory="$(#gp2x_sdl_image.lib)" />
+			<Add directory="$(#gp2x_boost.lib)" />
 		</Linker>
 		<Unit filename="src\KMBackend.cpp" />
 		<Unit filename="src\KMBackend.h" />
