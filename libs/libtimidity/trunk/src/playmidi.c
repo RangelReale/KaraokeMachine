@@ -518,9 +518,9 @@ static void drop_sustain(MidSong *song)
   evt_drop_sustain(song, song->current_event);
 }
 
-static void adjust_pitchbend(MidSong *song)
+static void evt_adjust_pitchbend(MidSong *song, MidEvent *event)
 {
-  int c = song->current_event->channel;
+  int c = event->channel;
   int i = song->voices;
 
   while (i--)
@@ -528,6 +528,11 @@ static void adjust_pitchbend(MidSong *song)
       {
 	recompute_freq(song, i);
       }
+}
+
+static void adjust_pitchbend(MidSong *song)
+{
+  evt_adjust_pitchbend(song, song->current_event);
 }
 
 static void evt_adjust_volume(MidSong *song, MidEvent *event)
@@ -743,7 +748,7 @@ void mid_song_event (MidSong *song, MidEvent *event)
             event->a + event->b * 128;
           song->channel[event->channel].pitchfactor = 0;
           /* Adjust pitch for notes already playing */
-          adjust_pitchbend(song);
+          evt_adjust_pitchbend(song, event);
           break;
 
         case ME_MAINVOLUME:
@@ -775,7 +780,7 @@ void mid_song_event (MidSong *song, MidEvent *event)
 #endif
 
             /* Change drum set */
-            song->channel[event->channel].bank = event->a;
+            //song->channel[event->channel].bank = event->a;
           }
           else
           {
