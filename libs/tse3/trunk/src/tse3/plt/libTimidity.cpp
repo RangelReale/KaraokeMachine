@@ -22,7 +22,7 @@
 
 #ifdef __WIN32__
 #include <windows.h>
-#elif defined(unix)
+#elif defined(__unix__)
 #include <sys/time.h>
 #endif
 
@@ -225,18 +225,18 @@ int TimidityMidiScheduler::get_ticks()
 {
 #ifdef __WIN32__
     return timeGetTime();
-#elif defined(unix)
+#elif defined(__unix__)
 
     // from SDL_GetTicks
 #if HAVE_CLOCK_GETTIME
-    Uint32 ticks;
+    int ticks;
     struct timespec now;
     clock_gettime(CLOCK_MONOTONIC, &now);
     ticks =
         (now.tv_sec) * 1000 + (now.tv_nsec) / 1000000;
     return (ticks);
 #else
-    Uint32 ticks;
+    int ticks;
     struct timeval now;
     gettimeofday(&now, NULL);
     ticks =

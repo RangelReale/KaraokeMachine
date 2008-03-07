@@ -415,7 +415,7 @@ int SimulatedMidiScheduler::get_ticks()
 
     // from SDL_GetTicks
 #if HAVE_CLOCK_GETTIME
-    Uint32 ticks;
+    int ticks;
     struct timespec now;
     clock_gettime(CLOCK_MONOTONIC, &now);
     ticks =
