@@ -34,11 +34,13 @@
 			<Add option="-Wall" />
 			<Add option="-Wno-non-virtual-dtor" />
 			<Add option="-DGP2X" />
+			<Add option="-DKM_USE_TIMIDITY" />
 			<Add directory="$(#gp2x_sdl.include)" />
 			<Add directory="$(#gp2x_sdl_ttf.include)" />
 			<Add directory="$(#gp2x_tse3.include)" />
 			<Add directory="$(#gp2x_sdl_image.include)" />
 			<Add directory="$(#gp2x_boost.include)" />
+			<Add directory="$(#gp2x_libtimidity.include)" />
 		</Compiler>
 		<Linker>
 			<Add option="-static -lgcc -lm -lc -lpthread -msoft-float" />
@@ -54,11 +56,13 @@
 			<Add library="z" />
 			<Add library="png12" />
 			<Add library="freetype" />
+			<Add library="timidity" />
 			<Add directory="$(#gp2x_sdl.lib)" />
 			<Add directory="$(#gp2x_sdl_ttf.lib)" />
 			<Add directory="$(#gp2x_tse3.lib)" />
 			<Add directory="$(#gp2x_sdl_image.lib)" />
 			<Add directory="$(#gp2x_boost.lib)" />
+			<Add directory="$(#gp2x_libtimidity.lib)" />
 		</Linker>
 		<Unit filename="src\KMBackend.cpp" />
 		<Unit filename="src\KMBackend.h" />
@@ -73,6 +77,8 @@
 		<Unit filename="src\KMSongFactory.h" />
 		<Unit filename="src\KMSong_TSE3.cpp" />
 		<Unit filename="src\KMSong_TSE3.h" />
+		<Unit filename="src\KMTimidity.cpp" />
+		<Unit filename="src\KMTimidity.h" />
 		<Unit filename="src\KMUtil.cpp" />
 		<Unit filename="src\KMUtil.h" />
 		<Unit filename="src\KMachine.cpp" />

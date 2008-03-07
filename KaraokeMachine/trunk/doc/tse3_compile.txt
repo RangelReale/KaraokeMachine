@@ -7,3 +7,12 @@ WINDOWS
 UNIX
 -------
 ./configure CFLAGS="-g -O0" CXXFLAGS="-g -O0" --disable-shared --enable-static
+
+
+
+== TIMIDITY SUPPORT ==
+--with-timidity --with-timidity-path=<root path of libtimidity>
+
+
+== GP2X SUPPORT ==
+--host=arm-linux

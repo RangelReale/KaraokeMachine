@@ -13,10 +13,14 @@ KM_Timidity kmtimidity;
 KM_Timidity::KM_Timidity() :
     song_(NULL), options_(), mutex_(NULL)
 {
+#ifndef GP2X
     options_.rate = 44100;
+#else
+    options_.rate = 22050;
+#endif
     options_.format = MID_AUDIO_S16;
     options_.channels = 2;
-    options_.buffer_size = 44100;
+    options_.buffer_size = options_.rate;
 
     // initialize timidity
     if (mid_init (NULL) < 0)

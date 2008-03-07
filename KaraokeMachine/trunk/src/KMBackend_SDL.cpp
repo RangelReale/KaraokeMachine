@@ -236,7 +236,17 @@ bool KMBackend_SDL::Loop(KMachine &machine)
                 {
                     case GP2X_VK_FX: /* X pressed */
                       {
-                        machine.AddString("5532*3");
+                        machine.AddString("5532*4");
+                        break;
+                      }
+                    case GP2X_VK_FA: /* A pressed */
+                      {
+                        machine.AddString("5532*1");
+                        break;
+                      }
+                    case GP2X_VK_FB: /* X pressed */
+                      {
+                        machine.AddString("5532*2");
                         break;
                       }
                     case GP2X_VK_FY: /* L pressed */
