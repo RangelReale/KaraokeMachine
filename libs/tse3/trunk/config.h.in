@@ -78,6 +78,12 @@
 /* Define to 1 if you have the <sys/types.h> header file. */
 #undef HAVE_SYS_TYPES_H
 
+/* Define if you have <timidity.h> (required for libTimidity support */
+#undef HAVE_TIMIDITY
+
+/* Define to 1 if you have the <timidity.h> header file. */
+#undef HAVE_TIMIDITY_H
+
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
 
@@ -127,6 +133,9 @@
 
 /* Define if OSS library support is required */
 #undef TSE3_WITH_OSS
+
+/* Define if libTimidity support is required */
+#undef TSE3_WITH_TIMIDITY
 
 /* Define if Win32 platform support is required */
 #undef TSE3_WITH_WIN32

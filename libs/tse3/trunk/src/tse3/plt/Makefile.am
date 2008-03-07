@@ -1,11 +1,11 @@
-tse3plth_HEADERS = Alsa.h OSS.h RiscOS.h Factory.h Win32.h Arts.h
-tse3plth_HEADERS += RiscOS.cpp Win32.cpp
+tse3plth_HEADERS = Alsa.h OSS.h RiscOS.h Factory.h Win32.h Arts.h libTimidity.h
+tse3plth_HEADERS += RiscOS.cpp Win32.cpp libTimidity.cpp
 tse3plthdir = $(pkgincludedir)/plt
 
 noinst_LTLIBRARIES = libtse3plt.la
 libtse3plt_la_SOURCES = OSS.cpp
 
-EXTRA_DIST = Arts.cpp Win32.cpp RiscOS.cpp Factory_Unix.cpp Factory_Win32.cpp Alsa-0.5.cpp Alsa-0.9.cpp midiswis.h
+EXTRA_DIST = Arts.cpp Win32.cpp RiscOS.cpp Factory_Unix.cpp Factory_Win32.cpp Alsa-0.5.cpp Alsa-0.9.cpp midiswis.h libTimidity.cpp
 
 DISTCLEANFILES = ./.deps/* ./.deps/.P
 
@@ -75,3 +75,21 @@ libtse3plt_la_SOURCES += $(libtse3plt_la_SOURCES_win32)
 libtse3plt_la_LIBADD  += $(libtse3plt_la_LIBADD_win32)
 INCLUDES              += $(INCLUDES_win32)
 
+# libTimidity
+
+if TSE3_WITH_TIMIDITY
+tse3plth_HEADERS_timidity   = libTimidity.h
+libtse3plt_la_SOURCES_timidity = libTimidity.cpp
+libtse3plt_la_LIBADD_timidity  = 
+INCLUDES_timidity             =
+else
+tse3plth_HEADERS_timidity      = 
+libtse3plt_la_SOURCES_timidity = 
+libtse3plt_la_LIBADD_timidity  = 
+INCLUDES_timidity              =
+endif
+
+tse3plth_HEADERS      += $(tse3plth_HEADERS_timidity)
+libtse3plt_la_SOURCES += $(libtse3plt_la_SOURCES_timidity)
+libtse3plt_la_LIBADD  += $(libtse3plt_la_LIBADD_timidity)
+INCLUDES              += $(INCLUDES_timidity)

@@ -63,7 +63,7 @@ test "$GCC" = yes && CPP_MM=M; AC_SUBST(CPP_MM)
 # Checks for header files
 AC_HEADER_DIRENT
 AC_HEADER_STDC
-AC_CHECK_HEADERS(sys/soundcard.h machine/soundcard.h linux/awe_voice.h awe_voice.h /usr/src/sys/i386/isa/sound/awe_voice.h /usr/src/sys/gnu/i386/isa/sound/awe_voice.h unistd.h alsa/asoundlib.h sys/asoundlib.h kde/arts/artsmidi.h arts/artsmidi.h)
+AC_CHECK_HEADERS(sys/soundcard.h machine/soundcard.h linux/awe_voice.h awe_voice.h /usr/src/sys/i386/isa/sound/awe_voice.h /usr/src/sys/gnu/i386/isa/sound/awe_voice.h unistd.h alsa/asoundlib.h sys/asoundlib.h kde/arts/artsmidi.h arts/artsmidi.h timidity.h)
 
 # Checks for typdefs, structures, and compiler characteristics
 AC_C_CONST
@@ -407,6 +407,67 @@ if test "$with_win32" = "yes" -a "$have_win32" = "yes"; then
 fi
 AM_CONDITIONAL(TSE3_WITH_WIN32, test "$with_win32" = "yes" -a "$have_win32" = "yes")
 
+# ----------------------------------------------------------------------------
+# Checks for libTimidity
+
+# 0. libTimidity path
+timidity_path=""
+
+AC_MSG_CHECKING(checking libtimidity path)
+AC_ARG_WITH(timidity-path,
+[  --with-timidity-path=path              libTimidity path],
+[if test "$withval" = ""; then
+  AC_MSG_RESULT(no)
+else
+  AC_MSG_RESULT(yes)
+  timidity_path="$withval"
+  CFLAGS="$CFLAGS -I$timidity_path/src"
+  CPPFLAGS="$CPPFLAGS -I$timidity_path/src"
+#  LDFLAGS="$LDFLAGS -L$timidity_path/src/.libs"
+fi], [AC_MSG_RESULT(yes); timidity_path_ok="yes"])
+
+
+# 1. Check whether libTimidity is there
+have_timidity="no"
+AC_DEFUN(AC_CHECK_TIMIDITY,
+[
+  AC_CHECK_HEADER(timidity.h,
+  [
+      have_timidity="yes"
+      AC_DEFINE(HAVE_TIMIDITY, 1,
+          [Define if you have <timidity.h> (required for libTimidity support)])
+  ], [have_timidity="no"], [timidity_path])
+])
+AC_CHECK_TIMIDITY
+
+AM_CONDITIONAL(HAVE_TIMIDITY, test "$have_timidity" = "yes")
+
+AC_MSG_CHECKING(whether libTimidity is available)
+if test "$have_timidity" = "yes"; then
+  AC_MSG_RESULT(yes)
+else
+  AC_MSG_RESULT(no)
+  AC_DEFINE(HAVE_TIMIDITY, 0,
+    [Define if you have <timidity.h> (required for libTimidity support])
+fi
+
+# 2. Check whether Timidity is wanted
+AC_MSG_CHECKING(whether Timidity support is wanted)
+AC_ARG_WITH(timidity,
+[  --with-timidity              whether to support libTimidity],
+[if test "$withval" = "yes"; then
+  AC_MSG_RESULT(yes)
+  with_timidity="yes"
+else
+  AC_MSG_RESULT(no)
+  with_timidity="no"
+fi], [AC_MSG_RESULT(yes); with_timidity="yes"])
+
+if test "$with_timidity" = "yes" -a "$have_timidity" = "yes"; then
+  AC_SUBST(TSE3_WITH_TIMIDITY)
+  AC_DEFINE(TSE3_WITH_TIMIDITY,1,[Define if libTimidity support is required])
+fi
+AM_CONDITIONAL(TSE3_WITH_TIMIDITY, test "$with_timidity" = "yes" -a "$have_timidity" = "yes")
 
 # ----------------------------------------------------------------------------
 # Finally, output the makefiles
