@@ -6,6 +6,23 @@
 
 namespace KaraokeMachine {
 
+// use timidity
+#ifdef KM_USE_TIMIDITY
+void KMBackend_SDL_AudioCallback(void *userdata, Uint8 *stream, int len)
+{
+    KMBackend_SDL *be=(KMBackend_SDL*)userdata;
+
+    //SDL_mutexP(be->GetMutex());
+    KM_Timidity::get()->Lock();
+
+    if (KM_Timidity::get()->GetSong())
+        mid_song_read_wave (KM_Timidity::get()->GetSong(), stream, len);
+
+    KM_Timidity::get()->Unlock();
+    //SDL_mutexV(be->GetMutex());
+}
+#endif
+
 KMBackend_SDL::KMBackend_SDL() :
     KMBackend(), screen_(NULL), bg_(NULL)
 {
@@ -24,10 +41,38 @@ KMBackend_SDL::KMBackend_SDL() :
     fontsize_=22;
 #endif
 
+// use timidity
+#ifdef KM_USE_TIMIDITY
+    sdlflags|=SDL_INIT_AUDIO;
+#endif
+
     if ( SDL_Init( sdlflags ) < 0 )
     {
         throw KMException( kmutil_format("Unable to init SDL: %s", SDL_GetError()) );
     }
+
+
+    mutex_=SDL_CreateMutex();
+
+// use timidity
+#ifdef KM_USE_TIMIDITY
+    SDL_AudioSpec aspec, aspecget;
+
+    memset(&aspec, 0, sizeof(aspec));
+    aspec.freq=KM_Timidity::get()->GetSongOptions()->rate;
+    aspec.format=(KM_Timidity::get()->GetSongOptions()->format==MID_AUDIO_S16?AUDIO_S16:AUDIO_S8);
+    aspec.channels=KM_Timidity::get()->GetSongOptions()->channels;
+    aspec.samples=2048;
+    aspec.callback=KMBackend_SDL_AudioCallback;
+    aspec.userdata=this;
+
+    if ( SDL_OpenAudio( &aspec, &aspecget ) < 0 )
+    {
+        throw KMException( kmutil_format("Unable to init SDL: %s", SDL_GetError()) );
+    }
+
+#endif
+
 #ifdef GP2X
     SDL_JoystickOpen(0);
 #endif
@@ -70,15 +115,27 @@ KMBackend_SDL::KMBackend_SDL() :
     {
         throw KMException( "Unable to load font" );
     }
+
+
+// use timidity
+#ifdef KM_USE_TIMIDITY
+    SDL_PauseAudio(0);
+#endif
 }
 
 KMBackend_SDL::~KMBackend_SDL()
 {
+// use timidity
+#ifdef KM_USE_TIMIDITY
+    SDL_PauseAudio(1);
+#endif
+
     TTF_CloseFont(font_);
 
     if (bg_)
     {
         SDL_FreeSurface(bg_);
+        SDL_DestroyMutex(mutex_);
     }
 }
 

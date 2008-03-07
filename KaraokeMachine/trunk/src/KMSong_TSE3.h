@@ -21,6 +21,12 @@
 #include "tse3/Playable.h"
 #include "tse3/Song.h"
 
+// use timidity
+#ifdef KM_USE_TIMIDITY
+#include <tse3/Plt/libTimidity.h>
+#include "KMTimidity.h"
+#endif
+
 #include <string>
 #include <map>
 
@@ -50,6 +56,7 @@ private:
     int idxstart_, idxend_;
     std::string text_;
 };
+
 
 /**
  * @class KMSong_TSE3
@@ -86,7 +93,10 @@ private:
 
     TSE3::Song *song_;
     TSE3::Metronome                 metronome_;
-#ifdef __WIN32__
+// use timidity
+#ifdef KM_USE_TIMIDITY
+    static TSE3::Plt::TimidityMidiScheduler scheduler_;
+#elif defined(__WIN32__)
     static TSE3::Plt::Win32MidiScheduler   scheduler_;
 #elif defined(GP2X)
     //static TSE3::Plt::OSSMidiScheduler      scheduler_;

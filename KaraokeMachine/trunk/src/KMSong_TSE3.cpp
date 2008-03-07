@@ -3,6 +3,7 @@
 #include <tse3/TextTrack.h>
 #include <tse3/Track.h>
 #include <tse3/MidiParams.h>
+#include <tse3/Error.h>
 #include <fstream>
 
 namespace KaraokeMachine {
@@ -33,7 +34,11 @@ private:
 // CLASS
 //      KMSong_TSE3
 /////////////////////////////////
-#ifdef __WIN32__
+
+// use timidity
+#ifdef KM_USE_TIMIDITY
+TSE3::Plt::TimidityMidiScheduler KMSong_TSE3::scheduler_(KM_Timidity::get()->GetSong());
+#elif defined(__WIN32__)
 TSE3::Plt::Win32MidiScheduler KMSong_TSE3::scheduler_;
 #elif defined(GP2X)
 //TSE3::Plt::OSSMidiScheduler KMSong_TSE3::scheduler_;
@@ -135,6 +140,11 @@ void KMSong_TSE3::LoadLyrics()
 
 bool KMSong_TSE3::Play()
 {
+// use timidity
+#ifdef KM_USE_TIMIDITY
+    scheduler_.SetSong(KM_Timidity::get()->InitSong());
+#endif
+
     transport_.play(song_, 0);
     return true;
 }
@@ -142,6 +152,12 @@ bool KMSong_TSE3::Play()
 bool KMSong_TSE3::Stop()
 {
     transport_.stop();
+// use timidity
+#ifdef KM_USE_TIMIDITY
+    scheduler_.SetSong(NULL);
+    KM_Timidity::get()->StopSong();
+#endif
+
     return false;
 }
 
@@ -154,7 +170,15 @@ bool KMSong_TSE3::Poll()
 {
     if (transport_.status() == TSE3::Transport::Resting) return false;
 
+// use timidity
+#ifdef KM_USE_TIMIDITY
+    KM_Timidity::get()->Lock();
+#endif
     transport_.poll();
+// use timidity
+#ifdef KM_USE_TIMIDITY
+    KM_Timidity::get()->Unlock();
+#endif
 
 
     int ppos=song_->textTrack()->index(transport_.scheduler()->clock(), false);

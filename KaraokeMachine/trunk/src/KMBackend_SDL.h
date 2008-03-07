@@ -10,6 +10,11 @@
 #include <SDL_thread.h>
 #include <SDL_mutex.h>
 
+// use timidity
+#ifdef KM_USE_TIMIDITY
+#include "KMTimidity.h"
+#endif
+
 namespace KaraokeMachine {
 
 class KMBackendThread_SDL : public KMBackendThread {
@@ -32,11 +37,14 @@ public:
     virtual bool Loop(KMachine &machine);
     virtual void SkipImage();
     virtual KMBackendThread* CreateThread(KMBackendThreadProcess *process);
+
+    SDL_mutex *GetMutex() { return mutex_; }
 private:
     int displaywidth_, displayheight_, fontsize_;
     int FPS, lastFPS, pastFPS, past;
     SDL_Surface *screen_, *bg_;
     TTF_Font *font_;
+    SDL_mutex *mutex_;
 };
 
 };

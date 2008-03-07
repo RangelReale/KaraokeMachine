@@ -32,11 +32,13 @@
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
+			<Add option="-DNOTKM_USE_TIMIDITY" />
 			<Add directory="$(#sdl.include)" />
 			<Add directory="$(#sdl_ttf.include)" />
 			<Add directory="$(#tse3.include)" />
 			<Add directory="$(#sdl_image.include)" />
 			<Add directory="$(#boost.include)" />
+			<Add directory="$(#libtimidity.include)" />
 		</Compiler>
 		<Linker>
 			<Add library="mingw32" />
@@ -51,11 +53,13 @@
 			<Add library="dxguid" />
 			<Add library="boost_filesystem-$(#boost.suffix)" />
 			<Add library="boost_program_options-$(#boost.suffix)" />
+			<Add library="timidity" />
 			<Add directory="$(#sdl.lib)" />
 			<Add directory="$(#sdl_ttf.lib)" />
 			<Add directory="$(#tse3.lib)" />
 			<Add directory="$(#sdl_image.lib)" />
 			<Add directory="$(#boost.lib)" />
+			<Add directory="$(#libtimidity.lib)" />
 		</Linker>
 		<Unit filename="cb.bmp" />
 		<Unit filename="src\KMBackend.cpp" />
@@ -73,6 +77,8 @@
 		<Unit filename="src\KMSongFactory.h" />
 		<Unit filename="src\KMSong_TSE3.cpp" />
 		<Unit filename="src\KMSong_TSE3.h" />
+		<Unit filename="src\KMTimidity.cpp" />
+		<Unit filename="src\KMTimidity.h" />
 		<Unit filename="src\KMUtil.cpp" />
 		<Unit filename="src\KMUtil.h" />
 		<Unit filename="src\KMachine.cpp" />
