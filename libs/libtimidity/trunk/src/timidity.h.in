@@ -67,6 +67,12 @@ extern "C"
   typedef struct _MidIStream MidIStream;
   typedef struct _MidDLSPatches MidDLSPatches;
   typedef struct _MidSong MidSong;
+  typedef struct _MidEvent MidEvent;
+  struct _MidEvent
+  {
+    sint32 time;
+    uint8 channel, type, a, b;
+  };
 
   typedef struct _MidSongOptions MidSongOptions;
   struct _MidSongOptions
