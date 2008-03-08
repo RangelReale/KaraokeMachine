@@ -23,7 +23,7 @@
 
 // use timidity
 #ifdef KM_USE_TIMIDITY
-#include <tse3/Plt/libTimidity.h>
+#include <tse3/plt/libTimidity.h>
 #include "KMTimidity.h"
 #endif
 

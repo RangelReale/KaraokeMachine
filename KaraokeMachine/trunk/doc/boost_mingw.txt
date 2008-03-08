@@ -8,6 +8,12 @@ WINDOWS
 	include=$(#boost)
 	lib=$(#boost)/stage/lib
 
+-----------------
+LINUX
+-----------------
+- boost
+	include=$(#boost)
+	lib=$(#boost)/stage/lib
 
 =================
 COMPILATION
@@ -20,3 +26,37 @@ WINDOWS
 # ./build.sh
 - go back to root dir
 # tools/jam/src/bin.ntx86/bjam toolset=gcc variant=release threading=multi link=static stage
+
+-----------------
+LINUX
+-----------------
+- cd tools/jam/src
+# ./build.sh
+- go back to root dir
+# tools/jam/src/bin.linuxx86/bjam toolset=gcc variant=release threading=multi link=static stage
+
+-----------------
+GP2x in WINDOWS
+-----------------
+- using msys
+- cd tools/jam/src
+# ./build.sh
+- go back to root dir
+- replace line on user-config.jam
+using gcc : 4.0.2arm : arm-linux-g++.exe : <root>/c/devkitGP2X <target-os>unix ;
+- edit tools/build/v2/tools/gcc.jam, comment line:
+flags gcc OPTIONS <threading>multi : -mthreads ;
+# tools/jam/src/bin.ntx86/bjam --user-config=user-config.jam toolset=gcc variant=release threading=multi link=static stage
+
+-----------------
+GP2X in LINUX
+-----------------
+- cd tools/jam/src
+# ./build.sh
+- go back to root dir
+# <load environment>
+- replace line on user-config.jam
+using gcc : 4.0.2arm : arm-open2x-linux-g++ : <root>/opt/open2x <target-os>unix ;
+# tools/jam/src/bin.linuxx86/bjam --user-config=user-config.jam toolset=gcc variant=release threading=multi link=static stage
+
+

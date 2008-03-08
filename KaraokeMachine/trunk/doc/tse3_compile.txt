@@ -11,7 +11,7 @@ UNIX
 
 
 == TIMIDITY SUPPORT ==
---with-timidity --with-timidity-path=<root path of libtimidity>
+CFLAGS="-I<full path to libtimidity>/src" --with-timidity --with-timidity-path=<root path of libtimidity>
 
 
 == GP2X SUPPORT ==
