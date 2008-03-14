@@ -7,10 +7,16 @@
 namespace KaraokeMachine {
 
 class KMBackendThreadProcess {
+public:
+    KMBackendThreadProcess() { iscancel_=false; }
+    void Cancel() { iscancel_=true; }
 protected:
     virtual void Run() = 0;
+    bool IsCancel() { return iscancel_; }
 
     friend class KMBackendThread;
+private:
+    bool iscancel_;
 };
 
 class KMBackendThread {

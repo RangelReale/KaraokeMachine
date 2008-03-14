@@ -348,6 +348,7 @@ void KMachine::DoStop()
 {
     if (playing_)
     {
+        StopSong();
         playing_->Stop();
         delete playing_;
         playing_=NULL;

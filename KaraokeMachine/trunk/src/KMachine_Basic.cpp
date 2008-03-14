@@ -16,13 +16,13 @@ private:
 void KMachinePlaySongProcess::Run()
 {
     song_->Play();
-    while (song_->Poll())
+    while (!IsCancel() && song_->Poll())
         kmutil_usleep(100);
 }
 
 
 KMachine_Basic::KMachine_Basic(KMBackend &backend) :
-    KMachine(), backend_(&backend)
+    KMachine(), backend_(&backend), songplayprocess_(NULL)
 {
 
 
@@ -52,8 +52,17 @@ void KMachine_Basic::DoRun()
 
 void KMachine_Basic::PlaySong(KMSong *song)
 {
-    KMachinePlaySongProcess *ps=new KMachinePlaySongProcess(song);
-    backend_->CreateThread(ps);
+    songplayprocess_=new KMachinePlaySongProcess(song);
+    backend_->CreateThread(songplayprocess_);
+}
+
+void KMachine_Basic::StopSong()
+{
+    if (songplayprocess_)
+    {
+        songplayprocess_->Cancel();
+        songplayprocess_=NULL;
+    }
 }
 
 };

@@ -18,8 +18,10 @@ public:
 protected:
     virtual void DoRun();
     virtual void PlaySong(KMSong *song);
+    virtual void StopSong();
 private:
     KMBackend *backend_;
+    KMBackendThreadProcess *songplayprocess_;
 };
 
 };

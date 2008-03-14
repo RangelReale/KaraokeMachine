@@ -152,9 +152,12 @@ bool KMSong_TSE3::Play()
 bool KMSong_TSE3::Stop()
 {
     transport_.stop();
+
 // use timidity
 #ifdef KM_USE_TIMIDITY
+    KM_Timidity::get()->Lock();
     scheduler_.SetSong(NULL);
+    KM_Timidity::get()->Unlock();
     KM_Timidity::get()->StopSong();
 #endif
 

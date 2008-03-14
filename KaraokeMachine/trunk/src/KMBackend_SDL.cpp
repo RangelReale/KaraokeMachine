@@ -307,7 +307,16 @@ bool KMBackend_SDL::Loop(KMachine &machine)
     // DRAWING STARTS HERE
 
     // clear screen
+    /* Lock the screen for direct access to the pixels */
+    if ( SDL_MUSTLOCK(screen_) ) {
+        if ( SDL_LockSurface(screen_) < 0 ) {
+            throw KMException( kmutil_format("Can't lock screen: %s", SDL_GetError()) );
+        }
+    }
     SDL_FillRect(screen_, 0, SDL_MapRGB(screen_->format, 0, 0, 0));
+    if ( SDL_MUSTLOCK(screen_) ) {
+        SDL_UnlockSurface(screen_);
+    }
 
     if (bg_)
     {

@@ -31,7 +31,7 @@
 		<Compiler>
 			<Add option="-Wall" />
 			<Add option="-Wno-non-virtual-dtor" />
-			<Add option="-DNOKM_USE_TIMIDITY" />
+			<Add option="-DKM_USE_TIMIDITY" />
 			<Add directory="$(#sdl.include)" />
 			<Add directory="$(#sdl_ttf.include)" />
 			<Add directory="$(#tse3.include)" />
