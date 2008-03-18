@@ -62,7 +62,11 @@ KMBackend_SDL::KMBackend_SDL() :
     aspec.freq=KM_Timidity::get()->GetSongOptions()->rate;
     aspec.format=(KM_Timidity::get()->GetSongOptions()->format==MID_AUDIO_S16?AUDIO_S16:AUDIO_S8);
     aspec.channels=KM_Timidity::get()->GetSongOptions()->channels;
+#ifndef GP2X
     aspec.samples=2048;
+#else
+    aspec.samples=128;
+#endif
     aspec.callback=KMBackend_SDL_AudioCallback;
     aspec.userdata=this;
 

@@ -20,7 +20,11 @@ KM_Timidity::KM_Timidity() :
 #endif
     options_.format = MID_AUDIO_S16;
     options_.channels = 2;
+#ifndef GP2X
     options_.buffer_size = options_.rate;
+#else
+    options_.buffer_size = 64;
+#endif
 
     // initialize timidity
     if (mid_init (NULL) < 0)
