@@ -53,10 +53,11 @@
 			<Add library="boost_filesystem-$(#gp2x_boost.suffix)" />
 			<Add library="boost_program_options-$(#gp2x_boost.suffix)" />
 			<Add library="jpeg" />
-			<Add library="z" />
 			<Add library="png12" />
 			<Add library="freetype" />
 			<Add library="timidity" />
+			<Add library="m" />
+			<Add library="z" />
 			<Add directory="$(#gp2x_sdl.lib)" />
 			<Add directory="$(#gp2x_sdl_ttf.lib)" />
 			<Add directory="$(#gp2x_tse3.lib)" />
