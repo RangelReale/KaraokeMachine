@@ -423,7 +423,7 @@ else
   timidity_path="$withval"
   CFLAGS="$CFLAGS -I$timidity_path/src"
   CPPFLAGS="$CPPFLAGS -I$timidity_path/src"
-#  LDFLAGS="$LDFLAGS -L$timidity_path/src/.libs"
+  LDFLAGS="$LDFLAGS -L$timidity_path/src"
 fi], [AC_MSG_RESULT(yes); timidity_path_ok="yes"])
 
 
@@ -496,4 +496,5 @@ AC_OUTPUT(
     src/examples/midifile/Makefile  \
     src/examples/ports/Makefile     \
     src/examples/recording/Makefile \
+    src/examples/timidity/Makefile  \
 )
