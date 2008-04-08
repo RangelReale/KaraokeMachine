@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <windows.h>
+//#include <windows.h>
 #include <SDL.h>
 #include "SDL_thread.h"
 #include "timidity.h"

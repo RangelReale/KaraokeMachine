@@ -722,7 +722,16 @@ void mid_song_event (MidSong *song, MidEvent *event)
         /* Effects affecting a single note */
 
         case ME_NOTEON:
-          if (!(event->b)) /* Velocity 0? */
+		if (ISDRUMCHANNEL(song, event->channel)) {
+			/* Mark this instrument to be loaded */
+			if (!(song->drumset[0]->instrument[event->a]))
+			{
+				song->drumset[0]->instrument[event->a] = MAGIC_LOAD_INSTRUMENT;
+				load_missing_instruments(song);
+			}
+		}
+
+	if (!(event->b)) /* Velocity 0? */
             evt_note_off(song, event);
           else
             evt_note_on(song, event);
@@ -771,16 +780,16 @@ void mid_song_event (MidSong *song, MidEvent *event)
         case ME_PROGRAM:
           if (ISDRUMCHANNEL(song, event->channel)) {
 #if 0
-              /* Mark this instrument to be loaded */
-              if (!(song->drumset[0]->instrument[event->a]))
-              {
-                song->drumset[0]->instrument[event->a] = MAGIC_LOAD_INSTRUMENT;
-                load_missing_instruments(song);
-              }
+// THIS IS NOT HERE!
+	      /* Mark this instrument to be loaded */
+	      if (!(song->drumset[0]->instrument[event->a]))
+	      {
+		song->drumset[0]->instrument[event->a] = MAGIC_LOAD_INSTRUMENT;
+		load_missing_instruments(song);
+	      }
 #endif
-
-            /* Change drum set */
-            //song->channel[event->channel].bank = event->a;
+	    /* Change drum set */
+	    song->channel[event->channel].bank = event->a;
           }
           else
           {
