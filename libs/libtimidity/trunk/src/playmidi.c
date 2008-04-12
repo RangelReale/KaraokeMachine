@@ -779,17 +779,9 @@ void mid_song_event (MidSong *song, MidEvent *event)
 
         case ME_PROGRAM:
           if (ISDRUMCHANNEL(song, event->channel)) {
-#if 0
-// THIS IS NOT HERE!
-	      /* Mark this instrument to be loaded */
-	      if (!(song->drumset[0]->instrument[event->a]))
-	      {
-		song->drumset[0]->instrument[event->a] = MAGIC_LOAD_INSTRUMENT;
-		load_missing_instruments(song);
-	      }
-#endif
 	    /* Change drum set */
-	    song->channel[event->channel].bank = event->a;
+	    if (song->drumset[event->a])
+		song->channel[event->channel].bank = event->a;
           }
           else
           {
