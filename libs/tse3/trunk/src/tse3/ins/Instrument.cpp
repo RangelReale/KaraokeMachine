@@ -524,9 +524,12 @@ void InstrumentData::load(const std::string &secname, std::istream &in)
                         std::istringstream si(line);
                         si >> no;
                     }
-                    std::string title = line.substr(line.find('=')+1);
-                    delete _names[no];
-                    _names[no] = new std::string(title);
+                    if (no>=0 && no<128)
+                    {
+                        std::string title = line.substr(line.find('=')+1);
+                        delete _names[no];
+                        _names[no] = new std::string(title);
+                    }
                 }
             }
         }
