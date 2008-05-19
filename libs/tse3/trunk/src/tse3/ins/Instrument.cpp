@@ -98,7 +98,7 @@ Instrument::Instrument(const std::string &title, const std::string &filename,
   _bankSelMethod(0), _useNotesAsControllers(false),
   _control(0), _rpn(0), _nrpn(0)
 {
-    std::ifstream in(filename.c_str());
+    std::ifstream in(filename.c_str(), std::ios::in|std::ios::binary); // mingw have a bug in text file reading, must read as binary
     if (in.good())
     {
         load(in, p);
@@ -569,7 +569,7 @@ const std::list<std::string> &CakewalkInstrumentFile::instruments
     {
         size_t progressCount = 0;
         searched_yet = true;
-        std::ifstream in(filename.c_str());
+        std::ifstream in(filename.c_str(), std::ios::in|std::ios::binary); // mingw have a bug in text file reading, must read as binary
         if (!in.good())
         {
             return ins;
