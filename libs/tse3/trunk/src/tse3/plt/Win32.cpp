@@ -100,12 +100,14 @@ Win32MidiScheduler::Win32MidiScheduler()
        if (i < nMidiIn)
        {
          if (midiInOpen(&(hMidi[i].in), i, 0, 0, 0) != MMSYSERR_NOERROR)
-            throw TSE3::MidiSchedulerError(MidiSchedulerCreateErr);
+            hMidi[i].in=NULL;
+            //throw TSE3::MidiSchedulerError(MidiSchedulerCreateErr);
        }
        else
        {
          if (midiOutOpen(&(hMidi[i].out), i - nMidiIn, 0, 0, 0) != MMSYSERR_NOERROR)
-            throw TSE3::MidiSchedulerError(MidiSchedulerCreateErr);
+            hMidi[i].out=NULL;
+            //throw TSE3::MidiSchedulerError(MidiSchedulerCreateErr);
        }
        addPort(i, false, i);
     }
@@ -144,15 +146,18 @@ const char* Win32MidiScheduler::impl_portName(int port) const
 {
   if (port > numPorts())
     return NULL;
-  else if (port < midiInGetNumDevs()) {
-    MIDIINCAPS m;
-    midiInGetDevCaps(port, &m, sizeof(m));
-    return m.szPname;
-  } else {
-    MIDIOUTCAPS m;
-    midiOutGetDevCaps(port - midiInGetNumDevs(), &m, sizeof(m));
-    return m.szPname;
-  }
+
+  if (hMidi[numberToIndex(port)].portname.empty())
+      if (port < midiInGetNumDevs()) {
+        MIDIINCAPS m;
+        midiInGetDevCaps(port, &m, sizeof(m));
+        hMidi[numberToIndex(port)].portname=m.szPname;
+      } else {
+        MIDIOUTCAPS m;
+        midiOutGetDevCaps(port - midiInGetNumDevs(), &m, sizeof(m));
+        hMidi[numberToIndex(port)].portname=m.szPname;
+      }
+  return hMidi[numberToIndex(port)].portname.c_str();
 }
 
 const char* Win32MidiScheduler::impl_portType(int port) const

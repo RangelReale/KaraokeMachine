@@ -19,6 +19,7 @@
 
 #include "tse3/MidiScheduler.h"
 #include <Windows.h>
+#include <string>
 
 using namespace std;
 
@@ -117,11 +118,16 @@ namespace TSE3
 
             private:
 
-              union HMIDI
+              typedef struct HMIDI
               {
-                  HMIDIOUT out;
-                  HMIDIIN  in;
+                  union
+                  {
+                      HMIDIOUT out;
+                      HMIDIIN  in;
+                  };
+                  string portname;
               };
+
               HMIDI   *hMidi;
               UINT     nMidi;
               Clock wstartClock;
