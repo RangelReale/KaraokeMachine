@@ -261,6 +261,25 @@ namespace TSE3
             void setTranspose(int t);
 
             /**
+             * Returns the channel ignored for tranpose.
+             * used mainly to avoid transposing the drum channel
+             *
+             * This can range between 0 and 15
+             *
+             * @return The transpose ignore channel value
+             * @see    setTransposeIgnoreChannel
+             */
+            int transposeIgnoreChannel() const { return _transposeIgnoreChannel; }
+
+            /**
+             * Set the transport ignore channel.
+             *
+             * @param t New transport ignore channel
+             * @see   transposeIgnoreChannel
+             */
+            void setTransposeIgnoreChannel(int t);
+
+            /**
              * Returns the minimum velocity window value. Note @ref MidiEvents
              * with veloicties below this value will have their velocity set
              * to this value. This is useful to prevent quiet notes from
@@ -351,6 +370,7 @@ namespace TSE3
             Clock        _minLength;
             Clock        _maxLength;
             int          _transpose;
+            int          _transposeIgnoreChannel;
             int          _minVelocity;
             int          _maxVelocity;
             int          _velocityScale;

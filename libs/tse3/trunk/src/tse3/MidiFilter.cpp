@@ -46,7 +46,7 @@ MidiFilter::MidiFilter()
   _channel(MidiCommand::SameChannel), _port(MidiCommand::SamePort),
   _offset(0), _timeScale(100), _quantise(0),
   _minLength(0), _maxLength(-1),
-  _transpose(0),
+  _transpose(0), _transposeIgnoreChannel(-1),
   _minVelocity(0), _maxVelocity(127), _velocityScale(100)
 {
 }
@@ -59,7 +59,7 @@ MidiFilter:: MidiFilter(const MidiFilter &s)
   _channel(s._channel), _port(s._port),
   _offset(s._offset), _timeScale(s._timeScale), _quantise(s._quantise),
   _minLength(s._minLength), _maxLength(s._maxLength),
-  _transpose(s._transpose),
+  _transpose(s._transpose), _transposeIgnoreChannel(s._transposeIgnoreChannel),
   _minVelocity(s._minVelocity), _maxVelocity(s._maxVelocity),
   _velocityScale(s._velocityScale)
 {
@@ -80,6 +80,7 @@ MidiFilter &MidiFilter::operator=(const MidiFilter &s)
     _minLength     = s._minLength;
     _maxLength     = s._maxLength;
     _transpose     = s._transpose;
+    _transposeIgnoreChannel = s._transposeIgnoreChannel;
     _minVelocity   = s._minVelocity;
     _maxVelocity   = s._maxVelocity;
     _velocityScale = s._velocityScale;
@@ -195,6 +196,14 @@ void MidiFilter::setTranspose(int t)
            MidiFilterListener::TransposeChanged);
 }
 
+void MidiFilter::setTransposeIgnoreChannel(int t)
+{
+    Impl::CritSec cs;
+
+    if (t >= 0 && t <= 15) _transposeIgnoreChannel = t;
+    notify(&MidiFilterListener::MidiFilter_Altered,
+           MidiFilterListener::TransposeChanged);
+}
 
 void MidiFilter::setMinVelocity(int v)
 {
@@ -292,6 +301,7 @@ MidiEvent MidiFilter::filter(const MidiEvent &event) const
         || e.data.status == MidiCommand_KeyPressure)
     {
         // Transpose
+        if (_transposeIgnoreChannel == -1 || _transposeIgnoreChannel != e.data.channel)
         {
             int note = e.data.data1 + _transpose;
             if (note >= 0 && note <= 127)
