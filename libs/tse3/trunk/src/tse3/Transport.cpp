@@ -169,7 +169,7 @@ void Transport::play(Playable *p, Clock start)
     while (pi->more())
     {
         _scheduler->tx(*(*pi));
-        callback_MidiOut((*pi)->data);
+        callback_MidiOut(*(*pi));
         ++(*pi);
     }
     delete pi;
@@ -245,7 +245,7 @@ void Transport::record(Playable *p, Clock start, PhraseEdit *pe,
     while (pi->more())
     {
         _scheduler->tx(*(*pi));
-        callback_MidiOut((*pi)->data);
+        callback_MidiOut(*(*pi));
         ++(*pi);
     }
     delete pi;
@@ -288,7 +288,7 @@ void Transport::stop()
     while (pi->more())
     {
         _scheduler->tx(*(*pi));
-        callback_MidiOut((*pi)->data);
+        callback_MidiOut(*(*pi));
         ++(*pi);
     }
     delete pi;
@@ -410,7 +410,7 @@ void Transport::poll()
             e = _scheduler->rx();
         }
         _midiEcho.echo(e);
-        callback_MidiIn(e.data);
+        callback_MidiIn(e);
         //mixer->processCommand_in(e);
 
         // We're not implementing a basic channel/port as in TSE2
@@ -524,7 +524,7 @@ void Transport::pollPlayback()
                      */
                     e = _filter.filter(e);
                     _scheduler->tx(e);
-                    callback_MidiOut(e.data);
+                    callback_MidiOut(e);
                     if (e.data.status == MidiCommand_NoteOn)
                     {
                         MidiEvent offEvent(e.offData, e.offTime);
@@ -574,7 +574,7 @@ void Transport::pollPlayback()
                         }
                         case MidiCommand_TSE_Meta_Text:
                         {
-                            callback_MidiOut(e.data);
+                            callback_MidiOut(e);
                             break;
                         }
                     }
@@ -656,14 +656,14 @@ namespace
     class NotifyMidiOut
     {
         public:
-            NotifyMidiOut(MidiCommand command)
-                : command(command) {}
+            NotifyMidiOut(MidiEvent event)
+                : event(event) {}
             void operator()(TransportCallback *c)
             {
-                c->Transport_MidiOut(command);
+                c->Transport_MidiOut(event);
             }
         private:
-            MidiCommand command;
+            MidiEvent event;
     };
 
     /**
@@ -672,27 +672,27 @@ namespace
     class NotifyMidiIn
     {
         public:
-            NotifyMidiIn(MidiCommand command)
-                : command(command) {}
+            NotifyMidiIn(MidiEvent event)
+                : event(event) {}
             void operator()(TransportCallback *c)
             {
-                c->Transport_MidiIn(command);
+                c->Transport_MidiIn(event);
             }
         private:
-            MidiCommand command;
+            MidiEvent event;
     };
 }
 
 
-void Transport::callback_MidiOut(MidiCommand c)
+void Transport::callback_MidiOut(MidiEvent e)
 {
-    for_each(callbacks.begin(), callbacks.end(), NotifyMidiOut(c));
+    for_each(callbacks.begin(), callbacks.end(), NotifyMidiOut(e));
 }
 
 
-void Transport::callback_MidiIn(MidiCommand c)
+void Transport::callback_MidiIn(MidiEvent e)
 {
-    for_each(callbacks.begin(), callbacks.end(), NotifyMidiIn(c));
+    for_each(callbacks.begin(), callbacks.end(), NotifyMidiIn(e));
 }
 
 

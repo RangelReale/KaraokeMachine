@@ -72,13 +72,25 @@ namespace TSE3
              * Called when some MIDI input has been recieved by the
              * @ref Transport object.
              */
-            virtual void Transport_MidiIn(MidiCommand c) = 0;
+            virtual void Transport_MidiIn(MidiCommand c) {}
+
+            /**
+             * Called when some MIDI input has been recieved by the
+             * @ref Transport object.
+             */
+            virtual void Transport_MidiIn(MidiEvent e) { Transport_MidiIn(e.data); }
 
             /**
              * Called when some MIDI output has been sent by the @ref Transport
              * object.
              */
-            virtual void Transport_MidiOut(MidiCommand c) = 0;
+            virtual void Transport_MidiOut(MidiCommand c) {}
+
+            /**
+             * Called when some MIDI output has been sent by the @ref Transport
+             * object.
+             */
+            virtual void Transport_MidiOut(MidiEvent e) { Transport_MidiOut(e.data); }
 
         private:
 

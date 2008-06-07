@@ -559,12 +559,12 @@ namespace TSE3
             /**
              * Sends Transport_MidiOut to all attached callbacks.
              */
-            void callback_MidiOut(MidiCommand c);
+            void callback_MidiOut(MidiEvent e);
 
             /**
              * Sends Transport_MidiIn to all attached callbacks.
              */
-            void callback_MidiIn(MidiCommand c);
+            void callback_MidiIn(MidiEvent e);
 
             /**
              * A single handler for every MidiSchedulerEvent except
