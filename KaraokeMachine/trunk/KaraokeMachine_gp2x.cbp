@@ -58,6 +58,7 @@
 			<Add library="timidity" />
 			<Add library="m" />
 			<Add library="z" />
+			<Add library="dl" />
 			<Add directory="$(#gp2x_sdl.lib)" />
 			<Add directory="$(#gp2x_sdl_ttf.lib)" />
 			<Add directory="$(#gp2x_tse3.lib)" />
