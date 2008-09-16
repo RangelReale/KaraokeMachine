@@ -471,11 +471,11 @@ namespace TSE3
                 {
                     listener_type *l
                         = static_cast<listener_type*>(listeners[i]);
-#ifndef _MSC_VER
 					l->NotifierImpl_Deleted
+#ifndef _MSC_VER
                         (static_cast<c_notifier_type*>(this));
 #else
-#pragma message("MUST FIX THIS!")
+                        (reinterpret_cast<c_notifier_type*>(this));
 #endif
                 }
             }
@@ -674,7 +674,12 @@ namespace TSE3
              */
             void NotifierImpl_Deleted(c_notifier_type *src)
             {
-                notifiers.erase(static_cast<notifier_type*>(src));
+                notifiers.erase(
+#ifndef _MSC_VER
+					static_cast<notifier_type*>(src));
+#else
+					reinterpret_cast<notifier_type*>(src));
+#endif
                 this->Notifier_Deleted(src);
             }
 
