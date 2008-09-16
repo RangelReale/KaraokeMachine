@@ -365,7 +365,7 @@ void MidiFileImportIterator::importMeta(int c)
             int cc; cc = *(mtrkpos[c]++);
             int bb; bb = *(mtrkpos[c]++);
             length -= 4;
-            dd = (int) pow(2, dd);
+            dd = (int) pow((float)2.0, dd);
             mtrkcommand[c] = MidiCommand(MidiCommand_TSE_Meta, 0, 0,
                                          MidiCommand_TSE_Meta_TimeSig,
                                          (nn << 4) | dd);
@@ -793,7 +793,7 @@ void MidiFileImport::loadMeta(size_t &pos, Song *song, Track *track,
             int cc; cc = file[pos++];
             int bb; bb = file[pos++];
             length -= 4;
-            dd = (int) pow(2, dd);
+            dd = (int) pow((float)2.0, dd);
             if (verbose >= 2)
                 out << "timesig event (" << nn << "/" << dd << ")";
             if (time == 0)

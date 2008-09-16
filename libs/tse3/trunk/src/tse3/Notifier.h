@@ -471,8 +471,12 @@ namespace TSE3
                 {
                     listener_type *l
                         = static_cast<listener_type*>(listeners[i]);
-                    l->NotifierImpl_Deleted
+#ifndef _MSC_VER
+					l->NotifierImpl_Deleted
                         (static_cast<c_notifier_type*>(this));
+#else
+#pragma message("MUST FIX THIS!")
+#endif
                 }
             }
 

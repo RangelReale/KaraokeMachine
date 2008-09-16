@@ -133,7 +133,7 @@ namespace TSE3
               Clock wstartClock;
 
               void runMidiData(HMIDIOUT, MidiCommand);
-	      static CALLBACK void callback(UINT, UINT, DWORD, DWORD, DWORD);
+	      static void CALLBACK callback(UINT, UINT, DWORD, DWORD, DWORD);
         };
 
     }
